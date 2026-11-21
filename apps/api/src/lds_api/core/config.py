@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     # Signature des licences (Ed25519) — clé privée PEM en base64, identifiant de clé
     licence_signing_key: SecretStr = SecretStr("")
     licence_key_id: str = "lds-2027-1"
+    # Anciennes clés publiques encore acceptées après une rotation : « kid:clé_base64url,… »
+    licence_previous_public_keys: str = ""
 
     # Fournisseurs (interfaces + simulateurs)
     sms_provider: Literal["simulator", "console"] = "simulator"
