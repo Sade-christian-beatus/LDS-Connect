@@ -1,0 +1,43 @@
+# Surcouche de développement local (fusionnée automatiquement par `docker compose up`).
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  redis:
+    ports:
+      - "127.0.0.1:6379:6379"
+
+  api:
+    command: ["uvicorn", "lds_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--app-dir", "src"]
+    environment:
+      ENVIRONMENT: development
+      SMTP_HOST: mailpit
+      SMS_SIMULATOR_URL: http://simulateurs:8090
+      PAYMENT_SIMULATOR_URL: http://simulateurs:8090
+    volumes:
+      - ./apps/api/src:/app/src
+      - ./apps/api/migrations:/app/migrations
+      - ./apps/api/tests:/app/tests
+
+  web:
+    build:
+      target: deps
+    command: ["sh", "-c", "pnpm dev --hostname 0.0.0.0"]
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:8025:8025"   # interface web
+      - "127.0.0.1:1025:1025"   # SMTP
+
+  simulateurs:
+    build: ./apps/simulateurs
+    ports:
+      - "127.0.0.1:8090:8090"   # boîte de réception SMS + paiements simulés

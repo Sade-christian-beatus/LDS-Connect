@@ -1,0 +1,34 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+apps/api/var/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+apps/web/test-results/
+apps/web/playwright-report/
+
+# Divers
+.DS_Store
+backups/
+
+# Instantanés Redis locaux
+dump.rdb
+
+# Service worker généré au build
+apps/web/public/sw.js
+apps/web/public/sw.js.map
