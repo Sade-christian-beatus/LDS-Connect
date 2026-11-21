@@ -69,7 +69,7 @@ install-local: ## Installe les dépendances Python et Node
 	cd $(WEB_DIR) && pnpm install
 
 dev-local: ## Lance API et web sans Docker
-	@echo "API : http://localhost:8000/docs — Web : http://localhost:3000"
+	@echo "API : http://localhost:8000/api/v1/docs — Web : http://localhost:3000"
 	@(cd $(API_DIR) && uv run uvicorn lds_api.main:app --reload --port 8000) & \
 	 (cd $(WEB_DIR) && pnpm dev) ; wait
 

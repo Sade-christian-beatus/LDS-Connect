@@ -2,7 +2,7 @@
 import "server-only";
 import { connection } from "next/server";
 
-const API = process.env.API_INTERNAL_URL ?? "http://localhost:8000";
+const API = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:8000";
 
 export class ApiUnavailable extends Error {}
 
