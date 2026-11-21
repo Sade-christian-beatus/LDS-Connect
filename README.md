@@ -44,14 +44,16 @@ make seed      # saison 2027, 17 régions, 2 poules, 20 équipes, comptes et jou
 Mot de passe commun : `Lds2027-demo` (refusé en production : le seed de démonstration ne
 s'exécute pas si `ENVIRONMENT=production`).
 
-| Compte | Rôle | Écran |
+| Compte | Rôle | Arrivée après connexion |
 |---|---|---|
-| `superadmin@lds.local` | super_admin (Secrétariat exécutif) | API complète |
-| `admin@lds.local` | admin_competition | API (calendrier, licences, clôture des feuilles) |
-| `club.vinnim@lds.local` | gestionnaire_club (Vinnim du Kadiogo uniquement) | API (effectif) |
-| `delegue@lds.local` | delegue_match | `/delegue` — feuille de match |
-| `technique@lds.local` | cellule_technique | API (lecture) |
+| `superadmin@lds.local` | super_admin (Secrétariat exécutif) | `/admin/equipes` — tout le back-office |
+| `admin@lds.local` | admin_competition | `/admin/equipes` — registre, licences, calendrier, journal |
+| `club.vinnim@lds.local` | gestionnaire_club (Vinnim du Kadiogo uniquement) | fiche de son équipe |
+| `delegue@lds.local` | delegue_match | `/delegue` — feuilles de match |
+| `technique@lds.local` | cellule_technique | `/admin/equipes` (lecture) |
 | `controle@lds.local` | controleur_acces | `/controle` — contrôle des licences |
+
+Connexion : http://localhost:3000/connexion (lien « Espace officiels » en bas du site public).
 
 Les joueurs et encadreurs du seed sont **fictifs** (noms tirés au hasard, CNIB « X… »,
 téléphones « +226 00… »). Aucun logo officiel n'est intégré : les équipes sont représentées
@@ -71,6 +73,10 @@ par leurs initiales et une couleur, en attendant les fichiers et l'accord de la 
 - **Classements** automatiques, critères de départage paramétrables par saison.
 - **Site public** : accueil avec scores en direct, calendrier, résultats, classements, pages
   équipes (données des joueurs limitées : la compétition compte des mineurs).
+- **Back-office** (`/admin`) : tableau de bord des 20 équipes, fiches équipes (joueurs,
+  encadreurs, vérification des résidences, données sensibles en consultation journalisée),
+  licences (délivrance, carte imprimable, suspension), calendrier (génération, stades,
+  horaires, tableau final), journal d'audit. Chaque rôle ne voit que ce qui le concerne.
 
 Toutes les règles sportives sont dans la table `competition_rules` (une ligne par saison).
 
