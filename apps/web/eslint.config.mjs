@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Fichiers générés (service worker, types OpenAPI) et résultats de tests
+    "public/sw.js",
+    "src/lib/api-schema.ts",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 
