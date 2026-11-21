@@ -27,8 +27,9 @@ def test_public_keys_are_exposed_without_auth(client, seeded):
 
 
 def test_issue_all_and_verify(client, db, as_admin, as_controller):
+    # Le seed de démonstration a déjà délivré les 37 licences : rien de plus à émettre
     t, result = issue_team(client, db, as_admin)
-    assert result == {"issued": 37, "errors": []}
+    assert result == {"issued": 0, "errors": []}
 
     lics = client.get(f"/api/v1/admin/teams/{t.id}/licences", headers=as_admin).json()
     assert len(lics) == 37
@@ -95,3 +96,35 @@ def test_qr_svg(client, db, as_admin, as_club):
     r = client.get(f"/api/v1/admin/licences/{lic['id']}/qr.svg", headers=as_club)
     assert r.status_code == 200 and r.headers["content-type"].startswith("image/svg+xml")
     assert r.text.startswith("<svg")
+
+
+def test_issue_for_new_player_and_released_player_revoked(client, db, as_admin):
+    t = vinnim(db)
+    squad = client.get(f"/api/v1/admin/teams/{t.id}/squad", headers=as_admin).json()
+    leaving = next(m for m in squad["members"] if m["kind"] == "player")
+    client.post(f"/api/v1/admin/persons/{leaving['person_id']}/release", headers=as_admin)
+    status = client.post(
+        "/api/v1/licences/verify", json={"token": leaving_token(db, leaving)}, headers=as_admin
+    ).json()["status"]
+    assert status == "revoked"
+
+    new = {
+        "first_name": "Nouveau",
+        "last_name": "Joueur",
+        "birth_date": "2008-05-05",
+        "position": "FW",
+    }
+    created = client.post(f"/api/v1/admin/teams/{t.id}/players", json=new, headers=as_admin).json()
+    r = client.post(
+        "/api/v1/admin/licences/issue",
+        json={"membership_id": created["membership_id"]},
+        headers=as_admin,
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["number"] == "LDS27-00741"
+
+
+def leaving_token(db, member) -> str:
+    from lds_api.models import Licence
+
+    return db.scalar(select(Licence.token).where(Licence.person_id == member["person_id"]))

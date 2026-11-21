@@ -76,31 +76,34 @@ def issue(db: Session, actor, membership: SquadMembership) -> Licence:
         if age_on(membership.person.birth_date, ref) < rules.min_age:
             raise LicenceError(f"Âge minimum non atteint ({rules.min_age} ans)")
 
-    lic = membership.licence
-    created = lic is None
-    if created:
-        lic = Licence(
-            number=_next_number(db, season),
-            membership_id=membership.id,
-            season_id=season.id,
-            person_id=membership.person_id,
-        )
-        db.add(lic)
-    elif lic.status == LicenceStatus.REVOKED:
-        raise LicenceError("Licence révoquée : une nouvelle décision est nécessaire")
+    # Pas de flush intermédiaire : la licence n'est écrite qu'une fois signée (jeton NOT NULL)
+    with db.no_autoflush:
+        _ = (membership.team, membership.person)  # chargés avant la création de la licence
+        lic = membership.licence
+        created = lic is None
+        if created:
+            lic = Licence(
+                number=_next_number(db, season),
+                membership_id=membership.id,
+                season_id=season.id,
+                person_id=membership.person_id,
+            )
+            db.add(lic)
+        elif lic.status == LicenceStatus.REVOKED:
+            raise LicenceError("Licence révoquée : une nouvelle décision est nécessaire")
 
-    lic.status = LicenceStatus.ACTIVE
-    lic.status_reason = None
-    lic.valid_from = max(season.starts_on, membership.joined_on)
-    lic.valid_until = season.ends_on
-    lic.issued_at = datetime.now(UTC)
-    lic.issued_by_id = getattr(actor, "id", None)
-    lic.key_id = get_settings().licence_key_id
-    lic.token = signed_token.sign(
-        build_payload(lic, membership, season),
-        _signing_key(),
-        prefix=signed_token.LICENCE_PREFIX,
-    )
+        lic.status = LicenceStatus.ACTIVE
+        lic.status_reason = None
+        lic.valid_from = max(season.starts_on, membership.joined_on)
+        lic.valid_until = season.ends_on
+        lic.issued_at = datetime.now(UTC)
+        lic.issued_by_id = getattr(actor, "id", None)
+        lic.key_id = get_settings().licence_key_id
+        lic.token = signed_token.sign(
+            build_payload(lic, membership, season),
+            _signing_key(),
+            prefix=signed_token.LICENCE_PREFIX,
+        )
     db.flush()
     audit.record(
         db,

@@ -38,6 +38,8 @@ from lds_api.seed import fake_people, reference
 SEASON_YEAR = 2027
 SEASON_START = date(2027, 1, 1)
 SEASON_END = date(2027, 6, 30)
+# Première journée de démonstration (samedi) — le calendrier réel est fixé par la Ligue
+FIRST_MATCHDAY = date(2027, 1, 9)
 
 
 class SeedError(RuntimeError):
@@ -192,11 +194,35 @@ def _membership(season, team, person, kind, shirt) -> SquadMembership:
     )
 
 
+def seed_demo_competition(db: Session, season: Season) -> None:
+    """Calendrier des deux poules, cases du tableau final et licences (démonstration)."""
+    from lds_api.models import Licence, Match
+    from lds_api.schemas.fixtures import GenerateFixturesIn
+    from lds_api.services import fixtures, licences
+
+    if db.scalar(select(Match.id).where(Match.season_id == season.id).limit(1)) is None:
+        params = GenerateFixturesIn(first_date=FIRST_MATCHDAY, days_between_rounds=7)
+        for pool in db.scalars(select(Pool).where(Pool.season_id == season.id)):
+            fixtures.generate_group_fixtures(db, None, pool, params)
+        fixtures.ensure_knockout_matches(db, None, season)
+
+    if db.scalar(select(Licence.id).where(Licence.season_id == season.id).limit(1)) is None:
+        members = db.scalars(
+            select(SquadMembership)
+            .where(SquadMembership.season_id == season.id)
+            .order_by(SquadMembership.team_id, SquadMembership.kind, SquadMembership.shirt_number)
+        )
+        for m in members:
+            licences.issue(db, None, m)
+    db.flush()
+
+
 def run(db: Session, *, demo: bool = True, reset: bool = False) -> Season:
     if reset:
         reset_database(db)
     season = seed_reference(db)
     if demo:
         seed_demo(db, season)
+        seed_demo_competition(db, season)
     db.commit()
     return season

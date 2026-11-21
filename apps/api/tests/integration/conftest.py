@@ -32,7 +32,7 @@ def engine() -> Iterator[Engine]:
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
     eng = create_engine(url)
-    with Session(eng) as s:
+    with Session(eng, autoflush=False) as s:
         seed_run.run(s, demo=True)
     yield eng
     eng.dispose()
@@ -61,11 +61,16 @@ def seeded(db: Session) -> Season:
     return db.scalar(select(Season).where(Season.year == seed_run.SEASON_YEAR))
 
 
+@pytest.fixture(autouse=True)
+def _clean_redis() -> None:
+    """Base Redis de test (n° 15) vidée avant chaque test : cache et limitation de débit."""
+    with contextlib.suppress(Exception):  # Redis absent : cache et limitation ignorés
+        ratelimit.get_redis().flushdb()
+
+
 @pytest.fixture
 def client(db: Session) -> Iterator[TestClient]:
     app.dependency_overrides[get_db] = lambda: db
-    with contextlib.suppress(Exception):  # Redis absent : la limitation est ignorée
-        ratelimit.get_redis().flushdb()
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
