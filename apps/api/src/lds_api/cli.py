@@ -56,6 +56,17 @@ def cmd_seed(args: argparse.Namespace) -> None:
         print(f"Comptes de démonstration : *@lds.local, mot de passe « {DEMO_PASSWORD} ».")
 
 
+def cmd_export(args: argparse.Namespace) -> None:
+    from lds_api.db.session import SessionLocal
+    from lds_api.services.export import export_all
+
+    with SessionLocal() as db:
+        result = export_all(db, Path(args.out), include_sensitive=args.include_sensitive)
+    print(f"Export écrit dans {result.pop('directory')} ({len(result)} tables).")
+    if args.include_sensitive:
+        print("ATTENTION : cet export contient des CNIB et téléphones en clair.")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="lds_api.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -68,6 +79,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-demo", action="store_true", help="Sans comptes ni joueurs fictifs")
     p.add_argument("--reset", action="store_true", help="Vide la base avant (hors production)")
     p.set_defaults(func=cmd_seed)
+
+    p = sub.add_parser("export", help="Export complet des données en JSON et CSV")
+    p.add_argument("--out", default="./var/exports", help="Dossier de destination")
+    p.add_argument(
+        "--include-sensitive",
+        action="store_true",
+        help="Inclut CNIB et téléphones déchiffrés (fichier sensible, action journalisée)",
+    )
+    p.set_defaults(func=cmd_export)
     return parser
 
 

@@ -12,7 +12,7 @@ from lds_api.db.types import EncryptedString
 
 config = context.config
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # Permet de cibler une autre base (tests) via `-x url=...`
 url = context.get_x_argument(as_dictionary=True).get("url") or get_settings().database_url
