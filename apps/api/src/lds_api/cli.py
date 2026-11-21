@@ -67,6 +67,57 @@ def cmd_export(args: argparse.Namespace) -> None:
         print("ATTENTION : cet export contient des CNIB et téléphones en clair.")
 
 
+MIN_PASSWORD_LENGTH = 12
+
+
+def cmd_create_user(args: argparse.Namespace) -> None:
+    import getpass
+    import sys
+
+    from sqlalchemy import select
+
+    from lds_api.core.security import hash_password
+    from lds_api.db.session import SessionLocal
+    from lds_api.models import Role, Team, User
+    from lds_api.models.enums import RoleCode
+    from lds_api.services import audit
+
+    if args.password_stdin:
+        password = sys.stdin.readline().rstrip("\n")
+    else:
+        password = getpass.getpass("Mot de passe : ")
+        if password != getpass.getpass("Confirmer : "):
+            raise SystemExit("Les mots de passe ne correspondent pas.")
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise SystemExit(f"Mot de passe trop court ({MIN_PASSWORD_LENGTH} caractères minimum).")
+
+    with SessionLocal() as db:
+        email = args.email.strip().lower()
+        if db.scalar(select(User).where(User.email == email)):
+            raise SystemExit(f"Le compte {email} existe déjà.")
+        role = db.scalar(select(Role).where(Role.code == RoleCode(args.role)))
+        if role is None:
+            raise SystemExit("Rôles absents : lancer d'abord `seed`.")
+        team_id = None
+        if args.role == RoleCode.GESTIONNAIRE_CLUB:
+            team = db.scalar(select(Team).where(Team.slug == args.team))
+            if team is None:
+                raise SystemExit("Un gestionnaire de club exige --team <slug de l'équipe>.")
+            team_id = team.id
+        user = User(
+            email=email,
+            full_name=args.name,
+            password_hash=hash_password(password),
+            roles=[role],
+            team_id=team_id,
+        )
+        db.add(user)
+        db.flush()
+        audit.record(db, None, "create", "user", user.id, {"email": email, "role": args.role})
+        db.commit()
+    print(f"Compte créé : {email} ({args.role}).")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="lds_api.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -88,6 +139,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Inclut CNIB et téléphones déchiffrés (fichier sensible, action journalisée)",
     )
     p.set_defaults(func=cmd_export)
+
+    from lds_api.models.enums import RoleCode
+
+    p = sub.add_parser("create-user", help="Crée un compte (ex. le premier super_admin)")
+    p.add_argument("--email", required=True)
+    p.add_argument("--name", required=True, help="Nom complet")
+    p.add_argument("--role", required=True, choices=[r.value for r in RoleCode])
+    p.add_argument("--team", help="Slug de l'équipe (gestionnaire de club)")
+    p.add_argument(
+        "--password-stdin", action="store_true", help="Lit le mot de passe sur l'entrée standard"
+    )
+    p.set_defaults(func=cmd_create_user)
     return parser
 
 

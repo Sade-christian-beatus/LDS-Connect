@@ -141,7 +141,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       token.current = null;
       setUser(null);
-      await forgetUser();
+      // Téléphone partagé : on efface le profil et les données en cache (noms des joueurs).
+      // Les actions non encore synchronisées sont conservées pour ne perdre aucune saisie.
+      await Promise.all([forgetUser(), db.sheets.clear(), db.lists.clear()]);
     }
   }, []);
 

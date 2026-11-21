@@ -8,7 +8,7 @@ API_DIR = apps/api
 WEB_DIR = apps/web
 
 .DEFAULT_GOAL := help
-.PHONY: help env keys keys-into-env dev down logs migrate seed test lint e2e shell-db \
+.PHONY: help env keys keys-into-env up dev down logs migrate seed test lint e2e shell-db \
         install-local dev-local migrate-local seed-local test-local backup restore export
 
 help: ## Affiche cette aide
@@ -21,11 +21,21 @@ env: ## Crée .env à partir de .env.example et y inscrit des clés neuves
 keys: ## Affiche un jeu de clés neuves (JWT, chiffrement, signature des licences)
 	@cd $(API_DIR) && uv run python -m lds_api.cli gen-keys
 
+# Avec uv si disponible, sinon dans le conteneur de l'API (seuls Docker et make sont requis)
 keys-into-env:
-	@cd $(API_DIR) && uv run python -m lds_api.cli gen-keys --write ../../.env
+	@if command -v uv >/dev/null 2>&1; then \
+	  cd $(API_DIR) && uv run python -m lds_api.cli gen-keys --write ../../.env; \
+	else \
+	  $(COMPOSE) build api && \
+	  $(COMPOSE) run --rm --no-deps -T -u "$$(id -u):$$(id -g)" -v "$(CURDIR)/.env:/tmp/lds.env" api \
+	    python -m lds_api.cli gen-keys --write /tmp/lds.env; \
+	fi
 
 # --- Docker ---------------------------------------------------------------
-dev: ## Lance toute la pile (API, web, PostgreSQL, Redis, Mailpit, simulateurs)
+up: ## Lance toute la pile en arrière-plan (API, web, PostgreSQL, Redis, Mailpit, simulateurs)
+	$(COMPOSE) up -d --build
+
+dev: ## Lance toute la pile au premier plan (journaux visibles)
 	$(COMPOSE) up --build
 
 down: ## Arrête la pile
