@@ -3,17 +3,55 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy import select
 
 from lds_api.core.deps import Actor, DbSession, ensure_team_scope, require
 from lds_api.core.errors import NotFound
 from lds_api.core.rbac import Perm
-from lds_api.models import Person
+from lds_api.models import AuditLog, Person, Team
 from lds_api.models.enums import MembershipKind
 from lds_api.schemas import registry as s
 from lds_api.services import audit, registry, seasons
 
 router = APIRouter(prefix="/admin", tags=["registre"])
+
+
+@router.get("/teams/overview", response_model=list[s.TeamOverview])
+def teams_overview(
+    db: DbSession,
+    actor: Annotated[Actor, Depends(require(Perm.SQUAD_READ))],
+):
+    """Synthèse de toutes les équipes (un gestionnaire de club ne voit que la sienne)."""
+    teams = db.scalars(select(Team).order_by(Team.name))
+    if actor.team_scoped:
+        teams = [t for t in teams if t.id == actor.user.team_id]
+    return [registry.overview(db, t) for t in teams]
+
+
+@router.get("/audit", response_model=list[s.AuditEntry])
+def audit_log(
+    db: DbSession,
+    actor: Annotated[Actor, Depends(require(Perm.AUDIT_READ))],
+    entity_type: str | None = None,
+    entity_id: str | None = None,
+    action: str | None = None,
+    before_id: Annotated[
+        int | None, Query(description="Pagination : entrées plus anciennes")
+    ] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+):
+    """Journal d'audit, du plus récent au plus ancien."""
+    q = select(AuditLog).order_by(AuditLog.id.desc()).limit(limit)
+    if entity_type:
+        q = q.where(AuditLog.entity_type == entity_type)
+    if entity_id:
+        q = q.where(AuditLog.entity_id == entity_id)
+    if action:
+        q = q.where(AuditLog.action == action)
+    if before_id:
+        q = q.where(AuditLog.id < before_id)
+    return list(db.scalars(q))
 
 
 @router.patch("/teams/{team_id}", response_model=s.PublicTeam)

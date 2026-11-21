@@ -2,7 +2,7 @@
 (mineurs : nom d'usage, poste, équipe, âge en années — jamais la date de naissance)."""
 
 import uuid
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -160,10 +160,45 @@ class SquadMember(BaseModel):
     function: StaffFunction | None = None
     is_local: bool | None = None
     residence_region: str | None = None
+    residence_region_id: uuid.UUID | None = None
     residence_since: date | None = None
+    residence_verified: bool | None = None
+    preferred_foot: Foot | None = None
+    fbf_licence_number: str | None = None
+    qualification: str | None = None
+    birth_place: str | None = None
+    nationality: str
+    guardian_consent_on: date | None = None
+    is_minor: bool
     has_cnib: bool
     has_phone: bool
     licence: LicenceBrief | None
+
+
+class TeamOverview(BaseModel):
+    """Synthèse d'une équipe pour le tableau de bord du registre."""
+
+    team: PublicTeam
+    players: int
+    staff: int
+    youth_players: int
+    local_players: int
+    licences_active: int
+    licences_missing: int
+    licences_blocked: int
+    compliant: bool
+    issues: list[str]
+
+
+class AuditEntry(ORM):
+    id: int
+    at: datetime
+    actor_label: str
+    action: str
+    entity_type: str
+    entity_id: str | None
+    changes: dict | None
+    ip_address: str | None
 
 
 class RuleCheck(BaseModel):

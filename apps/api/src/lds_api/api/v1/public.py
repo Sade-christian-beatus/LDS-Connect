@@ -6,7 +6,7 @@ from sqlalchemy import select
 from lds_api.core.deps import DbSession
 from lds_api.core.errors import NotFound
 from lds_api.domain.eligibility import age_on
-from lds_api.models import Team
+from lds_api.models import Region, Team
 from lds_api.models.enums import MembershipKind
 from lds_api.schemas import registry as s
 from lds_api.services import registry, seasons
@@ -17,6 +17,11 @@ router = APIRouter(tags=["public"])
 @router.get("/seasons/current", response_model=s.SeasonOut)
 def current_season(db: DbSession):
     return seasons.current_season(db)
+
+
+@router.get("/regions", response_model=list[s.RegionOut])
+def list_regions(db: DbSession):
+    return list(db.scalars(select(Region).order_by(Region.name)))
 
 
 @router.get("/teams", response_model=list[s.PublicTeam])
