@@ -1,21 +1,25 @@
 """Configuration de l'application, lue exclusivement depuis les variables d'environnement."""
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import SecretStr, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    # .env à la racine du dépôt (exécution depuis apps/api) ou dans le dossier courant
+    model_config = SettingsConfigDict(
+        env_file=("../../.env", ".env"), env_file_encoding="utf-8", extra="ignore"
+    )
 
     # Général
     environment: Literal["development", "test", "production"] = "development"
     app_name: str = "LDS Connect"
     public_base_url: str = "http://localhost:3000"
     api_base_url: str = "http://localhost:8000"
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    # Liste séparée par des virgules
+    cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:3000"]
 
     # Base de données et cache
     database_url: str = "postgresql+psycopg://lds:lds@localhost:5432/lds"
@@ -50,6 +54,13 @@ class Settings(BaseSettings):
     smtp_host: str = "localhost"
     smtp_port: int = 1025
     smtp_from: str = "no-reply@lds.local"
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _split_origins(cls, v: object) -> object:
+        if isinstance(v, str):
+            return [o.strip() for o in v.split(",") if o.strip()]
+        return v
 
 
 @lru_cache
