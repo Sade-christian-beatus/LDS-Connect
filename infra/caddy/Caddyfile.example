@@ -1,0 +1,26 @@
+# Exemple de reverse proxy Caddy (TLS automatique via Let's Encrypt).
+# Remplacer lds.exemple.bf par le nom de domaine retenu par la Ligue.
+# Nginx ou Traefik conviennent aussi : voir docs/DEPLOIEMENT.md.
+
+lds.exemple.bf {
+	encode gzip zstd
+
+	# API (y compris le flux temps réel SSE : pas de mise en tampon)
+	handle /api/* {
+		reverse_proxy api:8000 {
+			flush_interval -1
+		}
+	}
+
+	# Site public et PWA
+	handle {
+		reverse_proxy web:3000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}

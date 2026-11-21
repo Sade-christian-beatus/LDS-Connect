@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lds-green: #1f7a3a;
+  --color-lds-red: #c1272d;
+  --color-lds-gold: #f2c230;
+}
