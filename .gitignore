@@ -19,7 +19,7 @@ node_modules/
 out/
 *.tsbuildinfo
 next-env.d.ts
-apps/web/e2e/test-results/
+apps/web/test-results/
 apps/web/playwright-report/
 
 # Divers
@@ -28,3 +28,7 @@ backups/
 
 # Instantanés Redis locaux
 dump.rdb
+
+# Service worker généré au build
+apps/web/public/sw.js
+apps/web/public/sw.js.map
