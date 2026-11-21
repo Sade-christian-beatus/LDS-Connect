@@ -57,11 +57,14 @@ test("l'administration gère un effectif, une licence et le calendrier", async (
   // Calendrier : déplacer un match
   await page.getByRole("navigation", { name: "Espace officiels" }).getByRole("link", { name: "Calendrier" }).click();
   await expect(page.getByRole("heading", { name: "Calendrier" })).toBeVisible();
-  const kickoff = page.getByLabel(/Coup d'envoi/).first();
-  await kickoff.fill("2027-01-10T16:30");
-  await page.getByRole("button", { name: "Enregistrer" }).first().click();
-  await expect(page.getByText(/modifications enregistrées/)).toBeVisible();
-  await expect(page.getByLabel(/Coup d'envoi/).first()).toHaveValue("2027-01-10T16:30");
+  // Le match est suivi par son nom : la liste est triée par coup d'envoi et il change de place
+  const firstKickoff = page.getByLabel(/Coup d'envoi/).first();
+  const label = (await firstKickoff.getAttribute("aria-label"))!;
+  const fixture = label.replace("Coup d'envoi ", "");
+  await firstKickoff.fill("2027-01-10T16:30");
+  await page.getByRole("row").filter({ has: page.getByLabel(label, { exact: true }) }).getByRole("button", { name: "Enregistrer" }).click();
+  await expect(page.getByText(`${fixture} : modifications enregistrées`)).toBeVisible();
+  await expect(page.getByLabel(label, { exact: true })).toHaveValue("2027-01-10T16:30");
 
   // Journal : la suspension est tracée
   await page.getByRole("navigation", { name: "Espace officiels" }).getByRole("link", { name: "Journal" }).click();
