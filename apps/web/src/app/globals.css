@@ -5,3 +5,19 @@
   --color-lds-red: #c1272d;
   --color-lds-gold: #f2c230;
 }
+
+/* Impression d'une licence : seule la carte est imprimée */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: fixed;
+    inset: 0 auto auto 0;
+    border-color: #000;
+  }
+}

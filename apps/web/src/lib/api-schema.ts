@@ -1602,6 +1602,11 @@ export interface components {
             residence_since?: string | null;
             /** Residence Verified */
             residence_verified?: boolean | null;
+            /**
+             * Residence Pending
+             * @default false
+             */
+            residence_pending: boolean;
             preferred_foot?: components["schemas"]["Foot"] | null;
             /** Fbf Licence Number */
             fbf_licence_number?: string | null;
