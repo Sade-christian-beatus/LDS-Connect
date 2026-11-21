@@ -58,3 +58,9 @@ def test_audit_log_filters_and_permissions(client, as_admin, as_club, as_delegat
     assert ids == sorted(ids, reverse=True)
     older = client.get("/api/v1/admin/audit", params={"before_id": ids[0]}, headers=as_admin).json()
     assert all(e["id"] < ids[0] for e in older)
+
+
+def test_rules_public(client, seeded):
+    rules = client.get("/api/v1/rules").json()
+    assert rules["max_squad_players"] == 30 and rules["min_local_starters_ratio"] == 0.5
+    assert rules["prize_money"]["1"] == 24_000_000

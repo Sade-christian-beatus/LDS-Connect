@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { landingFor } from "../app-header";
 
 export default function ConnexionPage() {
   const { login } = useAuth();
@@ -17,7 +18,7 @@ export default function ConnexionPage() {
     setError(null);
     try {
       const user = await login(email, password);
-      router.push(user.permissions.includes("sheet:edit") ? "/delegue" : "/controle");
+      router.push(landingFor(user));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Connexion impossible");
     } finally {

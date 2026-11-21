@@ -107,11 +107,21 @@ def squad(db: Session, team: Team) -> s.Squad:
             item.residence_region_id = pl.residence_region_id
             item.residence_since = pl.residence_since
             item.residence_verified = pl.residence_verified
+            # Serait local une fois la résidence vérifiée : à traiter par l'administration
+            item.residence_pending = not pl.residence_verified and is_local(
+                residence_region_id=pl.residence_region_id,
+                residence_since=pl.residence_since,
+                residence_verified=True,
+                team_region_id=team.region_id,
+                on=today,
+                min_months=rules.residence_min_months,
+            )
             item.preferred_foot = pl.preferred_foot
             item.fbf_licence_number = pl.fbf_licence_number
             item.is_local = is_local(
                 residence_region_id=pl.residence_region_id,
                 residence_since=pl.residence_since,
+                residence_verified=pl.residence_verified,
                 team_region_id=team.region_id,
                 on=today,
                 min_months=rules.residence_min_months,
@@ -265,10 +275,26 @@ def membership_for(db: Session, person_id: uuid.UUID) -> SquadMembership:
 
 
 def update_player(db: Session, actor, m: SquadMembership, body: s.PlayerUpdate) -> None:
+    from fastapi import HTTPException, status
+
+    from lds_api.core.rbac import Perm
+
     data = body.model_dump(exclude_unset=True)
     person, player = m.person, m.person.player
     if player is None:
         raise NotFound("Joueur")
+    can_verify = actor.can(Perm.RESIDENCE_VERIFY)
+    if "residence_verified" in data and not can_verify:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "La vérification de résidence relève de l'administration"
+        )
+    residence_changed = any(
+        k in data and data[k] != getattr(player, k)
+        for k in ("residence_region_id", "residence_since")
+    )
+    if residence_changed and not can_verify:
+        # Nouvelle déclaration du club : le statut « local » attend une nouvelle vérification
+        data["residence_verified"] = False
     if "cnib_number" in data:
         _check_cnib_unique(db, data["cnib_number"], exclude=person.id)
     if "shirt_number" in data:

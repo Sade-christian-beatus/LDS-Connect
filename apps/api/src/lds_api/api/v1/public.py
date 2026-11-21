@@ -19,6 +19,12 @@ def current_season(db: DbSession):
     return seasons.current_season(db)
 
 
+@router.get("/rules", response_model=s.RulesOut)
+def current_rules(db: DbSession):
+    """Règles de la saison courante (barème, effectifs, règle des locaux, discipline…)."""
+    return seasons.rules_for(db, seasons.current_season(db))
+
+
 @router.get("/regions", response_model=list[s.RegionOut])
 def list_regions(db: DbSession):
     return list(db.scalars(select(Region).order_by(Region.name)))

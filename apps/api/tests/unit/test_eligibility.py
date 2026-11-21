@@ -42,9 +42,24 @@ def test_is_local(since, region, expected):
         is_local(
             residence_region_id=region,
             residence_since=since,
+            residence_verified=True,
             team_region_id=REGION,
             on=date(2027, 1, 1),
             min_months=6,
         )
         is expected
+    )
+
+
+def test_unverified_residence_is_not_local():
+    assert (
+        is_local(
+            residence_region_id=REGION,
+            residence_since=date(2020, 1, 1),
+            residence_verified=False,
+            team_region_id=REGION,
+            on=date(2027, 1, 1),
+            min_months=6,
+        )
+        is False
     )

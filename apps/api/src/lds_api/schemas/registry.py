@@ -163,6 +163,7 @@ class SquadMember(BaseModel):
     residence_region_id: uuid.UUID | None = None
     residence_since: date | None = None
     residence_verified: bool | None = None
+    residence_pending: bool = False
     preferred_foot: Foot | None = None
     fbf_licence_number: str | None = None
     qualification: str | None = None
@@ -218,3 +219,29 @@ class SensitiveData(BaseModel):
     person_id: uuid.UUID
     cnib_number: str | None
     phone: str | None
+
+
+class RulesOut(ORM):
+    """Règles sportives de la saison (information publique)."""
+
+    points_win: int
+    points_draw: int
+    points_loss: int
+    tiebreakers: list[str]
+    max_squad_players: int
+    max_staff: int
+    min_age: int
+    youth_age_limit: int
+    min_youth_players: int
+    age_reference_date: date | None
+    min_local_starters_ratio: float
+    residence_min_months: int
+    starters_count: int
+    max_substitutes_on_sheet: int
+    max_substitutions: int
+    yellow_cards_threshold: int
+    red_card_ban_matches: int
+    qualifiers_per_pool: int
+    third_place_match: bool
+    knockout_pairings: list[list[str]]
+    prize_money: dict[str, int]

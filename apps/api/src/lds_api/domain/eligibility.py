@@ -26,12 +26,16 @@ def is_local(
     *,
     residence_region_id: uuid.UUID | None,
     residence_since: date | None,
+    residence_verified: bool,
     team_region_id: uuid.UUID,
     on: date,
     min_months: int,
 ) -> bool:
     """Un joueur est « local » s'il réside dans la région de l'équipe depuis au moins
-    `min_months` mois à la date `on`."""
+    `min_months` mois à la date `on`, résidence vérifiée par l'administration (la seule
+    déclaration du club ne suffit pas : c'est la base de la règle des locaux)."""
+    if not residence_verified:
+        return False
     if residence_region_id is None or residence_since is None:
         return False
     if residence_region_id != team_region_id:

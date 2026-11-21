@@ -8,7 +8,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <AppHeader />
-      <main className="mx-auto max-w-3xl px-3 py-4">{children}</main>
+      <main className="mx-auto max-w-6xl px-3 py-4">{children}</main>
     </AuthProvider>
   );
 }

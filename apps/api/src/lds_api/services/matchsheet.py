@@ -130,6 +130,7 @@ def _candidates(db: Session, match: Match, team: Team) -> list[ms.CandidateOut]:
                 is_local=is_local(
                     residence_region_id=pl.residence_region_id,
                     residence_since=pl.residence_since,
+                    residence_verified=pl.residence_verified,
                     team_region_id=team.region_id,
                     on=day,
                     min_months=rules.residence_min_months,

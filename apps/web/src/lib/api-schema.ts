@@ -89,6 +89,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current Rules
+         * @description Règles de la saison courante (barème, effectifs, règle des locaux, discipline…).
+         */
+        get: operations["current_rules_api_v1_rules_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/regions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Regions */
+        get: operations["list_regions_api_v1_regions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teams": {
         parameters: {
             query?: never;
@@ -115,6 +152,46 @@ export interface paths {
         };
         /** Team Detail */
         get: operations["team_detail_api_v1_teams__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/teams/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Teams Overview
+         * @description Synthèse de toutes les équipes (un gestionnaire de club ne voit que la sienne).
+         */
+        get: operations["teams_overview_api_v1_admin_teams_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Audit Log
+         * @description Journal d'audit, du plus récent au plus ancien.
+         */
+        get: operations["audit_log_api_v1_admin_audit_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -758,6 +835,30 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AuditEntry */
+        AuditEntry: {
+            /** Id */
+            id: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Actor Label */
+            actor_label: string;
+            /** Action */
+            action: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Id */
+            entity_id: string | null;
+            /** Changes */
+            changes: {
+                [key: string]: unknown;
+            } | null;
+            /** Ip Address */
+            ip_address: string | null;
+        };
         /**
          * CandidateOut
          * @description Joueur de l'effectif, avec son éligibilité pour ce match.
@@ -1296,6 +1397,56 @@ export interface components {
             /** Detail */
             detail: string;
         };
+        /**
+         * RulesOut
+         * @description Règles sportives de la saison (information publique).
+         */
+        RulesOut: {
+            /** Points Win */
+            points_win: number;
+            /** Points Draw */
+            points_draw: number;
+            /** Points Loss */
+            points_loss: number;
+            /** Tiebreakers */
+            tiebreakers: string[];
+            /** Max Squad Players */
+            max_squad_players: number;
+            /** Max Staff */
+            max_staff: number;
+            /** Min Age */
+            min_age: number;
+            /** Youth Age Limit */
+            youth_age_limit: number;
+            /** Min Youth Players */
+            min_youth_players: number;
+            /** Age Reference Date */
+            age_reference_date: string | null;
+            /** Min Local Starters Ratio */
+            min_local_starters_ratio: number;
+            /** Residence Min Months */
+            residence_min_months: number;
+            /** Starters Count */
+            starters_count: number;
+            /** Max Substitutes On Sheet */
+            max_substitutes_on_sheet: number;
+            /** Max Substitutions */
+            max_substitutions: number;
+            /** Yellow Cards Threshold */
+            yellow_cards_threshold: number;
+            /** Red Card Ban Matches */
+            red_card_ban_matches: number;
+            /** Qualifiers Per Pool */
+            qualifiers_per_pool: number;
+            /** Third Place Match */
+            third_place_match: boolean;
+            /** Knockout Pairings */
+            knockout_pairings: string[][];
+            /** Prize Money */
+            prize_money: {
+                [key: string]: number;
+            };
+        };
         /** SeasonOut */
         SeasonOut: {
             /**
@@ -1445,8 +1596,25 @@ export interface components {
             is_local?: boolean | null;
             /** Residence Region */
             residence_region?: string | null;
+            /** Residence Region Id */
+            residence_region_id?: string | null;
             /** Residence Since */
             residence_since?: string | null;
+            /** Residence Verified */
+            residence_verified?: boolean | null;
+            preferred_foot?: components["schemas"]["Foot"] | null;
+            /** Fbf Licence Number */
+            fbf_licence_number?: string | null;
+            /** Qualification */
+            qualification?: string | null;
+            /** Birth Place */
+            birth_place?: string | null;
+            /** Nationality */
+            nationality: string;
+            /** Guardian Consent On */
+            guardian_consent_on?: string | null;
+            /** Is Minor */
+            is_minor: boolean;
             /** Has Cnib */
             has_cnib: boolean;
             /** Has Phone */
@@ -1539,6 +1707,31 @@ export interface components {
             status: components["schemas"]["LicenceStatus"];
             /** Reason */
             reason: string;
+        };
+        /**
+         * TeamOverview
+         * @description Synthèse d'une équipe pour le tableau de bord du registre.
+         */
+        TeamOverview: {
+            team: components["schemas"]["PublicTeam"];
+            /** Players */
+            players: number;
+            /** Staff */
+            staff: number;
+            /** Youth Players */
+            youth_players: number;
+            /** Local Players */
+            local_players: number;
+            /** Licences Active */
+            licences_active: number;
+            /** Licences Missing */
+            licences_missing: number;
+            /** Licences Blocked */
+            licences_blocked: number;
+            /** Compliant */
+            compliant: boolean;
+            /** Issues */
+            issues: string[];
         };
         /** TeamRef */
         TeamRef: {
@@ -1829,6 +2022,46 @@ export interface operations {
             };
         };
     };
+    current_rules_api_v1_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesOut"];
+                };
+            };
+        };
+    };
+    list_regions_api_v1_regions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegionOut"][];
+                };
+            };
+        };
+    };
     list_teams_api_v1_teams_get: {
         parameters: {
             query?: never;
@@ -1867,6 +2100,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicTeamDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    teams_overview_api_v1_admin_teams_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamOverview"][];
+                };
+            };
+        };
+    };
+    audit_log_api_v1_admin_audit_get: {
+        parameters: {
+            query?: {
+                entity_type?: string | null;
+                entity_id?: string | null;
+                action?: string | null;
+                /** @description Pagination : entrées plus anciennes */
+                before_id?: number | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEntry"][];
                 };
             };
             /** @description Validation Error */

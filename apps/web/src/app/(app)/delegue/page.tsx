@@ -35,7 +35,7 @@ function MatchList() {
 
   const matches = cached?.matches ?? [];
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-green-900">Mes matchs</h1>
         <label className="flex items-center gap-2 text-sm">
