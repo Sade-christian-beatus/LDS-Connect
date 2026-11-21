@@ -95,7 +95,7 @@ def test_qr_svg(client, db, as_admin, as_club):
     lic = client.get(f"/api/v1/admin/teams/{t.id}/licences", headers=as_club).json()[0]
     r = client.get(f"/api/v1/admin/licences/{lic['id']}/qr.svg", headers=as_club)
     assert r.status_code == 200 and r.headers["content-type"].startswith("image/svg+xml")
-    assert r.text.startswith("<svg")
+    assert r.text.startswith("<svg") and 'xmlns="http://www.w3.org/2000/svg"' in r.text
 
 
 def test_issue_for_new_player_and_released_player_revoked(client, db, as_admin):

@@ -91,7 +91,7 @@ function Controle() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto max-w-3xl space-y-4">
       <h1 className="text-xl font-bold text-green-900">Contrôle des licences</h1>
       <p className="text-xs text-stone-500">
         {keys

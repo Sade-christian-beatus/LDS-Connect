@@ -15,6 +15,7 @@ class Perm(StrEnum):
     SQUAD_READ = "squad:read"  # lire un effectif complet (données internes)
     SQUAD_WRITE = "squad:write"  # ajouter/modifier joueurs et encadreurs
     SENSITIVE_READ = "sensitive:read"  # lire CNIB / téléphone (accès journalisé)
+    RESIDENCE_VERIFY = "residence:verify"  # attester la résidence (statut « local »)
     # Licences
     LICENCE_ISSUE = "licence:issue"
     LICENCE_STATUS = "licence:status"  # suspendre / révoquer
@@ -41,6 +42,7 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
             Perm.SQUAD_READ,
             Perm.SQUAD_WRITE,
             Perm.SENSITIVE_READ,
+            Perm.RESIDENCE_VERIFY,
             Perm.LICENCE_ISSUE,
             Perm.LICENCE_STATUS,
             Perm.LICENCE_VERIFY,

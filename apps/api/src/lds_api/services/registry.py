@@ -91,6 +91,10 @@ def squad(db: Session, team: Team) -> s.Squad:
             birth_date=p.birth_date,
             age=age,
             shirt_number=m.shirt_number,
+            birth_place=p.birth_place,
+            nationality=p.nationality,
+            guardian_consent_on=p.guardian_consent_on,
+            is_minor=age < 18,
             has_cnib=p.cnib_index is not None,
             has_phone=p.phone_index is not None,
             licence=s.LicenceBrief.model_validate(m.licence) if m.licence else None,
@@ -100,10 +104,24 @@ def squad(db: Session, team: Team) -> s.Squad:
             player_ages.append(age)
             item.position = pl.position
             item.residence_region = pl.residence_region.name if pl.residence_region else None
+            item.residence_region_id = pl.residence_region_id
             item.residence_since = pl.residence_since
+            item.residence_verified = pl.residence_verified
+            # Serait local une fois la résidence vérifiée : à traiter par l'administration
+            item.residence_pending = not pl.residence_verified and is_local(
+                residence_region_id=pl.residence_region_id,
+                residence_since=pl.residence_since,
+                residence_verified=True,
+                team_region_id=team.region_id,
+                on=today,
+                min_months=rules.residence_min_months,
+            )
+            item.preferred_foot = pl.preferred_foot
+            item.fbf_licence_number = pl.fbf_licence_number
             item.is_local = is_local(
                 residence_region_id=pl.residence_region_id,
                 residence_since=pl.residence_since,
+                residence_verified=pl.residence_verified,
                 team_region_id=team.region_id,
                 on=today,
                 min_months=rules.residence_min_months,
@@ -111,6 +129,7 @@ def squad(db: Session, team: Team) -> s.Squad:
         elif m.kind == MembershipKind.STAFF and p.staff:
             staff_count += 1
             item.function = p.staff.function
+            item.qualification = p.staff.qualification
         members.append(item)
     checks = check_squad(player_ages, staff_count, _squad_rules(rules))
     return s.Squad(
@@ -256,10 +275,26 @@ def membership_for(db: Session, person_id: uuid.UUID) -> SquadMembership:
 
 
 def update_player(db: Session, actor, m: SquadMembership, body: s.PlayerUpdate) -> None:
+    from fastapi import HTTPException, status
+
+    from lds_api.core.rbac import Perm
+
     data = body.model_dump(exclude_unset=True)
     person, player = m.person, m.person.player
     if player is None:
         raise NotFound("Joueur")
+    can_verify = actor.can(Perm.RESIDENCE_VERIFY)
+    if "residence_verified" in data and not can_verify:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "La vérification de résidence relève de l'administration"
+        )
+    residence_changed = any(
+        k in data and data[k] != getattr(player, k)
+        for k in ("residence_region_id", "residence_since")
+    )
+    if residence_changed and not can_verify:
+        # Nouvelle déclaration du club : le statut « local » attend une nouvelle vérification
+        data["residence_verified"] = False
     if "cnib_number" in data:
         _check_cnib_unique(db, data["cnib_number"], exclude=person.id)
     if "shirt_number" in data:
@@ -315,3 +350,34 @@ def read_sensitive(db: Session, actor, person: Person) -> s.SensitiveData:
     """Lecture de la CNIB et du téléphone : toujours journalisée."""
     audit.record(db, actor, "read_sensitive", "person", person.id, {"fields": ["cnib", "phone"]})
     return s.SensitiveData(person_id=person.id, cnib_number=person.cnib_number, phone=person.phone)
+
+
+def overview(db: Session, team: Team) -> s.TeamOverview:
+    """Synthèse : effectifs, quotas, licences et anomalies d'une équipe."""
+    from lds_api.models.enums import LicenceStatus
+
+    season = seasons.current_season(db)
+    rules = seasons.rules_for(db, season)
+    sq = squad(db, team)
+    players = [m for m in sq.members if m.kind == MembershipKind.PLAYER]
+    staff = [m for m in sq.members if m.kind == MembershipKind.STAFF]
+    active = sum(1 for m in sq.members if m.licence and m.licence.status == LicenceStatus.ACTIVE)
+    missing = sum(1 for m in sq.members if m.licence is None)
+    blocked = sum(1 for m in sq.members if m.licence and m.licence.status != LicenceStatus.ACTIVE)
+    issues = [f"{c.label} ({c.detail})" for c in sq.compliance if not c.ok]
+    if missing:
+        issues.append(f"{missing} licence(s) à délivrer")
+    if blocked:
+        issues.append(f"{blocked} licence(s) suspendue(s) ou révoquée(s)")
+    return s.TeamOverview(
+        team=sq.team,
+        players=len(players),
+        staff=len(staff),
+        youth_players=sum(1 for m in players if m.age < rules.youth_age_limit),
+        local_players=sum(1 for m in players if m.is_local),
+        licences_active=active,
+        licences_missing=missing,
+        licences_blocked=blocked,
+        compliant=not issues,
+        issues=issues,
+    )

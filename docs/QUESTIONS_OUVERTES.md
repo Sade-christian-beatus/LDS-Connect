@@ -13,7 +13,7 @@ toutes modifiables dans `competition_rules` sans changer le code.
 | 4 | **Âge minimum** (16 ans) et **quota de moins de 19 ans** (7 par effectif) : règle de la Ligue ou seulement observée au Guiriko ? | appliqués (paramétrables) |
 | 5 | **Date de référence** pour le calcul des âges | 1er janvier 2027 (début de saison) |
 | 6 | **Règle des locaux** : 50 % des titulaires, arrondi au supérieur (6 sur 11) ? Le joueur remplacé en cours de match compte-t-il ? | 6 sur 11, appréciée sur les titulaires au coup d'envoi |
-| 7 | **Justificatif de résidence** (6 mois) : quel document, qui l'atteste, qui le vérifie ? | champ « résidence vérifiée » rempli par l'administration |
+| 7 | **Justificatif de résidence** (6 mois) : quel document, qui l'atteste, qui le vérifie ? | un joueur ne compte comme local qu'une fois sa résidence **vérifiée par l'administration** (permission `residence:verify`) ; toute modification de la résidence par un club annule la vérification |
 | 8 | **Feuille de match** : nombre de remplaçants inscrits, nombre de remplacements et de fenêtres | 9 remplaçants, 5 remplacements (fenêtres non contrôlées) |
 | 9 | **Suspensions** : seuil de cumul de jaunes, durée après un rouge, remise à zéro des jaunes avant les phases finales | 3 jaunes = 1 match ; rouge = 1 match ; second jaune = 1 match ; remise à zéro après la phase de poules |
 | 10 | **Procédure de réclamation** : délai, instance, conséquences sur une feuille validée | la feuille validée peut être clôturée par l'administration ; pas encore de procédure de correction après validation |

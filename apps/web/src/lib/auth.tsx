@@ -29,6 +29,8 @@ type AuthState = {
   login: (email: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   api: <T>(path: string, init?: RequestInit) => Promise<T>;
+  /** Réponse brute (fichiers : QR en SVG, exports…). */
+  raw: (path: string, init?: RequestInit) => Promise<Response>;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -89,6 +91,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refresh().finally(() => setReady(true));
   }, [refresh]);
 
+  const raw = useCallback(
+    async (path: string, init: RequestInit = {}): Promise<Response> => {
+      const doFetch = () =>
+        fetch(`/api/v1${path}`, {
+          ...init,
+          credentials: "include",
+          headers: { ...(token.current ? { Authorization: `Bearer ${token.current}` } : {}), ...init.headers },
+        });
+      let res: Response;
+      try {
+        res = await doFetch();
+        if (res.status === 401 && (await refresh())) res = await doFetch();
+      } catch {
+        throw new NetworkError("Hors connexion");
+      }
+      if (!res.ok) throw await parseError(res);
+      return res;
+    },
+    [refresh],
+  );
+
   const api = useCallback(
     async <T,>(path: string, init: RequestInit = {}): Promise<T> => {
       const doFetch = () =>
@@ -147,7 +170,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const value = useMemo(() => ({ user, ready, login, logout, api }), [user, ready, login, logout, api]);
+  const value = useMemo(
+    () => ({ user, ready, login, logout, api, raw }),
+    [user, ready, login, logout, api, raw],
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

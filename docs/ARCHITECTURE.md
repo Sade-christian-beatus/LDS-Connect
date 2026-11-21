@@ -103,7 +103,10 @@ flux en tampon (voir l'exemple Caddy).
   statique et les données sont rendues **à la requête** (rien n'est figé au build, l'image est
   donc portable d'un serveur à l'autre).
 - Types TypeScript **générés depuis l'OpenAPI** : `pnpm gen:api` → `src/lib/api-schema.ts`.
-- Pages publiques : `src/app/(public)`. Espace officiels : `src/app/(app)`.
+- Pages publiques : `src/app/(public)`. Espace officiels : `src/app/(app)` — back-office
+  (`admin/equipes`, `admin/calendrier`, `admin/journal`), feuilles de match (`delegue`),
+  contrôle des licences (`controle`). Le menu et l'écran d'arrivée dépendent des
+  permissions renvoyées par `/auth/me` ; l'API reste la seule garante des droits.
 
 ### Fonctionnement hors connexion
 

@@ -1,5 +1,6 @@
 """Licences numériques : délivrance, statut, QR code, vérification (en ligne et hors ligne)."""
 
+import io
 import uuid
 from datetime import date
 from typing import Annotated
@@ -146,8 +147,14 @@ def licence_qr(
     if lic is None:
         raise NotFound("Licence")
     ensure_team_scope(actor, lic.membership.team_id)
-    svg = segno.make(lic.token, error="m").svg_inline(scale=4, border=2)
-    return Response(svg, media_type="image/svg+xml", headers={"Cache-Control": "no-store"})
+    # SVG autonome (avec espace de noms) : affichable dans une balise <img> et imprimable
+    buf = io.BytesIO()
+    segno.make(lic.token, error="m").save(
+        buf, kind="svg", scale=4, border=2, xmldecl=False, svgns=True, title=lic.number
+    )
+    return Response(
+        buf.getvalue(), media_type="image/svg+xml", headers={"Cache-Control": "no-store"}
+    )
 
 
 @router.post("/licences/verify", response_model=VerifyOut)

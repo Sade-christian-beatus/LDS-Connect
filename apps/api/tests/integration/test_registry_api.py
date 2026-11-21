@@ -123,3 +123,41 @@ def test_controller_cannot_read_squads(client, db, as_controller):
     vinnim = team(db, "Vinnim")
     r = client.get(f"/api/v1/admin/teams/{vinnim.id}/squad", headers=as_controller)
     assert r.status_code == 403
+
+
+def test_residence_verification_is_reserved_to_administration(client, db, as_club, as_admin):
+    vinnim = team(db, "Vinnim")
+    url = f"/api/v1/admin/teams/{vinnim.id}/squad"
+    local = next(
+        m
+        for m in client.get(url, headers=as_club).json()["members"]
+        if m["kind"] == "player" and m["is_local"]
+    )
+    pid = local["person_id"]
+
+    # Le club ne peut pas attester lui-même une résidence
+    r = client.patch(
+        f"/api/v1/admin/players/{pid}", json={"residence_verified": True}, headers=as_club
+    )
+    assert r.status_code == 403
+
+    # Une nouvelle déclaration du club annule la vérification : le joueur n'est plus local
+    r = client.patch(
+        f"/api/v1/admin/players/{pid}", json={"residence_since": "2020-01-01"}, headers=as_club
+    )
+    assert r.status_code == 204
+    member = next(
+        m for m in client.get(url, headers=as_club).json()["members"] if m["person_id"] == pid
+    )
+    assert member["residence_verified"] is False and member["is_local"] is False
+    assert member["residence_pending"] is True
+
+    # L'administration atteste : le joueur redevient local
+    r = client.patch(
+        f"/api/v1/admin/players/{pid}", json={"residence_verified": True}, headers=as_admin
+    )
+    assert r.status_code == 204
+    member = next(
+        m for m in client.get(url, headers=as_admin).json()["members"] if m["person_id"] == pid
+    )
+    assert member["is_local"] is True and member["residence_pending"] is False

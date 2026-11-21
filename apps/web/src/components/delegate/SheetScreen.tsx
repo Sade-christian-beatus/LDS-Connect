@@ -29,7 +29,7 @@ export function SheetScreen({ matchId }: { matchId: string }) {
   const ready = sheet.home.violations.length === 0 && sheet.away.violations.length === 0;
 
   return (
-    <div className="space-y-3 pb-20">
+    <div className="mx-auto max-w-3xl space-y-3 pb-20">
       <Link href="/delegue" className="text-sm text-lds-green underline">
         ← Mes matchs
       </Link>
