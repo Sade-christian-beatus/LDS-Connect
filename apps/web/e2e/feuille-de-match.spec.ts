@@ -61,6 +61,7 @@ test("le délégué saisit et valide une feuille de match, y compris hors connex
   // Validation : résultat officiel
   await page.getByRole("button", { name: /valider la feuille/ }).click();
   await expect(page.getByText(/Feuille validée/)).toBeVisible();
+  await expect(page.getByText(/action\(s\) en attente/)).toBeHidden(); // confirmée par le serveur
 
   // Le classement public reflète la victoire
   await page.goto("/classements");

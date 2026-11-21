@@ -5,7 +5,7 @@ import logging
 import uuid
 
 import redis
-from sqlalchemy import func, select
+from sqlalchemy import event, func, select
 from sqlalchemy.orm import Session
 
 from lds_api.core.ratelimit import get_redis
@@ -22,17 +22,31 @@ CACHE_TTL = 300
 FAIR_PLAY_POINTS = {EventType.YELLOW_CARD: 1, EventType.SECOND_YELLOW: 3, EventType.RED_CARD: 3}
 
 
-def _cache_key(pool_id: uuid.UUID) -> str:
-    return f"standings:{pool_id}"
+# Cache versionné : la version n'est incrémentée qu'APRÈS le commit d'un résultat. Un calcul
+# commencé avant ce commit écrit sous l'ancienne version, que plus personne ne lit : un
+# classement périmé ne peut donc jamais être servi après une validation.
+def _version_key(pool_id: uuid.UUID) -> str:
+    return f"standings:ver:{pool_id}"
+
+
+def _cache_key(pool_id: uuid.UUID, version: int) -> str:
+    return f"standings:{pool_id}:v{version}"
 
 
 def invalidate(pool_id: uuid.UUID | None) -> None:
+    """Invalidation immédiate (données déjà validées en base)."""
     if pool_id is None:
         return
     try:
-        get_redis().delete(_cache_key(pool_id))
+        get_redis().incr(_version_key(pool_id))
     except redis.RedisError:
         log.warning("Redis indisponible : invalidation du classement ignorée")
+
+
+def invalidate_after_commit(db: Session, pool_id: uuid.UUID | None) -> None:
+    """Invalidation déclenchée seulement une fois la transaction validée."""
+    if pool_id is not None:
+        event.listen(db, "after_commit", lambda _s: invalidate(pool_id), once=True)
 
 
 def _group_matches(db: Session, pool: Pool):
@@ -87,8 +101,10 @@ def compute_rows(db: Session, pool: Pool, season: Season) -> list[Row]:
 
 
 def pool_standings(db: Session, pool: Pool, season: Season) -> fs.PoolStandings:
+    version: int | None = None
     try:
-        cached = get_redis().get(_cache_key(pool.id))
+        version = int(get_redis().get(_version_key(pool.id)) or 0)
+        cached = get_redis().get(_cache_key(pool.id, version))
         if cached:
             return fs.PoolStandings.model_validate_json(cached)
     except redis.RedisError:
@@ -129,7 +145,8 @@ def pool_standings(db: Session, pool: Pool, season: Season) -> fs.PoolStandings:
         ],
     )
     with contextlib.suppress(redis.RedisError):
-        get_redis().set(_cache_key(pool.id), out.model_dump_json(), ex=CACHE_TTL)
+        if version is not None:
+            get_redis().set(_cache_key(pool.id, version), out.model_dump_json(), ex=CACHE_TTL)
     return out
 
 

@@ -127,3 +127,20 @@ def test_bracket_filled_when_group_stage_complete(client, db, seeded, as_admin):
     assert (
         bracket[4]["home"] is None
     )  # demi-finales inconnues tant que les quarts ne sont pas joués
+
+
+def test_standings_cache_not_poisoned_by_concurrent_read(db, seeded):
+    """Un calcul lu avant le commit d'un résultat ne doit pas rester en cache après."""
+    p = pool(db, "A")
+    season = seasons.current_season(db)
+    stale = standings.pool_standings(db, p, season)  # mis en cache (version courante)
+    assert stale.matches_played == 0
+
+    standings.invalidate_after_commit(db, p.id)
+    m = db.scalar(select(Match).where(Match.pool_id == p.id))
+    m.status, m.home_score, m.away_score = MatchStatus.FINISHED, 2, 0
+    db.commit()  # l'invalidation n'a lieu qu'ici
+
+    fresh = standings.pool_standings(db, p, season)
+    assert fresh.matches_played == 1
+    assert fresh.rows[0].points == 3

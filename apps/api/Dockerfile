@@ -1,6 +1,7 @@
 FROM python:3.12-slim AS base
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
-COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /usr/local/bin/uv
+# uv installé depuis PyPI (un seul registre à autoriser sur un réseau restreint)
+RUN pip install --no-cache-dir "uv>=0.5,<1"
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./

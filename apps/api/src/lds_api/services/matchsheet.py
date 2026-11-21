@@ -500,7 +500,7 @@ def validate(db: Session, actor, sheet: MatchSheet) -> None:
         sheet.id,
         {"score": [home, away], "suspensions": len(created)},
     )
-    standings.invalidate(match.pool_id)
+    standings.invalidate_after_commit(db, match.pool_id)
     fixtures.refresh_knockout(db, season)
     _publish(db, match)
 
