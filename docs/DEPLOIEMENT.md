@@ -65,8 +65,10 @@ exécutif (mot de passe demandé sans écho, 12 caractères minimum) :
 docker compose -f docker-compose.yml exec api python -m lds_api.cli create-user --email secretariat@<domaine> --name "Secrétariat exécutif" --role super_admin
 ```
 
-La même commande crée les autres comptes (`--role delegue_match`, `--role gestionnaire_club
---team <slug-de-l-équipe>`, etc.).
+Les autres comptes (délégués, gestionnaires de club, contrôleurs…) se créent ensuite dans
+l'interface, menu **Comptes** du super administrateur : un mot de passe provisoire est
+généré et affiché une seule fois, à transmettre par un canal sûr ; à sa première connexion,
+la personne est **obligée** de le remplacer (rien d'autre n'est accessible avant). La commande `create-user` reste disponible en secours.
 
 PostgreSQL et Redis ne sont pas publiés par `docker-compose.yml`. L'API (8000) et le site
 (3000) sont liés à `127.0.0.1` (variable `BIND_ADDRESS`) : seul le reverse proxy du serveur y

@@ -21,7 +21,8 @@ test("l'administration gère un effectif, une licence et le calendrier", async (
 
   // Libérer une place (effectif complet) puis inscrire un joueur
   const unique = `E2e${Date.now().toString().slice(-6)}`;
-  const row = page.getByRole("row").filter({ hasText: "Défenseur" }).last();
+  // Dernier joueur de la liste (test rejouable : ne dépend pas d'un poste précis)
+  const row = page.getByRole("row").filter({ has: page.getByRole("button", { name: "Retirer" }) }).last();
   await row.getByRole("button", { name: "Retirer" }).click();
   await page.getByRole("dialog", { name: "Retirer de l'effectif" }).getByRole("button", { name: "Retirer de l'effectif" }).click();
   await expect(page.getByText(/retiré\(e\) de l'effectif/)).toBeVisible();

@@ -73,3 +73,12 @@ export const SHEET_STATUS_LABEL: Record<string, string> = {
   validated: "Validée",
   closed: "Clôturée",
 };
+
+export const ROLE_LABEL: Record<string, string> = {
+  super_admin: "Super administrateur",
+  admin_competition: "Administration de la compétition",
+  gestionnaire_club: "Gestionnaire de club",
+  delegue_match: "Délégué de match",
+  cellule_technique: "Cellule technique",
+  controleur_acces: "Contrôleur d'accès",
+};

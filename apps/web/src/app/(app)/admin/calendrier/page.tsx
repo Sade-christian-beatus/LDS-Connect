@@ -4,7 +4,7 @@ import { Badge, Button, Field, inputClass, Notice } from "@/components/admin/ui"
 import { RequireAuth } from "@/components/RequireAuth";
 import { ApiError, useAuth } from "@/lib/auth";
 import { formatDate, PHASE_LABEL } from "@/lib/format";
-import type { Match, Season, Venue } from "@/lib/types";
+import type { Delegate, Match, Season, Venue } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
 export default function CalendrierAdminPage() {
@@ -36,6 +36,8 @@ function CalendarAdmin() {
   const path = poolCode === "F" ? "/bracket" : `/matches?pool=${poolCode}`;
   const { data: matches, reload } = useApi<Match[]>(path);
   const { data: venues, reload: reloadVenues } = useApi<Venue[]>("/venues");
+  const { data: delegates } = useApi<Delegate[]>("/admin/delegates");
+  const { data: assignments, reload: reloadAssignments } = useApi<Record<string, Delegate>>("/admin/delegate-assignments");
 
   const ok = useCallback(
     (text: string) => {
@@ -65,7 +67,20 @@ function CalendarAdmin() {
       {pool && <GeneratePanel poolId={pool.id} hasMatches={!!matches?.length} onDone={ok} onError={fail} />}
       {poolCode === "F" && <BracketPanel onDone={ok} onError={fail} />}
 
-      {matches && venues && <MatchTable matches={matches} venues={venues} onSaved={ok} onError={fail} />}
+      {matches && venues && (
+        <MatchTable
+          matches={matches}
+          venues={venues}
+          delegates={delegates ?? []}
+          assignments={assignments ?? {}}
+          onAssigned={(t) => {
+            setNotice({ tone: "ok", text: t });
+            reloadAssignments();
+          }}
+          onSaved={ok}
+          onError={fail}
+        />
+      )}
       {venues && <VenuesPanel venues={venues} onDone={(t) => { setNotice({ tone: "ok", text: t }); reloadVenues(); }} onError={fail} />}
     </div>
   );
@@ -181,12 +196,21 @@ function BracketPanel({ onDone, onError }: { onDone: (t: string) => void; onErro
   );
 }
 
+type DelegateProps = {
+  delegates: Delegate[];
+  assignments: Record<string, Delegate>;
+  onAssigned: (t: string) => void;
+};
+
 function MatchTable({
   matches,
   venues,
+  delegates,
+  assignments,
+  onAssigned,
   onSaved,
   onError,
-}: {
+}: DelegateProps & {
   matches: Match[];
   venues: Venue[];
   onSaved: (t: string) => void;
@@ -206,10 +230,26 @@ function MatchTable({
             {title}
             {list[0]?.kickoff_at && <span className="ml-2 font-normal text-stone-500">{formatDate(list[0].kickoff_at)}</span>}
           </h2>
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[60rem] table-fixed text-sm">
+            {/* Largeurs fixes : toutes les journées s'alignent, aucun champ tronqué */}
+            <colgroup>
+              <col className="w-[20%]" />
+              <col className="w-[22%]" />
+              <col className="w-[18%]" />
+              <col className="w-[12%]" />
+              <col className="w-[17%]" />
+              <col className="w-[11%]" />
+            </colgroup>
             <tbody>
               {list.map((m) => (
-                <MatchRow key={`${m.id}-${m.kickoff_at}-${m.venue?.id}-${m.status}`} match={m} venues={venues} onSaved={onSaved} onError={onError} />
+                <MatchRow key={`${m.id}-${m.kickoff_at}-${m.venue?.id}-${m.status}`} match={m}
+                  venues={venues}
+                  delegates={delegates}
+                  assignments={assignments}
+                  onAssigned={onAssigned}
+                  onSaved={onSaved}
+                  onError={onError}
+                />
               ))}
             </tbody>
           </table>
@@ -222,9 +262,12 @@ function MatchTable({
 function MatchRow({
   match,
   venues,
+  delegates,
+  assignments,
+  onAssigned,
   onSaved,
   onError,
-}: {
+}: DelegateProps & {
   match: Match;
   venues: Venue[];
   onSaved: (t: string) => void;
@@ -280,6 +323,33 @@ function MatchRow({
             ))}
           </select>
         )}
+      </td>
+      <td className="px-2 py-1.5">
+        <select
+          aria-label={`Délégué ${label}`}
+          disabled={match.status === "finished" || !match.home || !match.away}
+          title={!match.home || !match.away ? "Équipes pas encore connues" : undefined}
+          className={inputClass}
+          value={assignments[match.id]?.id ?? ""}
+          onChange={async (e) => {
+            try {
+              const d = await api<Delegate | null>(`/admin/matches/${match.id}/delegate`, {
+                method: "PUT",
+                body: JSON.stringify({ user_id: e.target.value || null }),
+              });
+              onAssigned(d ? `${label} : délégué ${d.full_name}` : `${label} : délégué retiré`);
+            } catch (err) {
+              onError(err);
+            }
+          }}
+        >
+          <option value="">Délégué non attribué</option>
+          {delegates.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.full_name}
+            </option>
+          ))}
+        </select>
       </td>
       <td className="px-2 py-1.5 text-right">
         {!locked && (

@@ -16,11 +16,13 @@ export function menuFor(user: User): { href: string; label: string }[] {
   if (p.has("sheet:edit")) items.push({ href: "/delegue", label: "Feuilles de match" });
   if (p.has("licence:verify")) items.push({ href: "/controle", label: "Contrôle" });
   if (p.has("audit:read")) items.push({ href: "/admin/journal", label: "Journal" });
+  if (p.has("user:manage")) items.push({ href: "/admin/comptes", label: "Comptes" });
   return items;
 }
 
 /** Écran d'arrivée après connexion : l'outil principal du rôle. */
 export function landingFor(user: User): string {
+  if (user.must_change_password) return "/compte";
   const p = new Set(user.permissions);
   if (p.has("team:manage")) return "/admin/equipes";
   if (p.has("squad:write") && user.team_id) return `/admin/equipes/${user.team_id}`;
@@ -34,7 +36,8 @@ export function AppHeader() {
   const online = useOnline();
   const router = useRouter();
   const pathname = usePathname();
-  const menu = user ? menuFor(user) : [];
+  // Mot de passe provisoire : aucun menu tant qu'il n'est pas changé
+  const menu = user && !user.must_change_password ? menuFor(user) : [];
   return (
     <header className="sticky top-0 z-10 bg-lds-green text-white shadow">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
@@ -59,6 +62,11 @@ export function AppHeader() {
           <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${online ? "bg-green-700" : "bg-lds-red"}`} role="status">
             {online ? "En ligne" : "Hors connexion"}
           </span>
+          {user && (
+            <Link href="/compte" className="underline" title={user.email}>
+              Mon compte
+            </Link>
+          )}
           {user && (
             <button
               type="button"
