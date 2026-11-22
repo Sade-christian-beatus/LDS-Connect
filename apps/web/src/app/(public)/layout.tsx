@@ -5,6 +5,7 @@ const NAV = [
   { href: "/calendrier", label: "Calendrier" },
   { href: "/resultats", label: "Résultats" },
   { href: "/classements", label: "Classements" },
+  { href: "/statistiques", label: "Statistiques" },
   { href: "/equipes", label: "Équipes" },
 ];
 

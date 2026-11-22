@@ -38,3 +38,5 @@ export type GenerateFixturesIn = S["GenerateFixturesIn"];
 export type Position = S["PlayerCreate"]["position"];
 export type StaffFunction = S["StaffCreate"]["function"];
 export type Rules = S["RulesOut"];
+export type SeasonStats = S["SeasonStats"];
+export type StatRow = S["StatRow"];

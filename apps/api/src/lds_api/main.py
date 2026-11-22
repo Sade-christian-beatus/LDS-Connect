@@ -33,10 +33,14 @@ def create_app() -> FastAPI:
         v1.include_router(module.router)
     app.include_router(v1)
 
-    # GET et HEAD : les sondes de supervision et répartiteurs de charge utilisent souvent HEAD
-    @app.api_route(f"{API_PREFIX}/health", methods=["GET", "HEAD"], tags=["système"])
+    # GET (documenté) et HEAD (sondes de supervision, répartiteurs de charge, wait-on)
+    @app.get(f"{API_PREFIX}/health", tags=["système"])
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.head(f"{API_PREFIX}/health", include_in_schema=False)
+    def health_head() -> None:
+        return None
 
     return app
 

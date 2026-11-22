@@ -549,6 +549,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Season Stats
+         * @description Meilleurs buteurs et passeurs (feuilles validées). Nom d'usage uniquement.
+         */
+        get: operations["season_stats_api_v1_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/venues": {
         parameters: {
             query?: never;
@@ -1471,6 +1491,13 @@ export interface components {
             /** Pools */
             pools: components["schemas"]["PoolOut"][];
         };
+        /** SeasonStats */
+        SeasonStats: {
+            /** Scorers */
+            scorers: components["schemas"]["StatRow"][];
+            /** Assists */
+            assists: components["schemas"]["StatRow"][];
+        };
         /** SensitiveData */
         SensitiveData: {
             /**
@@ -1706,6 +1733,26 @@ export interface components {
             needs_draw: boolean;
             /** Qualified Zone */
             qualified_zone: boolean;
+        };
+        /** StatRow */
+        StatRow: {
+            /** Rank */
+            rank: number;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Display Name */
+            display_name: string;
+            team: components["schemas"]["TeamRef"];
+            /** Value */
+            value: number;
+            /**
+             * Penalties
+             * @default 0
+             */
+            penalties: number;
         };
         /** StatusIn */
         StatusIn: {
@@ -2783,6 +2830,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MatchOut"][];
+                };
+            };
+        };
+    };
+    season_stats_api_v1_stats_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonStats"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
