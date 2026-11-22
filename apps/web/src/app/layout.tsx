@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1f7a3a",
+  themeColor: "#0a3a1e",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body className="min-h-screen bg-stone-50 text-stone-900 antialiased">
         {children}
         <ServiceWorker />

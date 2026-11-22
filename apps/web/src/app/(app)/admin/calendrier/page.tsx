@@ -51,7 +51,7 @@ function CalendarAdmin() {
   const pool = season?.pools.find((p) => p.code === poolCode);
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-green-900">Calendrier</h1>
+      <h1 className="text-2xl font-black tracking-tight text-pitch">Calendrier</h1>
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Phase">
         {season?.pools.map((p) => (
           <TabButton key={p.code} active={poolCode === p.code} onClick={() => setPoolCode(p.code as "A" | "B")}>

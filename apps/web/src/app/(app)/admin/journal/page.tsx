@@ -73,7 +73,7 @@ function Journal() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-green-900">Journal d&apos;audit</h1>
+      <h1 className="text-2xl font-black tracking-tight text-pitch">Journal d&apos;audit</h1>
       <p className="text-sm text-stone-600">
         Qui a fait quoi, et quand. Le journal ne peut être ni modifié ni effacé, même par un administrateur de la base.
       </p>

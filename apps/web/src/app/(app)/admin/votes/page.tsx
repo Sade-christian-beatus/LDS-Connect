@@ -19,7 +19,7 @@ function BallotList() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold text-green-900">Votes du public</h1>
+        <h1 className="text-2xl font-black tracking-tight text-pitch">Votes du public</h1>
         <Link href="/admin/votes/nouveau" className="rounded bg-lds-green px-3 py-1.5 text-sm font-semibold text-white">
           + Nouveau scrutin
         </Link>

@@ -3,7 +3,7 @@ import { OrderView } from "./order-view";
 
 export default function OrderPage({ params }: PageProps<"/billets/[reference]">) {
   return (
-    <Suspense fallback={<p className="text-stone-500">Chargement de vos billets…</p>}>
+    <Suspense fallback={<p className="text-subtle">Chargement de vos billets…</p>}>
       <Resolve params={params} />
     </Suspense>
   );

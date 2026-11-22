@@ -104,7 +104,7 @@ function BallotForm() {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <h1 className="text-2xl font-bold text-green-900">Nouveau scrutin</h1>
+      <h1 className="text-2xl font-black tracking-tight text-pitch">Nouveau scrutin</h1>
       <Notice notice={notice} onClose={() => setNotice(null)} />
 
       <section className="grid gap-3 rounded-lg border border-stone-200 bg-white p-4 sm:grid-cols-2">

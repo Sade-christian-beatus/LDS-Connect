@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BracketTree } from "@/components/BracketTree";
+import { PageHeader } from "@/components/PageHeader";
 import { StandingsTable } from "@/components/StandingsTable";
 import { apiGet } from "@/lib/server-api";
 import type { Match, PoolStandings } from "@/lib/types";
@@ -10,8 +11,10 @@ export const metadata: Metadata = { title: "Classements" };
 export default function ClassementsPage() {
   return (
     <>
-      <h1 className="text-2xl font-bold text-green-900">Classements</h1>
-      <Suspense fallback={<p className="text-stone-500">Chargement des classements…</p>}>
+      <PageHeader kicker="Saison 2027" title="Classements">
+        Les quatre premiers de chaque poule se qualifient pour les quarts de finale.
+      </PageHeader>
+      <Suspense fallback={<p className="text-subtle">Chargement des classements…</p>}>
         <Tables />
       </Suspense>
     </>
@@ -25,15 +28,20 @@ async function Tables() {
   ]);
   return (
     <>
-      {standings.map((p) => (
-        <StandingsTable key={p.pool_code} pool={p} />
-      ))}
-      <p className="text-xs text-stone-500">
+      <div className="grid gap-6 xl:grid-cols-2">
+        {standings.map((p) => (
+          <StandingsTable key={p.pool_code} pool={p} />
+        ))}
+      </div>
+      <p className="text-xs text-subtle">
         Départage selon les critères de la saison (points, confrontations directes, différence de
         buts…). * égalité à départager par la commission.
       </p>
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-green-900">Phases finales</h2>
+        <h2 className="flex items-center gap-2 text-2xl font-black tracking-tight text-heading">
+          <span aria-hidden className="h-6 w-1.5 rounded-full bg-lds-gold" />
+          Phases finales
+        </h2>
         <BracketTree matches={bracket} />
       </section>
     </>

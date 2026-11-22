@@ -50,7 +50,7 @@ export function VoteWidget({ ballot }: { ballot: BallotOut }) {
 
   if (done) {
     return (
-      <div role="status" className="rounded-xl bg-green-50 p-5 text-green-900">
+      <div role="status" className="rounded-xl bg-qualify p-5 text-heading">
         <p className="text-lg font-bold">Merci, votre vote est enregistré !</p>
         <p className="text-sm">Un seul vote est possible par numéro pour ce scrutin.</p>
       </div>
@@ -58,11 +58,11 @@ export function VoteWidget({ ballot }: { ballot: BallotOut }) {
   }
 
   return (
-    <section className="space-y-4 rounded-xl border border-stone-200 bg-white p-4" aria-label="Voter">
+    <section className="space-y-4 rounded-xl border border-line bg-surface p-4" aria-label="Voter">
       <fieldset disabled={!!sent} className="space-y-2">
         <legend className="font-semibold">
           1. {multi ? `Choisissez jusqu'à ${ballot.max_choices} propositions` : "Choisissez votre favori"}
-          {multi && <span className="ml-2 text-sm font-normal text-stone-500">({choices.length}/{ballot.max_choices})</span>}
+          {multi && <span className="ml-2 text-sm font-normal text-subtle">({choices.length}/{ballot.max_choices})</span>}
         </legend>
         <ul className="grid gap-2 sm:grid-cols-2">
           {ballot.options.map((o) => {
@@ -70,13 +70,13 @@ export function VoteWidget({ ballot }: { ballot: BallotOut }) {
             return (
               <li key={o.id}>
                 <label
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 ${on ? "border-lds-green bg-green-50" : "border-stone-200"}`}
+                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 ${on ? "border-lds-green bg-qualify" : "border-line"}`}
                 >
                   <input type={multi ? "checkbox" : "radio"} name="choice" checked={on} onChange={() => toggle(o.id)} className="h-4 w-4" />
                   {o.team && <TeamBadge team={o.team} size="sm" />}
                   <span className="flex-1">
                     <span className="block font-medium">{o.label}</span>
-                    {o.team && <span className="text-xs text-stone-500">{o.team.name}</span>}
+                    {o.team && <span className="text-xs text-subtle">{o.team.name}</span>}
                   </span>
                 </label>
               </li>
@@ -107,13 +107,13 @@ export function VoteWidget({ ballot }: { ballot: BallotOut }) {
               required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded border border-stone-300 px-3 py-2"
+              className="w-full rounded border border-line px-3 py-2"
             />
             <button type="submit" disabled={busy} className="whitespace-nowrap rounded bg-lds-green px-4 py-2 font-semibold text-white disabled:opacity-60">
               Recevoir mon code
             </button>
           </div>
-          <p className="text-xs text-stone-500">
+          <p className="text-xs text-subtle">
             Numéros du Burkina Faso. Votre numéro sert uniquement à garantir un vote par personne : il n&apos;est ni publié,
             ni utilisé à d&apos;autres fins.
           </p>
@@ -143,7 +143,7 @@ export function VoteWidget({ ballot }: { ballot: BallotOut }) {
               required
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className="w-40 rounded border border-stone-300 px-3 py-2 text-center font-mono text-lg tracking-widest"
+              className="w-40 rounded border border-line px-3 py-2 text-center font-mono text-lg tracking-widest"
             />
             <button type="submit" disabled={busy} className="rounded bg-lds-green px-4 py-2 font-semibold text-white disabled:opacity-60">
               Valider mon vote
@@ -156,7 +156,7 @@ export function VoteWidget({ ballot }: { ballot: BallotOut }) {
       )}
 
       {error && (
-        <p role="alert" className="rounded bg-red-50 p-2 text-sm text-lds-red">
+        <p role="alert" className="rounded bg-red-50 dark:bg-red-950/40 p-2 text-sm text-lds-red">
           {error}
         </p>
       )}

@@ -92,7 +92,7 @@ function Controle() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <h1 className="text-xl font-bold text-green-900">Contrôle des licences</h1>
+      <h1 className="text-xl font-black tracking-tight text-pitch">Contrôle des licences</h1>
       <p className="text-xs text-stone-500">
         {keys
           ? `Appareil synchronisé le ${new Date(keys.savedAt).toLocaleString("fr-FR")} — vérification possible hors connexion.`

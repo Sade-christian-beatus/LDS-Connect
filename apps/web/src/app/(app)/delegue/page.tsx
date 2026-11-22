@@ -37,7 +37,7 @@ function MatchList() {
   return (
     <div className="mx-auto max-w-3xl space-y-3">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-green-900">Mes matchs</h1>
+        <h1 className="text-xl font-black tracking-tight text-pitch">Mes matchs</h1>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
           Toute la saison

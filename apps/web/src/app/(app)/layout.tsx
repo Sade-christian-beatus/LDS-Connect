@@ -7,8 +7,13 @@ export const metadata: Metadata = { title: "Espace officiels", robots: { index: 
 
 function HeaderShell() {
   return (
-    <header className="sticky top-0 z-10 bg-lds-green text-white shadow print:hidden">
-      <div className="mx-auto max-w-6xl px-3 py-2 text-sm font-bold">LDS · Officiels</div>
+    <header className="sticky top-0 z-30 bg-pitch text-white shadow print:hidden">
+      <div aria-hidden className="flex h-1">
+        <span className="flex-1 bg-lds-red" />
+        <span className="flex-1 bg-lds-gold" />
+        <span className="flex-1 bg-lds-green" />
+      </div>
+      <div className="px-4 py-2.5 text-sm font-black">LDS · Officiels</div>
     </header>
   );
 }
@@ -20,7 +25,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Suspense fallback={<HeaderShell />}>
         <AppHeader />
       </Suspense>
-      <main className="mx-auto max-w-6xl px-3 py-4">{children}</main>
+      {/* Menu latéral (grand écran, nombreux outils) : le contenu se décale d'autant */}
+      <div className="app-main">
+        <main className="mx-auto max-w-6xl px-4 py-5">{children}</main>
+      </div>
     </AuthProvider>
   );
 }
