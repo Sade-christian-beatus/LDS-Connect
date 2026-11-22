@@ -6,7 +6,7 @@ import { Badge, Button, Notice } from "@/components/admin/ui";
 import { RequireAuth } from "@/components/RequireAuth";
 import { ResultsBars } from "@/components/ResultsBars";
 import { useAuth } from "@/lib/auth";
-import { BALLOT_KIND_LABEL, BALLOT_STATE, formatDateTime } from "@/lib/format";
+import { BALLOT_KIND_LABEL, ballotBadge, formatDateTime } from "@/lib/format";
 import type { BallotAdmin, Voter } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
@@ -64,7 +64,9 @@ function BallotScreen({ id }: { id: string }) {
   }
 
   if (!b) return <p className="text-stone-500">Chargement du scrutin…</p>;
-  const st = BALLOT_STATE[b.state];
+  const st = ballotBadge(b);
+  // Définitifs une fois le vote clos et tous les votes suspects examinés.
+  const final = b.state === "closed" && b.flagged_voters === 0;
 
   return (
     <div className="space-y-4">
@@ -114,7 +116,7 @@ function BallotScreen({ id }: { id: string }) {
 
       <section className="space-y-2 rounded-lg border border-stone-200 bg-white p-4">
         <h2 className="font-semibold">
-          Résultats provisoires <span className="text-sm font-normal text-stone-500">({b.results?.participants ?? 0} votant(s) comptés)</span>
+          Résultats {final ? "définitifs" : "provisoires"} <span className="text-sm font-normal text-stone-500">({b.results?.participants ?? 0} votant(s) comptés)</span>
         </h2>
         {b.results && <ResultsBars results={b.results} />}
       </section>

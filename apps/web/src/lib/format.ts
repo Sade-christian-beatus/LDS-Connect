@@ -99,6 +99,11 @@ export const BALLOT_STATE: Record<string, { label: string; tone: "green" | "ambe
   closed: { label: "Clos", tone: "amber" },
 };
 
+/** Pastille d'un scrutin côté administration (la publication confirmée prime sur l'état). */
+export function ballotBadge(b: { state: string; status: string }) {
+  return b.status === "published" ? { label: "Résultats publiés", tone: "green" as const } : BALLOT_STATE[b.state];
+}
+
 /** Saisie « datetime-local » ↔ ISO : Ouagadougou est en UTC toute l'année. */
 export const toLocalInput = (iso: string | null | undefined) => (iso ? iso.slice(0, 16) : "");
 export const fromLocalInput = (v: string) => (v ? `${v}:00Z` : null);
