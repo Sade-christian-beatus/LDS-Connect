@@ -957,6 +957,248 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ballots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Ballots
+         * @description Scrutins ouverts, à venir et clos (résultats selon la règle de publication).
+         */
+        get: operations["list_ballots_api_v1_ballots_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ballots/{ballot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Ballot */
+        get: operations["get_ballot_api_v1_ballots__ballot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ballots/{ballot_id}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request Code
+         * @description Envoie un code par SMS au numéro indiqué ; les choix restent en attente du code.
+         */
+        post: operations["request_code_api_v1_ballots__ballot_id__code_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ballots/{ballot_id}/vote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cast Vote
+         * @description Confirme le vote avec le code reçu. Réponse identique que le vote soit compté
+         *     immédiatement ou mis de côté pour examen (pas d'indice pour un fraudeur).
+         */
+        post: operations["cast_vote_api_v1_ballots__ballot_id__vote_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin List */
+        get: operations["admin_list_api_v1_admin_ballots_get"];
+        put?: never;
+        /** Create Ballot */
+        post: operations["create_ballot_api_v1_admin_ballots_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ballot Candidates
+         * @description Propositions suggérées (joueurs d'un match, entraîneurs, buts marqués…).
+         */
+        get: operations["ballot_candidates_api_v1_admin_ballots_candidates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/{ballot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Get */
+        get: operations["admin_get_api_v1_admin_ballots__ballot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Ballot */
+        patch: operations["update_ballot_api_v1_admin_ballots__ballot_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/{ballot_id}/{action}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ballot Action
+         * @description Actions : open (ouvrir), close (clore avant la date), publish (publier les résultats).
+         */
+        post: operations["ballot_action_api_v1_admin_ballots__ballot_id___action__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/{ballot_id}/voters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ballot Voters */
+        get: operations["ballot_voters_api_v1_admin_ballots__ballot_id__voters_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/{ballot_id}/voters/{voter}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Review Voter */
+        post: operations["review_voter_api_v1_admin_ballots__ballot_id__voters__voter__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/{ballot_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ballot Report
+         * @description Données du procès-verbal (page imprimable / PDF côté interface).
+         */
+        get: operations["ballot_report_api_v1_admin_ballots__ballot_id__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/{ballot_id}/journal.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Journal Csv */
+        get: operations["journal_csv_api_v1_admin_ballots__ballot_id__journal_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ballots/{ballot_id}/results.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Results Csv */
+        get: operations["results_csv_api_v1_admin_ballots__ballot_id__results_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -1007,6 +1249,168 @@ export interface components {
             /** Ip Address */
             ip_address: string | null;
         };
+        /** BallotAdminOut */
+        BallotAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["BallotKind"];
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            /** Match Id */
+            match_id: string | null;
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** State */
+            state: string;
+            /** Max Choices */
+            max_choices: number;
+            /** Is Paid */
+            is_paid: boolean;
+            results_visibility: components["schemas"]["ResultsVisibility"];
+            /** Results Publish At */
+            results_publish_at: string | null;
+            /** Results Visible */
+            results_visible: boolean;
+            /** Options */
+            options: components["schemas"]["OptionOut"][];
+            results?: components["schemas"]["Results"] | null;
+            status: components["schemas"]["BallotStatus"];
+            /** Flagged Voters */
+            flagged_voters: number;
+            /** Rejected Voters */
+            rejected_voters: number;
+        };
+        /** BallotIn */
+        BallotIn: {
+            kind: components["schemas"]["BallotKind"];
+            /** Title */
+            title: string;
+            /** Description */
+            description?: string | null;
+            /** Match Id */
+            match_id?: string | null;
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /**
+             * Max Choices
+             * @default 1
+             */
+            max_choices: number;
+            /** @default immediate */
+            results_visibility: components["schemas"]["ResultsVisibility"];
+            /** Results Publish At */
+            results_publish_at?: string | null;
+            /**
+             * Is Paid
+             * @default false
+             */
+            is_paid: boolean;
+            /** Options */
+            options?: components["schemas"]["OptionIn"][];
+        };
+        /**
+         * BallotKind
+         * @enum {string}
+         */
+        BallotKind: "man_of_the_match" | "goal_of_the_month" | "player_of_the_season" | "coach_of_the_season" | "team_of_the_season" | "special";
+        /** BallotOut */
+        BallotOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["BallotKind"];
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            /** Match Id */
+            match_id: string | null;
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** State */
+            state: string;
+            /** Max Choices */
+            max_choices: number;
+            /** Is Paid */
+            is_paid: boolean;
+            results_visibility: components["schemas"]["ResultsVisibility"];
+            /** Results Publish At */
+            results_publish_at: string | null;
+            /** Results Visible */
+            results_visible: boolean;
+            /** Options */
+            options: components["schemas"]["OptionOut"][];
+            results?: components["schemas"]["Results"] | null;
+        };
+        /**
+         * BallotStatus
+         * @enum {string}
+         */
+        BallotStatus: "draft" | "open" | "closed" | "published";
+        /** BallotUpdate */
+        BallotUpdate: {
+            /** Title */
+            title?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Opens At */
+            opens_at?: string | null;
+            /** Closes At */
+            closes_at?: string | null;
+            /** Max Choices */
+            max_choices?: number | null;
+            results_visibility?: components["schemas"]["ResultsVisibility"] | null;
+            /** Results Publish At */
+            results_publish_at?: string | null;
+            /** Is Paid */
+            is_paid?: boolean | null;
+            /** Options */
+            options?: components["schemas"]["OptionIn"][] | null;
+        };
+        /** Candidate */
+        Candidate: {
+            /** Label */
+            label: string;
+            /** Sublabel */
+            sublabel: string | null;
+            /** Person Id */
+            person_id?: string | null;
+            /** Team Id */
+            team_id?: string | null;
+            /** Match Event Id */
+            match_event_id?: string | null;
+        };
         /**
          * CandidateOut
          * @description Joueur de l'effectif, avec son éligibilité pour ce match.
@@ -1034,6 +1438,28 @@ export interface components {
             licence_ok: boolean;
             /** Is Suspended */
             is_suspended: boolean;
+        };
+        /** CodeRequest */
+        CodeRequest: {
+            /** Phone */
+            phone: string;
+            /** Choices */
+            choices: string[];
+        };
+        /** CodeSent */
+        CodeSent: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Phone Hint */
+            phone_hint: string;
         };
         /**
          * CredentialsOut
@@ -1352,6 +1778,51 @@ export interface components {
          * @enum {string}
          */
         MembershipStatus: "active" | "released";
+        /** OptionIn */
+        OptionIn: {
+            /** Label */
+            label: string;
+            /** Person Id */
+            person_id?: string | null;
+            /** Team Id */
+            team_id?: string | null;
+            /** Match Event Id */
+            match_event_id?: string | null;
+            /** Media Url */
+            media_url?: string | null;
+        };
+        /** OptionOut */
+        OptionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            team: components["schemas"]["TeamRef"] | null;
+            /** Media Url */
+            media_url: string | null;
+            /** Position */
+            position: number;
+        };
+        /** OptionResult */
+        OptionResult: {
+            /**
+             * Option Id
+             * Format: uuid
+             */
+            option_id: string;
+            /** Label */
+            label: string;
+            team: components["schemas"]["TeamRef"] | null;
+            /** Votes */
+            votes: number;
+            /** Share */
+            share: number;
+            /** Rank */
+            rank: number;
+        };
         /** PasswordChangeIn */
         PasswordChangeIn: {
             /** Current Password */
@@ -1561,6 +2032,44 @@ export interface components {
             name: string;
             /** Slug */
             slug: string;
+        };
+        /**
+         * ReportOut
+         * @description Données du procès-verbal (page imprimable côté interface).
+         */
+        ReportOut: {
+            ballot: components["schemas"]["BallotAdminOut"];
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Generated By */
+            generated_by: string;
+            /** Valid Voters */
+            valid_voters: number;
+            /** Flagged Voters */
+            flagged_voters: number;
+            /** Rejected Voters */
+            rejected_voters: number;
+            /** Journal Sha256 */
+            journal_sha256: string;
+        };
+        /** Results */
+        Results: {
+            /** Participants */
+            participants: number;
+            /** Options */
+            options: components["schemas"]["OptionResult"][];
+        };
+        /**
+         * ResultsVisibility
+         * @enum {string}
+         */
+        ResultsVisibility: "immediate" | "scheduled";
+        /** ReviewIn */
+        ReviewIn: {
+            decision: components["schemas"]["VoteStatus"];
         };
         /**
          * RoleCode
@@ -2150,6 +2659,41 @@ export interface components {
             message: string;
             /** Person Id */
             person_id?: string | null;
+        };
+        /** VoteIn */
+        VoteIn: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /** Code */
+            code: string;
+        };
+        /**
+         * VoteStatus
+         * @enum {string}
+         */
+        VoteStatus: "valid" | "flagged" | "rejected";
+        /**
+         * VoterOut
+         * @description Participation vue par l'administration : jamais le numéro, seulement son empreinte.
+         */
+        VoterOut: {
+            /** Voter */
+            voter: string;
+            /**
+             * Cast At
+             * Format: date-time
+             */
+            cast_at: string;
+            status: components["schemas"]["VoteStatus"];
+            /** Flag Reason */
+            flag_reason: string | null;
+            /** Connection */
+            connection: string | null;
+            /** Choices */
+            choices: string[];
         };
     };
     responses: never;
@@ -3786,6 +4330,470 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["DelegateOut"] | null;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_ballots_api_v1_ballots_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BallotOut"][];
+                };
+            };
+        };
+    };
+    get_ballot_api_v1_ballots__ballot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BallotOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_code_api_v1_ballots__ballot_id__code_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CodeSent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cast_vote_api_v1_ballots__ballot_id__vote_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_api_v1_admin_ballots_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BallotAdminOut"][];
+                };
+            };
+        };
+    };
+    create_ballot_api_v1_admin_ballots_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BallotIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BallotAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ballot_candidates_api_v1_admin_ballots_candidates_get: {
+        parameters: {
+            query: {
+                /** @description match | players | coaches | goals | teams */
+                kind: string;
+                match_id?: string | null;
+                team_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Candidate"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_get_api_v1_admin_ballots__ballot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BallotAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_ballot_api_v1_admin_ballots__ballot_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BallotUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BallotAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ballot_action_api_v1_admin_ballots__ballot_id___action__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+                action: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BallotAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ballot_voters_api_v1_admin_ballots__ballot_id__voters_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["VoteStatus"] | null;
+            };
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoterOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_voter_api_v1_admin_ballots__ballot_id__voters__voter__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+                voter: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ballot_report_api_v1_admin_ballots__ballot_id__report_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    journal_csv_api_v1_admin_ballots__ballot_id__journal_csv_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    results_csv_api_v1_admin_ballots__ballot_id__results_csv_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ballot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

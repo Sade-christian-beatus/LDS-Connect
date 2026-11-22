@@ -36,6 +36,13 @@ Puis éditer `.env` :
 | `POSTGRES_PASSWORD` | mot de passe long et aléatoire |
 | `REFRESH_COOKIE_SECURE` | `true` |
 | `SMS_PROVIDER`, `PAYMENT_PROVIDER` | `console` / `disabled` tant que les contrats ne sont pas signés |
+| `VOTE_ALLOWED_COUNTRY_CODES` | `226` (Burkina Faso) ; ajouter d'autres indicatifs pour la diaspora |
+
+> **Votes du public et SMS** : seuls le simulateur et l'affichage dans les journaux
+> (`console`) existent aujourd'hui. **Les votes ne doivent pas être ouverts en production**
+> avant le branchement d'un connecteur SMS réel (opérateur ou agrégateur choisi par la Ligue,
+> à implémenter dans `apps/api/src/lds_api/providers/sms`). Avec `console`, les codes
+> n'apparaissent que dans les journaux du serveur.
 
 > **Clés** (`JWT_SECRET`, `FIELD_ENCRYPTION_KEY`, `BLIND_INDEX_KEY`, `LICENCE_SIGNING_KEY`) :
 > conserver une copie **hors du serveur** (coffre-fort de mots de passe, deux personnes

@@ -27,7 +27,8 @@ remplace pas un avis juridique.
 | Match | compositions, buts, cartons, suspensions | joueurs | public (noms d'usage) et officiels |
 | Comptes | e-mail, nom, rôle, mot de passe **haché (argon2id)** | officiels | super administrateur |
 | Traces | journal d'audit (auteur, action, date, adresse IP) | officiels | administration |
-| Phase 2 | téléphone des votants (index HMAC + chiffré), acheteurs de billets | public | administration |
+| Votes du public | numéro de téléphone du votant : **chiffré** dans le défi SMS uniquement ; les votes ne portent que son empreinte HMAC ; adresse IP et navigateur sous forme d'empreintes | public | administration (empreintes seulement, jamais le numéro) |
+| Phase 2 (à venir) | acheteurs de billets | public | administration |
 
 Aucune pièce d'identité numérisée n'est stockée à ce stade.
 
@@ -59,7 +60,16 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
 | Sauvegardes | chiffrées au repos pour les champs sensibles ; à stocker hors du serveur, accès restreint |
 | Données de test | seed de démonstration **100 % fictif**, refusé en production |
 
-## 5. Droits des personnes
+## 5. Votes du public
+
+- Finalité unique du numéro : garantir **un vote par personne** (code SMS à usage unique) ; il
+  n'est ni publié, ni réutilisé, ni transmis. Mention affichée sous le champ de saisie.
+- Le numéro n'est conservé en clair (chiffré) que dans le défi SMS ; les votes, le journal CSV
+  et le procès-verbal n'en contiennent qu'une empreinte.
+- Durée de conservation des défis SMS et des votes : **à fixer par la Ligue** (proposition :
+  suppression des défis 30 jours après la clôture, empreintes conservées pour le contrôle).
+
+## 6. Droits des personnes
 
 - **Accès / rectification** : via le club ou l'administration (modification journalisée).
 - **Effacement** : un joueur quittant l'effectif est retiré (licence révoquée) ; l'historique
@@ -69,7 +79,7 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
   CNIB et téléphones y sont masqués par défaut ; l'export avec données sensibles
   (`--include-sensitive`) est journalisé et doit être protégé comme la base elle-même.
 
-## 6. Points à décider par la Ligue
+## 7. Points à décider par la Ligue
 
 - Désignation formelle du responsable de traitement et dépôt de la déclaration CIL.
 - Durées de conservation par catégorie (licences, feuilles, journaux, votes, billets).

@@ -51,8 +51,12 @@ toutes modifiables dans `competition_rules` sans changer le code.
 
 ## Phases 2 et 3 (à préciser avant développement)
 
-- Votes : liste des trophées, calendrier des scrutins, publication immédiate ou différée,
-  vote payant (prix, reversement), format du procès-verbal.
+- Votes (livrés, à paramétrer) : liste officielle des trophées et calendrier des scrutins ;
+  **opérateur SMS** (indispensable en production) et coût par code envoyé ; ouverture à la
+  diaspora (indicatifs autorisés) ; seuils de détection des votes en masse (actuellement :
+  plus de 10 votes d'une même connexion en 10 min, 5 numéros qui se suivent) ; durée de
+  conservation des numéros chiffrés ; vote payant (prix, reversement) avec la billetterie ;
+  signataires du procès-verbal.
 - Billetterie : catégories et prix, quotas, forfaits supporters (transport, hébergement),
   accréditations (catégories, zones).
 - Talents : indicateurs attendus par la cellule technique.
