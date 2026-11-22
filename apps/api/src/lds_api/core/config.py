@@ -44,6 +44,8 @@ class Settings(BaseSettings):
 
     # Fournisseurs (interfaces + simulateurs)
     sms_provider: Literal["simulator", "console"] = "simulator"
+    # Votes du public : indicatifs autorisés (séparés par des virgules), Burkina Faso par défaut
+    vote_allowed_country_codes: str = "226"
     sms_simulator_url: str = "http://localhost:8090"
     payment_provider: Literal["simulator", "disabled"] = "disabled"
     payment_simulator_url: str = "http://localhost:8090"

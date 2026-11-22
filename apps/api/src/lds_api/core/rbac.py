@@ -32,6 +32,7 @@ class Perm(StrEnum):
     AUDIT_READ = "audit:read"
     USER_MANAGE = "user:manage"
     DATA_EXPORT = "data:export"
+    VOTE_MANAGE = "vote:manage"  # scrutins du public : création, examen des votes, PV
 
 
 ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
@@ -53,6 +54,7 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
             Perm.SHEET_CLOSE,
             Perm.STATS_READ,
             Perm.AUDIT_READ,
+            Perm.VOTE_MANAGE,
         }
     ),
     # Limité à son équipe (voir ensure_team_scope)
