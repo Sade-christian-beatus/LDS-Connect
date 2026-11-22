@@ -112,6 +112,7 @@ docs/              Architecture, déploiement, données personnelles, questions 
 
 ## Documentation
 
+- **[Les plateformes de LDS Connect : qui utilise quoi ?](docs/PLATEFORMES.md)** — à lire en premier
 - [Architecture](docs/ARCHITECTURE.md)
 - [Déploiement](docs/DEPLOIEMENT.md) — serveur Linux + Docker, TLS, sauvegardes, mises à jour
 - [Données personnelles](docs/DONNEES_PERSONNELLES.md) — mineurs, chiffrement, journalisation, CIL
