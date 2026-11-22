@@ -66,14 +66,14 @@ export function AppHeader() {
           <span className="flex-1 bg-lds-gold" />
           <span className="flex-1 bg-lds-green" />
         </div>
-        <div className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
+        <div className="flex items-center justify-between gap-2 px-3 py-2 text-[13px] sm:px-4 sm:text-sm">
           <Link href={user ? landingFor(user) : "/"} className="flex items-center gap-2 font-black tracking-tight">
             <span aria-hidden className="rounded-md bg-white px-1.5 py-0.5 text-xs text-pitch">LDS</span>
             Officiels
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${online ? "bg-white/10" : "bg-lds-red"}`}
+              className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${online ? "bg-white/10" : "bg-lds-red"}`}
               role="status"
             >
               <span className={`h-2 w-2 rounded-full ${online ? "bg-green-400" : "bg-white"}`} />
@@ -96,14 +96,14 @@ export function AppHeader() {
               </Link>
             )}
             {user && (
-              <Link href="/compte" className="underline sm:hidden">
+              <Link href="/compte" className="whitespace-nowrap underline sm:hidden">
                 Mon compte
               </Link>
             )}
             {user && (
               <button
                 type="button"
-                className="rounded-full border border-white/25 px-3 py-1 hover:bg-white/10"
+                className="whitespace-nowrap rounded-full border border-white/25 px-2.5 py-1 hover:bg-white/10 sm:px-3"
                 title={user.email}
                 onClick={async () => {
                   await logout();
