@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/admin/ui";
 import { RequireAuth } from "@/components/RequireAuth";
-import { BALLOT_KIND_LABEL, BALLOT_STATE, formatDateTime } from "@/lib/format";
+import { BALLOT_KIND_LABEL, ballotBadge, formatDateTime } from "@/lib/format";
 import type { BallotAdmin } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
@@ -32,7 +32,7 @@ function BallotList() {
       {data && data.length === 0 && <p className="text-stone-600">Aucun scrutin pour le moment.</p>}
       <ul className="space-y-2">
         {data?.map((b) => {
-          const st = BALLOT_STATE[b.state];
+          const st = ballotBadge(b);
           return (
             <li key={b.id}>
               <Link
