@@ -34,6 +34,7 @@ class UserAdminOut(BaseModel):
     roles: list[RoleCode]
     team: TeamBrief | None
     is_active: bool
+    must_change_password: bool
     last_login_at: datetime | None
     created_at: datetime
 
@@ -83,6 +84,7 @@ def _out(db, u: User) -> UserAdminOut:
         roles=sorted(u.role_codes),
         team=TeamBrief(id=team.id, name=team.name) if team else None,
         is_active=u.is_active,
+        must_change_password=u.must_change_password,
         last_login_at=u.last_login_at,
         created_at=u.created_at,
     )

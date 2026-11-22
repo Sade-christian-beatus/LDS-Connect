@@ -78,8 +78,8 @@ par leurs initiales et une couleur, en attendant les fichiers et l'accord de la 
   licences (délivrance, carte imprimable, suspension), calendrier (génération, stades,
   horaires, délégué attribué à chaque match, tableau final), journal d'audit, gestion des
   comptes (super administrateur : création avec mot de passe provisoire affiché une seule
-  fois, rôle, désactivation, réinitialisation). Chacun change son mot de passe depuis
-  « Mon compte ». Chaque rôle ne voit que ce qui le concerne.
+  fois et à changer obligatoirement à la première connexion, rôle, désactivation,
+  réinitialisation). Chacun change son mot de passe depuis « Mon compte ». Chaque rôle ne voit que ce qui le concerne.
 
 Toutes les règles sportives sont dans la table `competition_rules` (une ligne par saison).
 

@@ -82,6 +82,7 @@ def create(db: Session, actor, *, email: str, full_name: str, role: RoleCode, te
         password_hash=hash_password(password),
         roles=[_role(db, role)],
         team_id=_check_team(db, role, team_id),
+        must_change_password=True,
     )
     db.add(user)
     db.flush()
@@ -132,6 +133,7 @@ def update_user(db: Session, actor, user: User, data: dict) -> User:
 def reset_password(db: Session, actor, user: User) -> str:
     password = temporary_password()
     user.password_hash = hash_password(password)
+    user.must_change_password = True
     revoke_sessions(db, user.id)
     audit.record(db, actor, "reset_password", "user", user.id)
     return password
@@ -149,6 +151,7 @@ def change_own_password(db: Session, actor, current: str, new: str) -> None:
     if new == current:
         raise BusinessError("Le nouveau mot de passe doit être différent de l'actuel")
     user.password_hash = hash_password(new)
+    user.must_change_password = False
     revoke_sessions(db, user.id)  # les autres appareils devront se reconnecter
     audit.record(db, actor, "change_password", "user", user.id)
 

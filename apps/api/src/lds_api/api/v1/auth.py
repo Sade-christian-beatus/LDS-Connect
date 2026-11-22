@@ -28,6 +28,7 @@ class UserOut(BaseModel):
     roles: list[str]
     permissions: list[str]
     team_id: uuid.UUID | None
+    must_change_password: bool
 
 
 class TokenOut(BaseModel):
@@ -48,6 +49,7 @@ def _user_out(actor_or_user) -> UserOut:
         roles=sorted(r.value for r in user.role_codes),
         permissions=sorted(p.value for p in permissions_for(user.role_codes)),
         team_id=user.team_id,
+        must_change_password=user.must_change_password,
     )
 
 

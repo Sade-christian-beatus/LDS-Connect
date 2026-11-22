@@ -37,6 +37,11 @@ export default function MonComptePage() {
   return (
     <div className="mx-auto max-w-md space-y-4">
       <h1 className="text-2xl font-bold text-green-900">Mon compte</h1>
+      {user.must_change_password && !done && (
+        <p role="status" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+          Votre mot de passe est <strong>provisoire</strong> : choisissez-en un nouveau pour accéder à votre espace.
+        </p>
+      )}
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-lg border border-stone-200 bg-white p-3 text-sm">
         <dt className="text-stone-500">Nom</dt>
         <dd>{user.full_name}</dd>
@@ -61,7 +66,7 @@ export default function MonComptePage() {
       ) : (
         <form onSubmit={submit} className="space-y-3 rounded-lg border border-stone-200 bg-white p-4">
           <h2 className="font-semibold">Changer de mot de passe</h2>
-          <Field label="Mot de passe actuel">
+          <Field label={user.must_change_password ? "Mot de passe provisoire reçu" : "Mot de passe actuel"}>
             <input type="password" autoComplete="current-password" required className={inputClass} value={f.current} onChange={(e) => setF({ ...f, current: e.target.value })} />
           </Field>
           <Field label="Nouveau mot de passe" hint={`${MIN_LENGTH} caractères minimum ; une phrase de plusieurs mots est idéale.`}>

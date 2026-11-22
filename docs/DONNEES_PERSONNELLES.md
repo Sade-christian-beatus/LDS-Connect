@@ -53,7 +53,7 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
 | Accès | rôles et permissions (`core/rbac.py`) ; un club ne voit que son équipe |
 | Lecture des données sensibles | route dédiée, chaque lecture est inscrite au journal d'audit |
 | Journal d'audit | qui / quoi / quand / IP sur licences, effectifs, feuilles de match, résultats, suspensions, connexions, exports ; valeurs sensibles masquées (`***`) dans le journal ; table **en ajout seul** (un déclencheur PostgreSQL interdit modification et suppression) |
-| Authentification | mots de passe argon2id ; sessions courtes ; cookie `httpOnly` ; détection de réutilisation de jeton ; limitation des tentatives ; mots de passe provisoires générés aléatoirement, affichés une seule fois, jamais stockés en clair ni journalisés ; désactivation ou réinitialisation d'un compte = fermeture de ses sessions |
+| Authentification | mots de passe argon2id ; sessions courtes ; cookie `httpOnly` ; détection de réutilisation de jeton ; limitation des tentatives ; mots de passe provisoires générés aléatoirement, affichés une seule fois, jamais stockés en clair ni journalisés, à remplacer obligatoirement avant toute autre action ; désactivation ou réinitialisation d'un compte = fermeture de ses sessions |
 | Transport | HTTPS obligatoire en production (voir DEPLOIEMENT.md) |
 | Appareils des officiels | les feuilles de match en cache sur le téléphone contiennent des noms complets et des âges, pas de CNIB ni de téléphone ; la déconnexion efface le profil et les feuilles en cache (seules les actions non encore synchronisées sont conservées) |
 | Sauvegardes | chiffrées au repos pour les champs sensibles ; à stocker hors du serveur, accès restreint |

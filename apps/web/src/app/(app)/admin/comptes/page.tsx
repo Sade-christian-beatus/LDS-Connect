@@ -91,7 +91,14 @@ function Accounts() {
                   {u.team && <span className="block text-xs text-stone-500">{u.team.name}</span>}
                 </td>
                 <td className="px-2 py-1.5 text-xs">{u.last_login_at ? new Date(u.last_login_at).toLocaleString("fr-FR") : "Jamais"}</td>
-                <td className="px-2 py-1.5">{u.is_active ? <Badge tone="green">Actif</Badge> : <Badge tone="stone">Désactivé</Badge>}</td>
+                <td className="px-2 py-1.5">
+                  {u.is_active ? <Badge tone="green">Actif</Badge> : <Badge tone="stone">Désactivé</Badge>}
+                  {u.must_change_password && (
+                    <span className="mt-0.5 block">
+                      <Badge tone="amber">Mot de passe provisoire</Badge>
+                    </span>
+                  )}
+                </td>
                 <td className="px-2 py-1.5">
                   <div className="flex flex-wrap justify-end gap-x-3">
                     <Button variant="link" onClick={() => setDialog({ type: "edit", user: u })}>

@@ -40,11 +40,15 @@ test("création d'un délégué, attribution d'un match et changement de mot de 
 
   // 3. Première connexion du délégué, changement de mot de passe
   await page.getByRole("button", { name: "Déconnexion" }).click();
+  // Mot de passe provisoire : arrivée directe sur « Mon compte », le reste est bloqué
   await login(page, email, temporary);
-  await expect(page.getByRole("heading", { name: "Mes matchs" })).toBeVisible();
-  await page.getByRole("link", { name: "Mon compte" }).click();
+  await expect(page.getByRole("heading", { name: "Mon compte" })).toBeVisible();
+  await expect(page.getByText(/Votre mot de passe est provisoire/)).toBeVisible();
+  await page.goto("/delegue");
+  await expect(page.getByRole("link", { name: "Choisissez votre mot de passe" })).toBeVisible();
+  await page.getByRole("link", { name: "Choisissez votre mot de passe" }).click();
   const newPassword = `Une-phrase-solide-${stamp}`;
-  await page.getByLabel("Mot de passe actuel").fill(temporary);
+  await page.getByLabel("Mot de passe provisoire reçu").fill(temporary);
   await page.getByLabel("Nouveau mot de passe", { exact: true }).fill(newPassword);
   await page.getByLabel("Confirmer le nouveau mot de passe").fill(newPassword);
   await page.getByRole("button", { name: "Changer le mot de passe" }).click();

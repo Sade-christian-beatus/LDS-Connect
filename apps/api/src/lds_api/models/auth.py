@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Table
+from sqlalchemy import false as sa_false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lds_api.db.base import Base, Timestamps, UUIDPk
@@ -34,6 +35,10 @@ class User(UUIDPk, Timestamps, Base):
     # Pour le rôle gestionnaire_club : périmètre limité à cette équipe
     team_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("teams.id"))
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Mot de passe provisoire (création, réinitialisation) : à changer avant toute autre action
+    must_change_password: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=sa_false(), nullable=False
+    )
 
     roles: Mapped[list[Role]] = relationship(secondary=user_roles, lazy="selectin")
 

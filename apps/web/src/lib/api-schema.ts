@@ -2032,6 +2032,8 @@ export interface components {
             team: components["schemas"]["TeamBrief"] | null;
             /** Is Active */
             is_active: boolean;
+            /** Must Change Password */
+            must_change_password: boolean;
             /** Last Login At */
             last_login_at: string | null;
             /**
@@ -2067,6 +2069,8 @@ export interface components {
             permissions: string[];
             /** Team Id */
             team_id: string | null;
+            /** Must Change Password */
+            must_change_password: boolean;
         };
         /** UserUpdateIn */
         UserUpdateIn: {

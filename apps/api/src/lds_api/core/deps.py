@@ -81,6 +81,13 @@ def require(*perms: Perm) -> Callable[[Actor], Actor]:
     """Dépendance : l'utilisateur doit détenir toutes les permissions indiquées."""
 
     def checker(actor: CurrentActor) -> Actor:
+        if actor.user.must_change_password:
+            # Seuls « Mon compte » (/auth/me, /auth/password) et la déconnexion restent permis
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN,
+                detail="Changez votre mot de passe provisoire avant de continuer",
+                headers={"X-LDS-Reason": "password_change_required"},
+            )
         missing = [p for p in perms if not actor.can(p)]
         if missing:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "Action non autorisée pour votre rôle")
