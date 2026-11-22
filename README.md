@@ -73,6 +73,10 @@ par leurs initiales et une couleur, en attendant les fichiers et l'accord de la 
 - **Classements** automatiques, critères de départage paramétrables par saison.
 - **Site public** : accueil avec scores en direct, calendrier, résultats, classements, pages
   équipes (données des joueurs limitées : la compétition compte des mineurs).
+- **Votes du public** (`/votes`, phase 2) : homme du match, but du mois, joueur et
+  entraîneur de la saison, onze idéal, trophées spéciaux. Un vote par numéro, confirmé
+  par code SMS ; votes en masse mis de côté pour examen ; résultats en continu ou à date
+  programmée ; procès-verbal imprimable et journal CSV.
 - **Back-office** (`/admin`) : tableau de bord des 20 équipes, fiches équipes (joueurs,
   encadreurs, vérification des résidences, données sensibles en consultation journalisée),
   licences (délivrance, carte imprimable, suspension), calendrier (génération, stades,

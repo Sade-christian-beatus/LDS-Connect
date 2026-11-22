@@ -15,6 +15,7 @@ export function menuFor(user: User): { href: string; label: string }[] {
   if (p.has("fixture:manage")) items.push({ href: "/admin/calendrier", label: "Calendrier" });
   if (p.has("sheet:edit")) items.push({ href: "/delegue", label: "Feuilles de match" });
   if (p.has("licence:verify")) items.push({ href: "/controle", label: "Contrôle" });
+  if (p.has("vote:manage")) items.push({ href: "/admin/votes", label: "Votes" });
   if (p.has("audit:read")) items.push({ href: "/admin/journal", label: "Journal" });
   if (p.has("user:manage")) items.push({ href: "/admin/comptes", label: "Comptes" });
   return items;
@@ -39,7 +40,7 @@ export function AppHeader() {
   // Mot de passe provisoire : aucun menu tant qu'il n'est pas changé
   const menu = user && !user.must_change_password ? menuFor(user) : [];
   return (
-    <header className="sticky top-0 z-10 bg-lds-green text-white shadow">
+    <header className="sticky top-0 z-10 bg-lds-green text-white shadow print:hidden">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
         <Link href="/" className="font-bold">
           LDS · Officiels

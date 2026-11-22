@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lds_api.db.base import Base, Timestamps, UUIDPk
@@ -67,6 +68,11 @@ class OtpChallenge(UUIDPk, Base):
     phone_index: Mapped[str] = mapped_column(String(64), index=True)
     phone: Mapped[str] = mapped_column(EncryptedString)
     purpose: Mapped[str] = mapped_column(String(40))  # vote, …
+    ballot_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("ballots.id", ondelete="CASCADE"), index=True
+    )
+    # Choix du votant (identifiants d'options), enregistrés comme votes une fois le code validé
+    choices: Mapped[list[str] | None] = mapped_column(JSONB)
     code_hash: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
@@ -77,10 +83,16 @@ class OtpChallenge(UUIDPk, Base):
 
 class Vote(UUIDPk, Base):
     __tablename__ = "votes"
-    __table_args__ = (UniqueConstraint("ballot_id", "phone_index", "option_id"),)
+    # Un numéro = une participation par scrutin : chaque choix occupe un rang (1..max_choices),
+    # la paire (numéro, rang) est unique, de même que (numéro, option).
+    __table_args__ = (
+        UniqueConstraint("ballot_id", "phone_index", "option_id"),
+        UniqueConstraint("ballot_id", "phone_index", "rank"),
+    )
 
     ballot_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ballots.id"), index=True)
     option_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ballot_options.id"))
+    rank: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
     phone_index: Mapped[str] = mapped_column(String(64), index=True)
     otp_challenge_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("otp_challenges.id"))
     order_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("orders.id"))

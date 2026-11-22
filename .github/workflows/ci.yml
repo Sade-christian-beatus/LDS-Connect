@@ -80,6 +80,7 @@ jobs:
     env:
       DATABASE_URL: postgresql+psycopg://lds:lds@localhost:5432/lds
       REDIS_URL: redis://localhost:6379/0
+      SMS_SIMULATOR_URL: http://127.0.0.1:8090
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -103,13 +104,16 @@ jobs:
           uv run alembic upgrade head
           uv run python -m lds_api.cli seed
           nohup uv run uvicorn lds_api.main:app --host 127.0.0.1 --port 8000 > api.log 2>&1 &
+      - name: Simulateur SMS (codes de vote lus par le test)
+        working-directory: apps/simulateurs
+        run: nohup ../api/.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8090 > sim.log 2>&1 &
       - name: Site (build de production et démarrage)
         working-directory: apps/web
         run: |
           pnpm install --frozen-lockfile
           pnpm build
           nohup pnpm start > web.log 2>&1 &
-          npx wait-on -t 60000 http-get://127.0.0.1:3000 http-get://127.0.0.1:8000/api/v1/health
+          npx wait-on -t 60000 http-get://127.0.0.1:3000 http-get://127.0.0.1:8000/api/v1/health http-get://127.0.0.1:8090/health
         env:
           API_INTERNAL_URL: http://127.0.0.1:8000
       - working-directory: apps/web
@@ -123,3 +127,4 @@ jobs:
         run: |
           echo "--- API ---"; tail -n 100 apps/api/api.log || true
           echo "--- Web ---"; tail -n 100 apps/web/web.log || true
+          echo "--- Simulateur ---"; tail -n 50 apps/simulateurs/sim.log || true

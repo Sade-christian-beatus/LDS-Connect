@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Espace officiels", robots: { index: 
 
 function HeaderShell() {
   return (
-    <header className="sticky top-0 z-10 bg-lds-green text-white shadow">
+    <header className="sticky top-0 z-10 bg-lds-green text-white shadow print:hidden">
       <div className="mx-auto max-w-6xl px-3 py-2 text-sm font-bold">LDS · Officiels</div>
     </header>
   );

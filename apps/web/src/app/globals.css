@@ -6,9 +6,9 @@
   --color-lds-gold: #f2c230;
 }
 
-/* Impression d'une licence : seule la carte est imprimée */
+/* Impression d'une licence : seule la carte est imprimée (pages contenant une carte) */
 @media print {
-  body * {
+  body:has(.print-area) * {
     visibility: hidden;
   }
   .print-area,
@@ -20,4 +20,10 @@
     inset: 0 auto auto 0;
     border-color: #000;
   }
+}
+
+/* Documents imprimables (procès-verbal) : marges A4 */
+@page {
+  size: A4;
+  margin: 15mm;
 }

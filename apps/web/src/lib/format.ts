@@ -82,3 +82,28 @@ export const ROLE_LABEL: Record<string, string> = {
   cellule_technique: "Cellule technique",
   controleur_acces: "Contrôleur d'accès",
 };
+
+export const BALLOT_KIND_LABEL: Record<string, string> = {
+  man_of_the_match: "Homme du match",
+  goal_of_the_month: "But du mois",
+  player_of_the_season: "Joueur de la saison",
+  coach_of_the_season: "Entraîneur de la saison",
+  team_of_the_season: "Onze idéal",
+  special: "Trophée spécial",
+};
+
+export const BALLOT_STATE: Record<string, { label: string; tone: "green" | "amber" | "stone" | "blue" }> = {
+  draft: { label: "Brouillon", tone: "stone" },
+  upcoming: { label: "À venir", tone: "blue" },
+  open: { label: "Vote ouvert", tone: "green" },
+  closed: { label: "Clos", tone: "amber" },
+};
+
+/** Saisie « datetime-local » ↔ ISO : Ouagadougou est en UTC toute l'année. */
+export const toLocalInput = (iso: string | null | undefined) => (iso ? iso.slice(0, 16) : "");
+export const fromLocalInput = (v: string) => (v ? `${v}:00Z` : null);
+
+export function formatDateTime(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: TZ }).format(new Date(iso));
+}
