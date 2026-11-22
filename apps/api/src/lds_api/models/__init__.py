@@ -19,10 +19,11 @@ from lds_api.models.registry import (
     TeamEntry,
 )
 from lds_api.models.talents import PlayerStat
-from lds_api.models.ticketing import Accreditation, Order, Ticket, TicketType
+from lds_api.models.ticketing import AccessScan, Accreditation, Order, Ticket, TicketType
 from lds_api.models.voting import Ballot, BallotOption, OtpChallenge, Vote
 
 __all__ = [
+    "AccessScan",
     "Accreditation",
     "AuditLog",
     "Ballot",
