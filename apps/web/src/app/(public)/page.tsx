@@ -2,10 +2,11 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { LiveScores } from "@/components/LiveScores";
 import { MatchCard } from "@/components/MatchCard";
+import { ScorersTable } from "@/components/ScorersTable";
 import { StandingsTable } from "@/components/StandingsTable";
 import { formatDate } from "@/lib/format";
 import { apiGet } from "@/lib/server-api";
-import type { Match, PoolStandings, Season } from "@/lib/types";
+import type { Match, PoolStandings, Season, SeasonStats, Venue } from "@/lib/types";
 
 export default function Accueil() {
   return (
@@ -26,10 +27,12 @@ export default function Accueil() {
 }
 
 async function HomeContent() {
-  const [season, matches, standings] = await Promise.all([
+  const [season, matches, standings, stats, venues] = await Promise.all([
     apiGet<Season>("/seasons/current"),
     apiGet<Match[]>("/matches"),
     apiGet<PoolStandings[]>("/standings"),
+    apiGet<SeasonStats>("/stats?limit=5"),
+    apiGet<Venue[]>("/venues"),
   ]);
   const upcoming = matches.filter((m) => m.status === "scheduled" && m.home).slice(0, 6);
   const results = matches.filter((m) => m.status === "finished").slice(-6).reverse();
@@ -70,6 +73,34 @@ async function HomeContent() {
           <StandingsTable key={p.pool_code} pool={p} compact />
         ))}
       </section>
+      <div className="grid gap-6 md:grid-cols-2">
+        <section className="space-y-2">
+          <h2 className="text-lg font-bold text-green-900">Meilleurs buteurs</h2>
+          <ScorersTable rows={stats.scorers} unit="buts" empty="Aucun but marqué pour le moment." />
+          <Link href="/statistiques" className="text-sm font-medium text-lds-green underline">
+            Toutes les statistiques
+          </Link>
+        </section>
+        <section className="space-y-2">
+          <h2 className="text-lg font-bold text-green-900">Lieux de la compétition</h2>
+          <ul className="space-y-2">
+            {season.pools.map((p) => (
+              <li key={p.code} className="rounded-lg border border-stone-200 bg-white p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-lds-red">
+                  {p.name} · {p.host_city}
+                </p>
+                <ul className="mt-1 text-sm">
+                  {venues
+                    .filter((v) => v.city === p.host_city)
+                    .map((v) => (
+                      <li key={v.id}>{v.name}</li>
+                    ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </>
   );
 }

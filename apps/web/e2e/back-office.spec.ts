@@ -58,13 +58,17 @@ test("l'administration gère un effectif, une licence et le calendrier", async (
   await page.getByRole("navigation", { name: "Espace officiels" }).getByRole("link", { name: "Calendrier" }).click();
   await expect(page.getByRole("heading", { name: "Calendrier" })).toBeVisible();
   // Le match est suivi par son nom : la liste est triée par coup d'envoi et il change de place
-  const firstKickoff = page.getByLabel(/Coup d'envoi/).first();
+  // Premier match encore modifiable (les matchs commencés ou terminés sont verrouillés)
+  const firstKickoff = page.locator(`input[aria-label^="Coup d'envoi"]:enabled`).first();
   const label = (await firstKickoff.getAttribute("aria-label"))!;
   const fixture = label.replace("Coup d'envoi ", "");
-  await firstKickoff.fill("2027-01-10T16:30");
+  // Nouvelle heure toujours différente de l'actuelle (test rejouable sur les mêmes données)
+  const current = await firstKickoff.inputValue();
+  const target = current.endsWith("16:30") ? "2027-01-10T18:00" : "2027-01-10T16:30";
+  await firstKickoff.fill(target);
   await page.getByRole("row").filter({ has: page.getByLabel(label, { exact: true }) }).getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByText(`${fixture} : modifications enregistrées`)).toBeVisible();
-  await expect(page.getByLabel(label, { exact: true })).toHaveValue("2027-01-10T16:30");
+  await expect(page.getByLabel(label, { exact: true })).toHaveValue(target);
 
   // Journal : la suspension est tracée
   await page.getByRole("navigation", { name: "Espace officiels" }).getByRole("link", { name: "Journal" }).click();

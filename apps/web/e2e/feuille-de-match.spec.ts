@@ -19,7 +19,8 @@ test("le délégué saisit et valide une feuille de match, y compris hors connex
   const match = page.getByRole("link").filter({ hasText: "Feuille non ouverte" }).first();
   await expect(match).toBeVisible();
   await match.click();
-  await expect(page.getByText("Brouillon")).toBeVisible();
+  await expect(page.getByLabel("Score")).toBeVisible();
+  await expect(page.getByText("Brouillon").first()).toBeVisible();
 
   // Compositions des deux équipes (proposition automatique conforme)
   const tabs = page.getByRole("navigation", { name: "Sections de la feuille" }).getByRole("button");
