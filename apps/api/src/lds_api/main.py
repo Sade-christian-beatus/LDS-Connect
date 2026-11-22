@@ -3,7 +3,7 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from lds_api.api.v1 import auth, fixtures, licences, live, public, registry, sheets
+from lds_api.api.v1 import auth, fixtures, licences, live, public, registry, sheets, users
 from lds_api.core.config import get_settings
 from lds_api.core.errors import install_handlers
 
@@ -29,7 +29,7 @@ def create_app() -> FastAPI:
     install_handlers(app)
 
     v1 = APIRouter(prefix=API_PREFIX)
-    for module in (auth, public, registry, licences, fixtures, sheets, live):
+    for module in (auth, public, registry, licences, fixtures, sheets, live, users):
         v1.include_router(module.router)
     app.include_router(v1)
 
