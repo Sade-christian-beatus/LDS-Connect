@@ -46,7 +46,7 @@ s'exécute pas si `ENVIRONMENT=production`).
 
 | Compte | Rôle | Arrivée après connexion |
 |---|---|---|
-| `superadmin@lds.local` | super_admin (Secrétariat exécutif) | `/admin/equipes` — tout le back-office |
+| `superadmin@lds.local` | super_admin (Secrétariat exécutif) | `/admin/equipes` — tout le back-office, dont les comptes |
 | `admin@lds.local` | admin_competition | `/admin/equipes` — registre, licences, calendrier, journal |
 | `club.vinnim@lds.local` | gestionnaire_club (Vinnim du Kadiogo uniquement) | fiche de son équipe |
 | `delegue@lds.local` | delegue_match | `/delegue` — feuilles de match |
@@ -76,7 +76,10 @@ par leurs initiales et une couleur, en attendant les fichiers et l'accord de la 
 - **Back-office** (`/admin`) : tableau de bord des 20 équipes, fiches équipes (joueurs,
   encadreurs, vérification des résidences, données sensibles en consultation journalisée),
   licences (délivrance, carte imprimable, suspension), calendrier (génération, stades,
-  horaires, tableau final), journal d'audit. Chaque rôle ne voit que ce qui le concerne.
+  horaires, délégué attribué à chaque match, tableau final), journal d'audit, gestion des
+  comptes (super administrateur : création avec mot de passe provisoire affiché une seule
+  fois, rôle, désactivation, réinitialisation). Chacun change son mot de passe depuis
+  « Mon compte ». Chaque rôle ne voit que ce qui le concerne.
 
 Toutes les règles sportives sont dans la table `competition_rules` (une ligne par saison).
 

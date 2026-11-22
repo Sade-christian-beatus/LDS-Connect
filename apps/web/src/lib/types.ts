@@ -40,3 +40,7 @@ export type StaffFunction = S["StaffCreate"]["function"];
 export type Rules = S["RulesOut"];
 export type SeasonStats = S["SeasonStats"];
 export type StatRow = S["StatRow"];
+export type UserAdmin = S["UserAdminOut"];
+export type Credentials = S["CredentialsOut"];
+export type Delegate = S["DelegateOut"];
+export type RoleCode = S["UserCreateIn"]["role"];

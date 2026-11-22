@@ -16,6 +16,7 @@ export function menuFor(user: User): { href: string; label: string }[] {
   if (p.has("sheet:edit")) items.push({ href: "/delegue", label: "Feuilles de match" });
   if (p.has("licence:verify")) items.push({ href: "/controle", label: "Contrôle" });
   if (p.has("audit:read")) items.push({ href: "/admin/journal", label: "Journal" });
+  if (p.has("user:manage")) items.push({ href: "/admin/comptes", label: "Comptes" });
   return items;
 }
 
@@ -59,6 +60,11 @@ export function AppHeader() {
           <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${online ? "bg-green-700" : "bg-lds-red"}`} role="status">
             {online ? "En ligne" : "Hors connexion"}
           </span>
+          {user && (
+            <Link href="/compte" className="underline" title={user.email}>
+              Mon compte
+            </Link>
+          )}
           {user && (
             <button
               type="button"

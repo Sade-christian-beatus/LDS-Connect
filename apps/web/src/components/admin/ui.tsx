@@ -16,16 +16,28 @@ export function Dialog({
   wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  // Fermeture décidée par le code (ex. passage à une autre fenêtre) : ne pas rappeler onClose,
+  // sinon l'état de la fenêtre suivante serait effacé.
+  const closingByCode = useRef(false);
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
     if (open && !d.open) d.showModal();
-    if (!open && d.open) d.close();
+    if (!open && d.open) {
+      closingByCode.current = true;
+      d.close();
+    }
   }, [open]);
   return (
     <dialog
       ref={ref}
-      onClose={onClose}
+      onClose={() => {
+        if (closingByCode.current) {
+          closingByCode.current = false;
+          return;
+        }
+        onClose();
+      }}
       aria-label={title}
       className={`m-auto w-[95vw] rounded-xl p-0 shadow-xl backdrop:bg-black/40 ${wide ? "max-w-3xl" : "max-w-lg"}`}
     >
@@ -53,12 +65,15 @@ export function Field({
   hint?: string;
   children: React.ReactNode;
 }) {
+  // L'aide reste hors du libellé : le nom du champ (lecteurs d'écran) se limite au libellé
   return (
-    <label className="block text-sm">
-      <span className="font-medium text-stone-700">{label}</span>
-      {children}
+    <div className="text-sm">
+      <label className="block">
+        <span className="font-medium text-stone-700">{label}</span>
+        {children}
+      </label>
       {hint && <span className="mt-0.5 block text-xs text-stone-500">{hint}</span>}
-    </label>
+    </div>
   );
 }
 
