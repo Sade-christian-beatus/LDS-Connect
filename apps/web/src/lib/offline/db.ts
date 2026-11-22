@@ -23,12 +23,31 @@ export type QueueItem = {
 export type CachedSheet = { matchId: string; sheet: Sheet; savedAt: number };
 export type CachedList = { key: string; matches: DelegateMatch[]; savedAt: number };
 export type CachedKeys = { key: string; value: unknown; savedAt: number };
+/** Passage au contrôle d'accès, enregistré sur l'appareil puis synchronisé. */
+export type LocalScan = {
+  clientId: string;
+  matchId: string;
+  token: string;
+  code: string | null;
+  kind: "ticket" | "accreditation" | "unknown";
+  label: string | null;
+  result: "admitted" | "duplicate" | "invalid" | "wrong_match";
+  detail: string;
+  scannedAt: string;
+  device: string;
+  offline: boolean;
+  synced: 0 | 1;
+  /** Décision du serveur quand elle diffère (ex. double entrée vue par une autre porte) */
+  serverResult?: LocalScan["result"];
+  serverDetail?: string;
+};
 
 class LdsDb extends Dexie {
   sheets!: EntityTable<CachedSheet, "matchId">;
   queue!: EntityTable<QueueItem, "id">;
   lists!: EntityTable<CachedList, "key">;
   kv!: EntityTable<CachedKeys, "key">;
+  scans!: EntityTable<LocalScan, "clientId">;
 
   constructor() {
     super("lds-connect");
@@ -38,6 +57,7 @@ class LdsDb extends Dexie {
       lists: "key",
       kv: "key",
     });
+    this.version(2).stores({ scans: "clientId, matchId, synced, code, scannedAt" });
   }
 }
 

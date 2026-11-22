@@ -28,7 +28,8 @@ remplace pas un avis juridique.
 | Comptes | e-mail, nom, rôle, mot de passe **haché (argon2id)** | officiels | super administrateur |
 | Traces | journal d'audit (auteur, action, date, adresse IP) | officiels | administration |
 | Votes du public | numéro de téléphone du votant : **chiffré** dans le défi SMS uniquement ; les votes ne portent que son empreinte HMAC ; adresse IP et navigateur sous forme d'empreintes | public | administration (empreintes seulement, jamais le numéro) |
-| Phase 2 (à venir) | acheteurs de billets | public | administration |
+| Billetterie | nom et numéro de l'acheteur : nom en clair (affiché sur ses billets), numéro **chiffré** + empreinte ; **le QR des billets ne contient ni nom ni numéro** | public | administration (numéro masqué : « +226 •• •• 34 56 ») |
+| Accréditations | nom, organisation, catégorie, zones (inscrits dans le QR signé, contrôlés avec une pièce d'identité) | non | administration |
 
 Aucune pièce d'identité numérisée n'est stockée à ce stade.
 
@@ -69,7 +70,15 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
 - Durée de conservation des défis SMS et des votes : **à fixer par la Ligue** (proposition :
   suppression des défis 30 jours après la clôture, empreintes conservées pour le contrôle).
 
-## 6. Droits des personnes
+## 6. Billetterie
+
+- Achat **sans compte** : le nom et le numéro servent à la commande, au paiement mobile money
+  et à l'envoi du lien des billets par SMS. Le lien porte une clé secrète dont seule
+  l'empreinte est conservée.
+- Les passages au contrôle (`access_scans`) sont liés au billet, pas à l'acheteur.
+- Durée de conservation des commandes : **à fixer par la Ligue** (obligations comptables).
+
+## 7. Droits des personnes
 
 - **Accès / rectification** : via le club ou l'administration (modification journalisée).
 - **Effacement** : un joueur quittant l'effectif est retiré (licence révoquée) ; l'historique
@@ -79,7 +88,7 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
   CNIB et téléphones y sont masqués par défaut ; l'export avec données sensibles
   (`--include-sensitive`) est journalisé et doit être protégé comme la base elle-même.
 
-## 7. Points à décider par la Ligue
+## 8. Points à décider par la Ligue
 
 - Désignation formelle du responsable de traitement et dépôt de la déclaration CIL.
 - Durées de conservation par catégorie (licences, feuilles, journaux, votes, billets).

@@ -66,12 +66,30 @@ def checkout(pid: str) -> str:
     p = PAYMENTS.get(pid)
     if not p:
         raise HTTPException(404)
-    return f"""<html><body style="font-family:sans-serif;max-width:420px;margin:2rem auto">
-    <h2>Paiement simulé</h2><p>Référence : {html.escape(p['reference'])}<br>
-    Montant : {p['amount']} {html.escape(p['currency'])}<br>Statut : {p['status']}</p>
-    <form method="post" action="/payment/{pid}/success"><button>Payer</button></form>
-    <form method="post" action="/payment/{pid}/fail"><button>Refuser</button></form>
-    </body></html>"""
+    amount = f"{p['amount']:,}".replace(",", " ")
+    phone = html.escape(p.get("phone") or "")
+    done = p["status"] != "pending"
+    buttons = (
+        f"<p class='st'>Statut : <b>{html.escape(p['status'])}</b></p>"
+        if done
+        else f"""<form method="post" action="/payment/{pid}/success">
+        <button class="ok">Confirmer le paiement</button></form>
+        <form method="post" action="/payment/{pid}/fail"><button class="ko">Refuser</button></form>"""
+    )
+    return f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Paiement simulé</title><style>
+    body{{font-family:system-ui,sans-serif;background:#f4f4f5;margin:0;padding:1.5rem}}
+    .c{{max-width:380px;margin:auto;background:#fff;border-radius:16px;padding:1.5rem;
+    box-shadow:0 4px 20px #0001}}.tag{{background:#fef3c7;color:#92400e;font-size:.75rem;
+    padding:.25rem .5rem;border-radius:99px;font-weight:600}}h1{{font-size:1.2rem}}
+    .amt{{font-size:2rem;font-weight:800;margin:.5rem 0}}button{{width:100%;padding:.9rem;
+    border:0;border-radius:12px;font-size:1rem;font-weight:700;margin-top:.6rem;cursor:pointer}}
+    .ok{{background:#15803d;color:#fff}}.ko{{background:#e4e4e7}}.m{{color:#52525b;font-size:.9rem}}
+    </style></head><body><div class="c"><span class="tag">SIMULATEUR — aucun argent réel</span>
+    <h1>Paiement mobile money</h1><p class="m">Référence {html.escape(p["reference"])}</p>
+    <p class="amt">{amount} FCFA</p><p class="m">Débit du numéro {phone}</p>
+    {buttons}</div></body></html>"""
 
 
 @app.post("/payment/{pid}/{outcome}")
@@ -81,9 +99,16 @@ def settle(pid: str, outcome: str):
         raise HTTPException(404)
     p["status"] = "succeeded" if outcome == "success" else "failed"
     try:
-        httpx.post(p["callback_url"], json={"id": pid, "reference": p["reference"],
-                                            "status": p["status"], "amount": p["amount"]},
-                   timeout=5)
+        httpx.post(
+            p["callback_url"],
+            json={
+                "id": pid,
+                "reference": p["reference"],
+                "status": p["status"],
+                "amount": p["amount"],
+            },
+            timeout=5,
+        )
     except httpx.HTTPError as exc:
         p["callback_error"] = str(exc)
     return RedirectResponse(p.get("return_url") or f"/payment/{pid}", status_code=303)

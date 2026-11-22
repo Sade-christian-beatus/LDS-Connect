@@ -57,6 +57,9 @@ toutes modifiables dans `competition_rules` sans changer le code.
   plus de 10 votes d'une même connexion en 10 min, 5 numéros qui se suivent) ; durée de
   conservation des numéros chiffrés ; vote payant (prix, reversement) avec la billetterie ;
   signataires du procès-verbal.
-- Billetterie : catégories et prix, quotas, forfaits supporters (transport, hébergement),
-  accréditations (catégories, zones).
+- Billetterie (livrée, à paramétrer) : **agrégateur de paiement** et frais par transaction ;
+  catégories, prix et quotas par stade ; fermeture des ventes (au coup d'envoi par défaut) ;
+  remboursements (hors plateforme aujourd'hui) ; forfaits supporters (transport,
+  hébergement) ; zones et catégories d'accréditations ; nombre de portes et d'appareils de
+  contrôle par stade.
 - Talents : indicateurs attendus par la cellule technique.

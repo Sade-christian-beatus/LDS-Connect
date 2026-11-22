@@ -77,6 +77,12 @@ par leurs initiales et une couleur, en attendant les fichiers et l'accord de la 
   entraîneur de la saison, onze idéal, trophées spéciaux. Un vote par numéro, confirmé
   par code SMS ; votes en masse mis de côté pour examen ; résultats en continu ou à date
   programmée ; procès-verbal imprimable et journal CSV.
+- **Billetterie** (`/billetterie`, phase 2) : achat sans compte, paiement mobile money
+  (agrégateur derrière une interface, simulateur en local), places réservées 15 min,
+  billets à QR signé gardés sur le téléphone (`/billets`) et lien envoyé par SMS.
+  **Contrôle des entrées** (`/acces`) hors connexion avec synchronisation différée et
+  détection des doubles entrées entre portes ; **accréditations** (presse, officiels…)
+  à carte imprimable.
 - **Back-office** (`/admin`) : tableau de bord des 20 équipes, fiches équipes (joueurs,
   encadreurs, vérification des résidences, données sensibles en consultation journalisée),
   licences (délivrance, carte imprimable, suspension), calendrier (génération, stades,
