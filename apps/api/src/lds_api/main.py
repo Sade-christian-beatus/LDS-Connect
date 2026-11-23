@@ -8,6 +8,7 @@ from lds_api.api.v1 import (
     fixtures,
     licences,
     live,
+    media,
     public,
     registry,
     sheets,
@@ -53,6 +54,7 @@ def create_app() -> FastAPI:
         votes,
         ticketing,
         talents,
+        media,
     )
     for module in modules:
         v1.include_router(module.router)

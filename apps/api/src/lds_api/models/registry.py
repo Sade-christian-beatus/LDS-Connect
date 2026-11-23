@@ -159,6 +159,11 @@ class Team(UUIDPk, Timestamps, Base):
 
     region: Mapped[Region] = relationship()
 
+    @property
+    def logo_url(self) -> str | None:
+        """Adresse publique du logo envoyé (stockage de la plateforme), sinon None."""
+        return f"/api/v1/media/{self.logo_path}" if self.logo_path else None
+
 
 class TeamEntry(UUIDPk, Base):
     """Engagement d'une équipe dans une saison, avec sa poule."""

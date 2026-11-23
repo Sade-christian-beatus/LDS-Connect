@@ -1,0 +1,109 @@
+"""Images publiques de la plateforme : logo de la Ligue et logos des équipes.
+
+Les fichiers sont dans le stockage de la plateforme (disque ou S3), jamais dans le dépôt de
+code. Chaque version a un nom unique (empreinte du contenu) : on peut la mettre en cache
+indéfiniment, et changer de logo change l'adresse. Seuls PNG, JPEG et WebP sont acceptés,
+reconnus à leurs premiers octets (le SVG est refusé : il peut contenir du script).
+"""
+
+import hashlib
+import re
+import uuid
+
+from sqlalchemy.orm import Session
+
+from lds_api.core.errors import BusinessError, NotFound
+from lds_api.models import Team
+from lds_api.providers.storage import get_storage
+from lds_api.services import audit
+
+MAX_BYTES = 1_000_000
+BRAND_POINTER = "brand/current"
+# Seules ces clés sont servies publiquement (jamais les photos ou documents des personnes)
+PUBLIC_KEY = re.compile(r"^(brand/logo|teams/[0-9a-f-]{36}/logo)-[0-9a-f]{12}\.(png|jpg|webp)$")
+TYPES = {"png": "image/png", "jpg": "image/jpeg", "webp": "image/webp"}
+
+
+def sniff(data: bytes) -> str:
+    """Extension déduite du contenu (et non du nom de fichier envoyé)."""
+    if len(data) > MAX_BYTES:
+        raise BusinessError("Image trop lourde (1 Mo au maximum)", code="image_too_large")
+    if data.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png"
+    if data.startswith(b"\xff\xd8\xff"):
+        return "jpg"
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "webp"
+    raise BusinessError("Format non accepté : PNG, JPEG ou WebP", code="image_format")
+
+
+def _store(prefix: str, data: bytes) -> str:
+    ext = sniff(data)
+    key = f"{prefix}-{hashlib.sha256(data).hexdigest()[:12]}.{ext}"
+    get_storage().put(key, data, TYPES[ext])
+    return key
+
+
+def public_url(key: str | None) -> str | None:
+    return f"/api/v1/media/{key}" if key else None
+
+
+def read_public(key: str) -> tuple[bytes, str]:
+    if not PUBLIC_KEY.match(key):
+        raise NotFound("Fichier introuvable")
+    try:
+        data = get_storage().get(key)
+    except (FileNotFoundError, KeyError, OSError) as exc:
+        raise NotFound("Fichier introuvable") from exc
+    return data, TYPES[key.rsplit(".", 1)[1]]
+
+
+# --- Logo de la Ligue -----------------------------------------------------------------------
+def brand_key() -> str | None:
+    try:
+        key = get_storage().get(BRAND_POINTER).decode().strip()
+    except Exception:  # noqa: BLE001 — fichier absent (disque ou S3) : marque provisoire
+        return None
+    return key if PUBLIC_KEY.match(key) else None
+
+
+def set_brand_logo(db: Session, actor, data: bytes) -> str:
+    old = brand_key()
+    key = _store("brand/logo", data)
+    get_storage().put(BRAND_POINTER, key.encode(), "text/plain")
+    if old and old != key:
+        get_storage().delete(old)
+    audit.record(db, actor, "update", "brand", None, {"logo": key})
+    return key
+
+
+def delete_brand_logo(db: Session, actor) -> None:
+    old = brand_key()
+    if old:
+        get_storage().delete(old)
+    get_storage().delete(BRAND_POINTER)
+    audit.record(db, actor, "delete", "brand", None, {"logo": old})
+
+
+# --- Logos des équipes ----------------------------------------------------------------------
+def set_team_logo(db: Session, actor, team_id: uuid.UUID, data: bytes) -> Team:
+    team = db.get(Team, team_id)
+    if team is None:
+        raise NotFound("Équipe introuvable")
+    old = team.logo_path
+    team.logo_path = _store(f"teams/{team.id}/logo", data)
+    if old and old != team.logo_path and PUBLIC_KEY.match(old):
+        get_storage().delete(old)
+    audit.record(db, actor, "update_logo", "team", team.id, {"logo": [old, team.logo_path]})
+    return team
+
+
+def delete_team_logo(db: Session, actor, team_id: uuid.UUID) -> Team:
+    team = db.get(Team, team_id)
+    if team is None:
+        raise NotFound("Équipe introuvable")
+    if team.logo_path and PUBLIC_KEY.match(team.logo_path):
+        get_storage().delete(team.logo_path)
+    audit.record(db, actor, "delete_logo", "team", team.id, {"logo": team.logo_path})
+    team.logo_path = None
+    return team
