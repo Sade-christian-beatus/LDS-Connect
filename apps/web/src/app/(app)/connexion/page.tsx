@@ -2,11 +2,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BrandLogo } from "@/components/BrandLogo";
+import { PitchLines } from "@/components/Illustrations";
 import { useAuth } from "@/lib/auth";
+import { useBrandLogo } from "@/lib/brand";
 import { landingFor } from "../app-header";
 
 export default function ConnexionPage() {
   const { login } = useAuth();
+  const logo = useBrandLogo();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,9 +35,13 @@ export default function ConnexionPage() {
     <div className="mx-auto mt-4 grid max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl md:grid-cols-2">
       <div className="relative hidden flex-col justify-between bg-gradient-to-br from-pitch to-lds-green p-8 text-white md:flex">
         <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-16 h-64 w-64 rounded-full border-[28px] border-white/5" />
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-lds-gold">LDS Connect</p>
-          <p className="mt-2 text-3xl font-black leading-tight">Ligue de la Souveraineté</p>
+        <PitchLines className="text-white/[0.06]" />
+        <div className="relative space-y-4">
+          <BrandLogo logoUrl={logo} size="xl" />
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-lds-gold">LDS Connect</p>
+            <p className="mt-1 text-3xl font-black leading-tight">Ligue de la Souveraineté</p>
+          </div>
         </div>
         <ul className="relative space-y-2 text-sm text-green-50">
           <li>✓ Registre, licences et calendrier</li>

@@ -1,3 +1,4 @@
+import { EmptyState } from "./Illustrations";
 import Link from "next/link";
 import type { StatRow } from "@/lib/types";
 import { TeamBadge } from "./TeamBadge";
@@ -5,7 +6,7 @@ import { TeamBadge } from "./TeamBadge";
 const MEDAL = ["bg-lds-gold text-pitch", "bg-stone-300 text-stone-800", "bg-amber-700 text-white"];
 
 export function ScorersTable({ rows, unit, empty }: { rows: StatRow[]; unit: string; empty: string }) {
-  if (rows.length === 0) return <p className="rounded-xl border border-dashed border-line p-4 text-sm text-muted">{empty}</p>;
+  if (rows.length === 0) return <EmptyState title={empty} />;
   return (
     <ol className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
       {rows.map((r) => (

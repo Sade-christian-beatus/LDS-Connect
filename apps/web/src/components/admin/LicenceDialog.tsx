@@ -1,5 +1,7 @@
 "use client";
 // Licence d'un membre : carte imprimable (QR signé), délivrance, suspension / révocation.
+import { useBrandLogo } from "@/lib/brand";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { POSITION_LABEL, STAFF_LABEL } from "@/lib/format";
@@ -24,6 +26,7 @@ type Props = {
 
 export function LicenceDialogBody({ member, team, canIssue, canChangeStatus, onChanged, onError }: Props) {
   const { api, raw } = useAuth();
+  const logo = useBrandLogo();
   const lic = member.licence;
   const [qr, setQr] = useState<string | null>(null);
   const [status, setStatus] = useState(lic?.status === "active" ? "suspended" : "active");
@@ -87,6 +90,7 @@ export function LicenceDialogBody({ member, team, canIssue, canChangeStatus, onC
   return (
     <div className="space-y-4">
       <div className="print-area mx-auto flex max-w-sm flex-col items-center gap-2 rounded-xl border-2 border-lds-green p-4 text-center">
+        <BrandLogo logoUrl={logo} size="lg" className="shadow-none" />
         <p className="text-xs font-bold uppercase tracking-wide text-lds-green">Ligue de la Souveraineté · Licence</p>
         <p className="text-lg font-bold">
           {member.first_name} {member.last_name}

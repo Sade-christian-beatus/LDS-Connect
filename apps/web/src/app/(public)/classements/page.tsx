@@ -1,3 +1,4 @@
+import { Trophy } from "@/components/Illustrations";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BracketTree } from "@/components/BracketTree";
@@ -39,7 +40,7 @@ async function Tables() {
       </p>
       <section className="space-y-3">
         <h2 className="flex items-center gap-2 text-2xl font-black tracking-tight text-heading">
-          <span aria-hidden className="h-6 w-1.5 rounded-full bg-lds-gold" />
+          <Trophy className="h-9 w-9" />
           Phases finales
         </h2>
         <BracketTree matches={bracket} />

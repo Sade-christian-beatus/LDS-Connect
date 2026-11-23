@@ -1,6 +1,8 @@
 "use client";
 // Billets d'une commande : suivi du paiement, puis billets à QR code, gardés sur l'appareil
 // pour être présentés à l'entrée même sans connexion.
+import { useBrandLogo } from "@/lib/brand";
+import { BrandLogo } from "@/components/BrandLogo";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
@@ -19,6 +21,7 @@ export function OrderView({ reference }: { reference: string }) {
 
 function View({ reference }: { reference: string }) {
   const params = useSearchParams();
+  const logo = useBrandLogo();
   const [key, setKey] = useState<string | null>(params.get("k"));
   const [data, setData] = useState<CachedOrder | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -142,6 +145,7 @@ function View({ reference }: { reference: string }) {
               <article aria-label={`Billet ${t.code}`} className="overflow-hidden rounded-2xl bg-surface shadow-lg ring-1 ring-line">
                 <MatchHero match={o.match} compact />
                 <div className="relative flex flex-col items-center gap-2 border-t-2 border-dashed border-line p-5">
+                  <BrandLogo logoUrl={logo} size="md" className="absolute right-4 top-4 shadow-none ring-1 ring-line" />
                   <span aria-hidden className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-canvas" />
                   <span aria-hidden className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-canvas" />
                   <p className="text-xs uppercase tracking-widest text-subtle">

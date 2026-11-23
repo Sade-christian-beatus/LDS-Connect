@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useAuth } from "@/lib/auth";
+import { useBrandLogo } from "@/lib/brand";
 import { ROLE_LABEL } from "@/lib/format";
 import { useOnline } from "@/lib/offline/use-sheet";
 import type { User } from "@/lib/types";
@@ -31,6 +33,7 @@ export function menuFor(user: User): Item[] {
   if (p.has("vote:manage")) items.push({ href: "/admin/votes", label: "Votes", group: "Public" });
   if (p.has("audit:read")) items.push({ href: "/admin/journal", label: "Journal", group: "Administration" });
   if (p.has("user:manage")) items.push({ href: "/admin/comptes", label: "Comptes", group: "Administration" });
+  if (p.has("brand:manage")) items.push({ href: "/admin/identite", label: "Identité", group: "Administration" });
   return items;
 }
 
@@ -55,6 +58,7 @@ export function AppHeader() {
   const online = useOnline();
   const router = useRouter();
   const pathname = usePathname();
+  const logo = useBrandLogo();
   // Mot de passe provisoire : aucun menu tant qu'il n'est pas changé
   const menu = user && !user.must_change_password ? menuFor(user) : [];
   const sidebar = menu.length >= SIDEBAR_MIN;
@@ -70,8 +74,11 @@ export function AppHeader() {
         </div>
         <div className="flex items-center justify-between gap-2 px-3 py-2 text-[13px] sm:px-4 sm:text-sm">
           <Link href={user ? landingFor(user) : "/"} className="flex items-center gap-2 font-black tracking-tight">
-            <span aria-hidden className="rounded-md bg-white px-1.5 py-0.5 text-xs text-pitch">LDS</span>
-            Officiels
+            <BrandLogo logoUrl={logo} size="sm" />
+            <span className="leading-tight">
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-lds-gold">LDS Connect</span>
+              <span className="block">Officiels</span>
+            </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <span

@@ -46,7 +46,7 @@ toutes modifiables dans `competition_rules` sans changer le code.
 | 22 | **Agrégateur de paiement** mobile money (billetterie, vote payant) ; **Faso Arzeka** (plateforme nationale de paiement de l'administration, DGTCP) envisagée | simulateur local ; interface `PaymentProvider` prête ; désactivé par défaut. Faso Arzeka : à confirmer avec la DGTCP (la Ligue peut-elle encaisser par ce canal ? documentation technique officielle, environnement de test, signature des notifications) ; aucun logo ni nom affiché sans accord |
 | 23 | **Hébergement** : serveur au Burkina Faso exigé ? Hébergeur retenu ? | code portable (Docker) ; voir [DEPLOIEMENT.md](DEPLOIEMENT.md) |
 | 24 | **Nom de domaine officiel** (ex. lds-connect.bf) | non défini |
-| 25 | **Logos officiels et charte graphique** de la Ligue et des 20 équipes, accord d'utilisation | initiales + couleurs génériques |
+| 25 | **Logos officiels et charte graphique** de la Ligue et des 20 équipes, accord d'utilisation | logo de la Ligue fourni (à envoyer depuis « Identité ») ; logos des équipes à envoyer depuis chaque fiche équipe ; en attendant, blasons dessinés aux couleurs des clubs ; aucun logo dans le dépôt de code |
 | 26 | **Comptes réseaux sociaux** : intégration souhaitée (liens, publications automatiques) ? | non intégrés |
 
 ## Phases 2 et 3 (à préciser avant développement)

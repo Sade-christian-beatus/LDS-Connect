@@ -1,5 +1,7 @@
 "use client";
 // Accréditations : presse, officiels, équipes, sécurité, bénévoles, partenaires.
+import { useBrandLogo } from "@/lib/brand";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Dialog, Field, inputClass, Notice } from "@/components/admin/ui";
 import { RequireAuth } from "@/components/RequireAuth";
@@ -207,6 +209,7 @@ function Accreditations() {
 
 function Card({ acc, onError }: { acc: Accreditation; onError: (e: unknown) => void }) {
   const { raw } = useAuth();
+  const logo = useBrandLogo();
   const [qr, setQr] = useState<string | null>(null);
   useEffect(() => {
     let url: string | null = null;
@@ -228,9 +231,12 @@ function Card({ acc, onError }: { acc: Accreditation; onError: (e: unknown) => v
   return (
     <div className="space-y-3">
       <div className="print-area mx-auto w-72 overflow-hidden rounded-xl border-2 border-lds-green text-center">
-        <div className="bg-lds-green px-3 py-2 text-white">
+        <div className="flex items-center gap-2 bg-lds-green px-3 py-2 text-left text-white">
+          <BrandLogo logoUrl={logo} size="md" className="shadow-none" />
+          <div>
           <p className="text-[10px] font-bold uppercase tracking-widest">Ligue de la Souveraineté</p>
           <p className="text-xl font-black uppercase">{ACCREDITATION_LABEL[acc.category]}</p>
+          </div>
         </div>
         <div className="space-y-1 p-3">
           <p className="text-lg font-bold leading-tight">{acc.full_name}</p>

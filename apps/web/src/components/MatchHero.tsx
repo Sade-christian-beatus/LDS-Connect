@@ -1,4 +1,5 @@
 // Bandeau d'un match (accueil, billetterie, billets) : équipes en grand, date, stade.
+import { PitchLines } from "./Illustrations";
 import { formatDate, formatTime, PHASE_LABEL } from "@/lib/format";
 import type { Match } from "@/lib/types";
 import { TeamBadge } from "./TeamBadge";
@@ -18,6 +19,7 @@ export function MatchHero({ match, children, compact = false }: { match: Match; 
   const stage = match.phase === "group" ? `Poule ${match.pool_code} · Journée ${match.round_number}` : PHASE_LABEL[match.phase];
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-950 via-green-900 to-lds-green text-white shadow-lg">
+      <PitchLines className="text-white/[0.07]" />
       <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full border-[24px] border-white/5" />
       <div aria-hidden className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full border-[18px] border-yellow-400/10" />
       <div className={`relative ${compact ? "p-4" : "p-5 sm:p-7"}`}>

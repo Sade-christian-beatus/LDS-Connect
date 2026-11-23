@@ -180,6 +180,11 @@ Les données appartiennent à la Ligue. Export complet (JSON + CSV, une table pa
 make export
 ```
 
+Logos : après l'installation, le Secrétariat exécutif envoie le logo de la Ligue (menu
+**Identité**) et l'administration celui de chaque équipe (fiche de l'équipe). Les fichiers sont
+dans le stockage de la plateforme (volume `storage` ou S3), jamais dans le dépôt de code : la
+sauvegarde de la base ne les contient pas, sauvegarder aussi ce volume (voir « Sauvegardes »).
+
 Recalcul complet des statistiques des joueurs (elles se mettent à jour seules à chaque
 validation de feuille ; utile après une reprise de données) :
 

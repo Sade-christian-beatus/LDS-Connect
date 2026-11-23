@@ -1,3 +1,4 @@
+import { EmptyState, Stadium } from "@/components/Illustrations";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -19,6 +20,12 @@ export default function BilletteriePage() {
           Retrouver mes billets
         </Link>
       </PageHeader>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#06180d] to-pitch shadow-lg">
+        <Stadium className="mx-auto block w-full max-w-3xl" />
+        <p className="absolute left-4 top-3 rounded-full bg-black/30 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-lds-gold backdrop-blur sm:left-6 sm:top-5">
+          Votre place au stade
+        </p>
+      </div>
       <Suspense fallback={<p className="text-subtle">Chargement des matchs…</p>}>
         <OnSale />
       </Suspense>
@@ -30,9 +37,7 @@ async function OnSale() {
   const list = await apiGet<MatchTickets[]>("/tickets/matches");
   if (list.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-line bg-surface p-8 text-center text-muted">
-        Aucun billet en vente pour le moment. Revenez avant les prochains matchs !
-      </p>
+      <EmptyState title="Aucun billet en vente pour le moment">Revenez avant les prochains matchs !</EmptyState>
     );
   }
   return (
@@ -64,7 +69,7 @@ async function OnSale() {
                 {soldOut ? (
                   <span className="rounded-full bg-red-100 px-3 py-1 font-bold text-lds-red">Complet</span>
                 ) : prices.length ? (
-                  <span className="rounded-full bg-lds-green px-3 py-1 font-bold text-white group-hover:bg-green-800">
+                  <span className="whitespace-nowrap rounded-full bg-lds-green px-3 py-1 font-bold text-white group-hover:bg-green-800">
                     dès {formatFcfa(Math.min(...prices))}
                   </span>
                 ) : (

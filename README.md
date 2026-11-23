@@ -56,8 +56,10 @@ s'exécute pas si `ENVIRONMENT=production`).
 Connexion : http://localhost:3000/connexion (lien « Espace officiels » en bas du site public).
 
 Les joueurs et encadreurs du seed sont **fictifs** (noms tirés au hasard, CNIB « X… »,
-téléphones « +226 00… »). Aucun logo officiel n'est intégré : les équipes sont représentées
-par leurs initiales et une couleur, en attendant les fichiers et l'accord de la Ligue.
+téléphones « +226 00… »). **Aucun logo n'est versionné dans le dépôt** (dépôt public) : le logo de la Ligue et ceux des
+équipes s'envoient depuis l'espace officiels (« Identité », fiche de chaque équipe) et sont
+conservés dans le stockage de la plateforme. En leur absence, une marque provisoire aux couleurs
+du Burkina et des blasons dessinés aux couleurs et initiales de chaque équipe sont affichés.
 
 ## Ce qui est disponible (phase 1)
 
