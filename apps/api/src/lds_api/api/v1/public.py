@@ -51,6 +51,7 @@ def team_detail(slug: str, db: DbSession):
         if m.kind == MembershipKind.PLAYER and p.player:
             players.append(
                 s.PublicPlayer(
+                    person_id=p.id,
                     display_name=p.display_name,
                     position=p.player.position,
                     age=age_on(p.birth_date, ref),

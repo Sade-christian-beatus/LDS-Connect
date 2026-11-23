@@ -18,7 +18,7 @@ from lds_api.models.registry import (
     Team,
     TeamEntry,
 )
-from lds_api.models.talents import PlayerStat
+from lds_api.models.talents import PlayerStat, TalentNote, TalentWatch
 from lds_api.models.ticketing import AccessScan, Accreditation, Order, Ticket, TicketType
 from lds_api.models.voting import Ballot, BallotOption, OtpChallenge, Vote
 
@@ -49,6 +49,8 @@ __all__ = [
     "Suspension",
     "Team",
     "TeamEntry",
+    "TalentNote",
+    "TalentWatch",
     "Ticket",
     "TicketType",
     "User",

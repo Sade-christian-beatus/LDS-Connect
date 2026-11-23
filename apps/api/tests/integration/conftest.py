@@ -100,3 +100,17 @@ def as_delegate(client) -> dict[str, str]:
 @pytest.fixture
 def as_controller(client) -> dict[str, str]:
     return login(client, "controle@lds.local")
+
+
+@pytest.fixture
+def match_id(db, seeded) -> str:
+    """Premier match de la 1re journée de la poule A."""
+    from lds_api.models import Match, Pool
+
+    pool_a = db.scalar(select(Pool).where(Pool.code == "A"))
+    m = db.scalar(
+        select(Match)
+        .where(Match.pool_id == pool_a.id, Match.round_number == 1)
+        .order_by(Match.kickoff_at)
+    )
+    return str(m.id)

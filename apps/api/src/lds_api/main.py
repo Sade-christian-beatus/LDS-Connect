@@ -11,6 +11,7 @@ from lds_api.api.v1 import (
     public,
     registry,
     sheets,
+    talents,
     ticketing,
     users,
     votes,
@@ -40,7 +41,19 @@ def create_app() -> FastAPI:
     install_handlers(app)
 
     v1 = APIRouter(prefix=API_PREFIX)
-    modules = (auth, public, registry, licences, fixtures, sheets, live, users, votes, ticketing)
+    modules = (
+        auth,
+        public,
+        registry,
+        licences,
+        fixtures,
+        sheets,
+        live,
+        users,
+        votes,
+        ticketing,
+        talents,
+    )
     for module in modules:
         v1.include_router(module.router)
     app.include_router(v1)
