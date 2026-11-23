@@ -1,19 +1,23 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { BrandLogo } from "@/components/BrandLogo";
 import { BottomTabs, TopNav } from "@/components/PublicNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NAV } from "@/lib/public-nav";
+import { apiGet } from "@/lib/server-api";
 import { THEME_SCRIPT } from "@/lib/theme";
+
+async function BrandSlot({ size = "md" }: { size?: "md" | "lg" }) {
+  const brand = await apiGet<{ logo_url: string | null }>("/brand").catch(() => null);
+  return <BrandLogo logoUrl={brand?.logo_url} size={size} />;
+}
 
 function Brand() {
   return (
-    <Link href="/" className="flex items-center gap-2.5" aria-label="Ligue de la Souveraineté — accueil">
-      {/* Marque provisoire (aucun logo officiel tant que la Ligue n'a pas fourni le sien) */}
-      <span aria-hidden className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow">
-        <span className="absolute inset-x-0 top-0 h-1/2 bg-lds-red" />
-        <span className="absolute inset-x-0 bottom-0 h-1/2 bg-lds-green" />
-        <span className="relative text-xl leading-none text-lds-gold drop-shadow">★</span>
-      </span>
+    <Link href="/" className="flex items-center gap-3" aria-label="Ligue de la Souveraineté — accueil">
+      <Suspense fallback={<BrandLogo />}>
+        <BrandSlot />
+      </Suspense>
       <span className="leading-tight">
         <span className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-lds-gold">LDS Connect</span>
         <span className="block text-base font-black tracking-tight sm:text-lg">Ligue de la Souveraineté</span>
@@ -69,8 +73,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
       <footer className="bg-pitch pb-24 text-green-100/80 md:pb-0 print:hidden">
         <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
-          <div className="space-y-2">
-            <p className="font-black text-white">Ligue de la Souveraineté</p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Suspense fallback={<BrandLogo size="lg" />}>
+                <BrandSlot size="lg" />
+              </Suspense>
+              <p className="font-black text-white">Ligue de la Souveraineté</p>
+            </div>
             <p className="text-xs leading-relaxed">
               20 équipes des 17 régions du Burkina Faso. Données des joueurs limitées (nom d&apos;usage, poste, âge) : la
               compétition compte des joueurs mineurs.

@@ -1,5 +1,6 @@
 "use client";
 // Billets achetés sur cet appareil (sans compte).
+import { EmptyState } from "@/components/Illustrations";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
@@ -20,12 +21,11 @@ export default function MesBilletsPage() {
         lien reçu par SMS.
       </PageHeader>
       {list && list.length === 0 && (
-        <div className="rounded-xl border border-dashed border-line bg-surface p-8 text-center">
-          <p className="text-muted">Aucun billet sur cet appareil.</p>
-          <Link href="/billetterie" className="mt-3 inline-block rounded-lg bg-lds-green px-4 py-2 font-semibold text-white">
+        <EmptyState title="Aucun billet sur cet appareil">
+          <Link href="/billetterie" className="mt-1 inline-block rounded-lg bg-lds-green px-4 py-2 font-semibold text-white">
             Acheter des billets
           </Link>
-        </div>
+        </EmptyState>
       )}
       <ul className="space-y-3">
         {list?.map((o) => {

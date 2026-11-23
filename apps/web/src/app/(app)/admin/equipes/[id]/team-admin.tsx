@@ -1,4 +1,5 @@
 "use client";
+import { LogoUploader } from "@/components/admin/LogoUploader";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -37,7 +38,7 @@ function describeError(e: unknown): string {
 }
 
 function TeamScreen({ teamId }: { teamId: string }) {
-  const { user, api } = useAuth();
+  const { user, api, raw } = useAuth();
   const { data: squad, error, reload } = useApi<Squad>(`/admin/teams/${teamId}/squad`);
   const { data: regions } = useApi<Region[]>("/regions");
   const [tab, setTab] = useState<PersonKind>("player");
@@ -157,6 +158,26 @@ function TeamScreen({ teamId }: { teamId: string }) {
       </header>
 
       <Notice notice={notice} onClose={() => setNotice(null)} />
+
+      {can("team:manage") && (
+        <details className="rounded-lg border border-stone-200 bg-white p-4">
+          <summary className="cursor-pointer text-sm font-semibold">Logo de l&apos;équipe</summary>
+          <div className="mt-3">
+            <LogoUploader
+              label={`Logo de ${squad.team.name}`}
+              currentUrl={squad.team.logo_url}
+              upload={(body) => raw(`/admin/teams/${teamId}/logo`, { method: "PUT", body })}
+              remove={() => raw(`/admin/teams/${teamId}/logo`, { method: "DELETE" })}
+              onDone={ok}
+              onError={fail}
+            />
+            <p className="mt-2 text-xs text-stone-500">
+              Sans logo, un blason à ses couleurs et initiales est affiché. Le logo apparaît partout : calendrier, classements,
+              billets, votes.
+            </p>
+          </div>
+        </details>
+      )}
 
       <section aria-label="Conformité de l'effectif" className="flex flex-wrap gap-2">
         {squad.compliance.map((c) => (

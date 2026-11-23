@@ -49,7 +49,7 @@ son rôle permet.
 
 | Rôle | Arrive sur | Voit dans le menu |
 |---|---|---|
-| Super administrateur (Secrétariat exécutif) | Registre | Registre · Calendrier · Feuilles de match · Talents · Licences · Entrées · Billetterie · Accréditations · Votes · Journal · **Comptes** |
+| Super administrateur (Secrétariat exécutif) | Registre | Registre · Calendrier · Feuilles de match · Talents · Licences · Entrées · Billetterie · Accréditations · Votes · Journal · **Comptes** · **Identité** |
 | Administration de la compétition | Registre | Registre · Calendrier · Feuilles de match · Talents · Licences · Entrées · Billetterie · Accréditations · Votes · Journal |
 | Gestionnaire de club | **Fiche de son équipe** (et rien d'autre) | Registre (son équipe) |
 | Délégué de match | **Mes matchs** | Registre (lecture) · Feuilles de match · Licences |

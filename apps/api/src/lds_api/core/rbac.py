@@ -37,6 +37,7 @@ class Perm(StrEnum):
     TICKET_MANAGE = "ticket:manage"  # catégories, prix, ventes, annulation de billets
     ACCESS_SCAN = "access:scan"  # contrôle des billets et accréditations à l'entrée
     ACCREDITATION_MANAGE = "accreditation:manage"  # presse, officiels, partenaires…
+    BRAND_MANAGE = "brand:manage"  # logo de la Ligue (identité visuelle)
     # Talents
     TALENT_NOTES = "talent:notes"  # liste de suivi et notes d'observation (internes)
 

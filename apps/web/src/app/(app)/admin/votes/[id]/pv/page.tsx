@@ -1,5 +1,7 @@
 "use client";
 // Procès-verbal d'un scrutin : page imprimable (enregistrement en PDF depuis le navigateur).
+import { useBrandLogo } from "@/lib/brand";
+import { BrandLogo } from "@/components/BrandLogo";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Suspense } from "react";
@@ -21,6 +23,7 @@ export default function ProcesVerbalPage() {
 
 function Report() {
   const { id } = useParams<{ id: string }>();
+  const logo = useBrandLogo();
   const { data: r, error } = useApi<VoteReport>(`/admin/ballots/${id}/report`);
   if (error) return <p className="text-lds-red">{error}</p>;
   if (!r) return <p className="text-stone-500">Préparation du procès-verbal…</p>;
@@ -38,6 +41,9 @@ function Report() {
 
       <article className="space-y-5 bg-white p-8 text-sm leading-relaxed text-stone-900 shadow print:p-0 print:shadow-none">
         <header className="border-b-2 border-lds-green pb-3 text-center">
+          <div className="mb-2 flex justify-center">
+            <BrandLogo logoUrl={logo} size="lg" className="shadow-none" />
+          </div>
           <p className="text-xs font-bold uppercase tracking-widest text-lds-green">Ligue de la Souveraineté</p>
           <h1 className="mt-1 text-xl font-bold">Procès-verbal du vote du public</h1>
           <p className="font-semibold">{b.title}</p>

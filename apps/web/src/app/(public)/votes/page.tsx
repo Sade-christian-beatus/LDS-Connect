@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/Illustrations";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -29,7 +30,8 @@ async function Ballots() {
     ["Bientôt", ballots.filter((b) => b.state === "upcoming")],
     ["Votes terminés", ballots.filter((b) => b.state === "closed")],
   ];
-  if (ballots.length === 0) return <p className="text-muted">Aucun vote en cours pour le moment.</p>;
+  if (ballots.length === 0)
+    return <EmptyState title="Aucun vote en cours pour le moment">Les votes ouvrent après les matchs et en fin de mois.</EmptyState>;
   return (
     <>
       {groups

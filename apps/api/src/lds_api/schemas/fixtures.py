@@ -17,6 +17,7 @@ class TeamRef(BaseModel):
     slug: str
     primary_color: str
     secondary_color: str
+    logo_url: str | None = None
 
 
 class VenueOut(BaseModel):

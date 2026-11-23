@@ -1,3 +1,4 @@
+import { Stadium } from "@/components/Illustrations";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Countdown } from "@/components/Countdown";
@@ -80,6 +81,7 @@ async function HomeContent() {
         </section>
       ) : (
         <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pitch to-lds-green p-6 text-white sm:p-8">
+          <Stadium className="pointer-events-none absolute -bottom-6 right-0 w-2/3 max-w-xl opacity-60" />
           <p className="text-sm font-semibold uppercase tracking-widest text-lds-gold">{season.name}</p>
           <h1 className="mt-1 text-3xl font-black sm:text-4xl">Ligue de la Souveraineté</h1>
           <p className="mt-2 max-w-2xl text-green-50">
