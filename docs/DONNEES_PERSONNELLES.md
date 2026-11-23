@@ -78,7 +78,21 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
 - Les passages au contrôle (`access_scans`) sont liés au billet, pas à l'acheteur.
 - Durée de conservation des commandes : **à fixer par la Ligue** (obligations comptables).
 
-## 7. Droits des personnes
+## 7. Talents (phase 3)
+
+- **Fiche publique d'un joueur** : nom d'usage, poste, équipe, âge, numéro et statistiques
+  de la saison, rien d'autre (ni nom complet, ni date de naissance, ni région de résidence).
+- **Tableau de bord** (cellule technique, administration) : nom complet et âge, jamais la
+  date de naissance ni les coordonnées ; l'export CSV est inscrit au journal.
+- **Notes d'observation** : texte **chiffré** en base, visible seulement de la cellule
+  technique et de l'administration (`talent:notes`) ; chaque consultation d'une fiche est
+  journalisée ; le texte n'est jamais recopié dans le journal ; une note retirée l'est avec
+  un motif, sans effacement. Consigne affichée : s'en tenir à des appréciations sportives
+  (beaucoup de joueurs sont mineurs).
+- Durée de conservation des notes : **à fixer par la Ligue** (proposition : fin de la saison
+  suivante).
+
+## 8. Droits des personnes
 
 - **Accès / rectification** : via le club ou l'administration (modification journalisée).
 - **Effacement** : un joueur quittant l'effectif est retiré (licence révoquée) ; l'historique
@@ -88,7 +102,7 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
   CNIB et téléphones y sont masqués par défaut ; l'export avec données sensibles
   (`--include-sensitive`) est journalisé et doit être protégé comme la base elle-même.
 
-## 8. Points à décider par la Ligue
+## 9. Points à décider par la Ligue
 
 - Désignation formelle du responsable de traitement et dépôt de la déclaration CIL.
 - Durées de conservation par catégorie (licences, feuilles, journaux, votes, billets).

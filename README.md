@@ -83,6 +83,11 @@ par leurs initiales et une couleur, en attendant les fichiers et l'accord de la 
   **Contrôle des entrées** (`/acces`) hors connexion avec synchronisation différée et
   détection des doubles entrées entre portes ; **accréditations** (presse, officiels…)
   à carte imprimable.
+- **Talents** (phase 3) : statistiques de chaque joueur recalculées à la validation des
+  feuilles (minutes, buts, passes, cartons, clean sheets, homme du match) ; tableau de
+  bord de la cellule technique (filtres poste, âge, équipe, région, poule) ; liste de
+  suivi et notes d'observation internes, chiffrées et journalisées ; fiche publique par
+  joueur (`/joueurs/…`, données autorisées pour les mineurs seulement).
 - **Back-office** (`/admin`) : tableau de bord des 20 équipes, fiches équipes (joueurs,
   encadreurs, vérification des résidences, données sensibles en consultation journalisée),
   licences (délivrance, carte imprimable, suspension), calendrier (génération, stades,

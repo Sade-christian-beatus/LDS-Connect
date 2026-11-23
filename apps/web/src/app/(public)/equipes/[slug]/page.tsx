@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { MatchCard } from "@/components/MatchCard";
 import { TeamBadge } from "@/components/TeamBadge";
@@ -87,7 +88,9 @@ async function Team({ params }: { params: PageProps<"/equipes/[slug]">["params"]
                     >
                       {p.shirt_number ?? "–"}
                     </span>
-                    <span className="flex-1 font-medium">{p.display_name}</span>
+                    <Link href={`/joueurs/${p.person_id}`} className="flex-1 font-medium hover:underline">
+                      {p.display_name}
+                    </Link>
                     <span className="text-xs text-subtle">{p.age} ans</span>
                   </li>
                 ))}
