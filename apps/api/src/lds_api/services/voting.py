@@ -21,7 +21,13 @@ from sqlalchemy.orm import Session, selectinload
 
 from lds_api.core import ratelimit
 from lds_api.core.config import get_settings
-from lds_api.core.crypto import _blind_key, blind_index, normalize_phone, phone_index
+from lds_api.core.crypto import (
+    _blind_key,
+    blind_index,
+    mask_phone,
+    normalize_phone,
+    phone_index,
+)
 from lds_api.core.errors import BusinessError, NotFound
 from lds_api.domain import voting as rules
 from lds_api.models import (
@@ -372,10 +378,6 @@ def _code_hash(challenge_id: uuid.UUID, code: str) -> str:
     return hmac.new(_blind_key(), f"otp:{challenge_id}:{code}".encode(), hashlib.sha256).hexdigest()
 
 
-def _hint(phone: str) -> str:
-    return f"{phone[:4]} •• •• {phone[-4:-2]} {phone[-2:]}"
-
-
 def _already_voted(db: Session, b: Ballot, pidx: str) -> bool:
     return (
         db.scalar(select(Vote.id).where(Vote.ballot_id == b.id, Vote.phone_index == pidx).limit(1))
@@ -430,7 +432,7 @@ def request_code(db: Session, b: Ballot, body: vs.CodeRequest, ip: str | None) -
             status.HTTP_503_SERVICE_UNAVAILABLE, "Envoi du SMS impossible, réessayez plus tard"
         ) from exc
     return vs.CodeSent(
-        challenge_id=challenge.id, expires_at=challenge.expires_at, phone_hint=_hint(phone)
+        challenge_id=challenge.id, expires_at=challenge.expires_at, phone_hint=mask_phone(phone)
     )
 
 

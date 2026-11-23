@@ -33,6 +33,10 @@ class Perm(StrEnum):
     USER_MANAGE = "user:manage"
     DATA_EXPORT = "data:export"
     VOTE_MANAGE = "vote:manage"  # scrutins du public : création, examen des votes, PV
+    # Billetterie et accès au stade
+    TICKET_MANAGE = "ticket:manage"  # catégories, prix, ventes, annulation de billets
+    ACCESS_SCAN = "access:scan"  # contrôle des billets et accréditations à l'entrée
+    ACCREDITATION_MANAGE = "accreditation:manage"  # presse, officiels, partenaires…
 
 
 ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
@@ -55,6 +59,9 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
             Perm.STATS_READ,
             Perm.AUDIT_READ,
             Perm.VOTE_MANAGE,
+            Perm.TICKET_MANAGE,
+            Perm.ACCESS_SCAN,
+            Perm.ACCREDITATION_MANAGE,
         }
     ),
     # Limité à son équipe (voir ensure_team_scope)
@@ -63,7 +70,7 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
         {Perm.SQUAD_READ, Perm.LICENCE_VERIFY, Perm.SHEET_EDIT, Perm.SHEET_VALIDATE}
     ),
     RoleCode.CELLULE_TECHNIQUE: frozenset({Perm.SQUAD_READ, Perm.STATS_READ}),
-    RoleCode.CONTROLEUR_ACCES: frozenset({Perm.LICENCE_VERIFY}),
+    RoleCode.CONTROLEUR_ACCES: frozenset({Perm.LICENCE_VERIFY, Perm.ACCESS_SCAN}),
 }
 
 # Rôles dont le périmètre est restreint à une seule équipe

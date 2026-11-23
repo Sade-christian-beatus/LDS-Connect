@@ -15,11 +15,12 @@ s'ouvre ensuite comme une application.
    supporters, médias, clubs                         selon le rôle du compte :
    ─ accueil, scores en direct                       ─ Back-office (ordinateur)
    ─ calendrier, résultats                              registre, licences, calendrier,
-   ─ classements, statistiques                          délégués, votes, journal, comptes
-   ─ pages des équipes, votes du public              ─ Feuille de match (téléphone)
+   ─ classements, statistiques                          délégués, billetterie, votes,
+   ─ pages des équipes, votes du public                 accréditations, journal, comptes
+   ─ billetterie, mes billets (hors réseau)          ─ Feuille de match (téléphone)
                                                         délégués — fonctionne hors réseau
-                                                     ─ Contrôle des licences (téléphone)
-                                                        contrôleurs au stade — hors réseau
+                                                     ─ Contrôle des licences et des entrées
+                                                        (téléphone) au stade — hors réseau
           │                                                          │
           └──────────────────────────┬───────────────────────────────┘
                                      │  (invisible pour les utilisateurs)
@@ -33,10 +34,11 @@ s'ouvre ensuite comme une application.
 
 | Espace | Adresse | Pour qui | Appareil | Compte | Hors réseau |
 |---|---|---|---|---|---|
-| **Site public** | `/` (accueil, `/calendrier`, `/resultats`, `/classements`, `/statistiques`, `/equipes`, `/votes`) | Tout le monde : supporters, médias, clubs | Téléphone ou ordinateur | Non (vote : numéro de téléphone + code SMS) | Non (consultation en ligne) |
+| **Site public** | `/` (accueil, `/calendrier`, `/resultats`, `/classements`, `/statistiques`, `/equipes`, `/votes`, `/billetterie`) | Tout le monde : supporters, médias, clubs | Téléphone ou ordinateur | Non (vote : code SMS ; achat : nom + numéro mobile money) | **Mes billets** (`/billets`) : oui, les billets restent sur le téléphone |
 | **Back-office** | `/admin/…` | Secrétariat exécutif, administration de la compétition, gestionnaires de club, cellule technique | Ordinateur de préférence | Oui | Non |
 | **Feuille de match** | `/delegue` | Délégués de match | **Téléphone** (installé comme une application) | Oui | **Oui** : saisie au bord du terrain, envoi au retour du réseau |
-| **Contrôle des licences** | `/controle` | Contrôleurs d'accès au stade | **Téléphone** | Oui | **Oui** : vérification des QR codes sans réseau |
+| **Contrôle des licences** | `/controle` | Délégués, contrôleurs au stade | **Téléphone** | Oui | **Oui** : vérification des QR codes sans réseau |
+| **Contrôle des entrées** | `/acces` | Contrôleurs d'accès aux portes du stade | **Téléphone** | Oui | **Oui** : billets et accréditations vérifiés sans réseau, passages envoyés au retour du réseau |
 | **Mon compte** | `/compte` | Tout officiel | Tous | Oui | Non |
 | **API** | `/api` (documentation : `/api/v1/docs`) | Personne directement : c'est le moteur ; l'équipe informatique de la Ligue | — | — | — |
 
@@ -47,12 +49,12 @@ son rôle permet.
 
 | Rôle | Arrive sur | Voit dans le menu |
 |---|---|---|
-| Super administrateur (Secrétariat exécutif) | Registre | Registre · Calendrier · Feuilles de match · Contrôle · Votes · Journal · **Comptes** |
-| Administration de la compétition | Registre | Registre · Calendrier · Feuilles de match · Contrôle · Votes · Journal |
+| Super administrateur (Secrétariat exécutif) | Registre | Registre · Calendrier · Feuilles de match · Licences · Entrées · Billetterie · Accréditations · Votes · Journal · **Comptes** |
+| Administration de la compétition | Registre | Registre · Calendrier · Feuilles de match · Licences · Entrées · Billetterie · Accréditations · Votes · Journal |
 | Gestionnaire de club | **Fiche de son équipe** (et rien d'autre) | Registre (son équipe) |
-| Délégué de match | **Mes matchs** | Registre (lecture) · Feuilles de match · Contrôle |
+| Délégué de match | **Mes matchs** | Registre (lecture) · Feuilles de match · Licences |
 | Cellule technique | Registre | Registre (lecture) |
-| Contrôleur d'accès | **Contrôle des licences** | Contrôle |
+| Contrôleur d'accès | **Contrôle des entrées** | Licences · Entrées |
 
 ## « Application » ou « site » ?
 
@@ -83,5 +85,6 @@ le reste vers le site : pour les utilisateurs, il n'y a qu'**une seule adresse**
 ## Phases suivantes
 
 Les votes du public (phase 2) sont une page du **site public** (`/votes`), gérée depuis le
-menu **Votes** de l'espace officiels. La billetterie ajoutera un espace d'achat public et un écran de contrôle des billets dans l'**espace
-officiels**, sur le modèle du contrôle des licences. Toujours une seule adresse.
+menu **Votes** de l'espace officiels. La billetterie est une page du **site public**
+(`/billetterie`, `/billets`) et deux outils de l'espace officiels : **Billetterie** (prix,
+ventes) et **Entrées** (contrôle aux portes, hors réseau). Toujours une seule adresse.

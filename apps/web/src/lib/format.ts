@@ -112,3 +112,14 @@ export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: TZ }).format(new Date(iso));
 }
+
+export function formatFcfa(n: number | null | undefined): string {
+  return n == null ? "—" : `${n.toLocaleString("fr-FR")} FCFA`;
+}
+
+export const SALE_STATE: Record<string, { label: string; tone: "green" | "amber" | "stone" | "blue" | "red" }> = {
+  on_sale: { label: "En vente", tone: "green" },
+  not_open: { label: "Bientôt", tone: "blue" },
+  sold_out: { label: "Complet", tone: "red" },
+  closed: { label: "Fermées", tone: "stone" },
+};

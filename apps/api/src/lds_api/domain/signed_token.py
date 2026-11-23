@@ -20,6 +20,8 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
 LICENCE_PREFIX = "LDS1"
+TICKET_PREFIX = "LDT1"
+ACCREDITATION_PREFIX = "LDA1"
 
 
 class TokenError(ValueError):

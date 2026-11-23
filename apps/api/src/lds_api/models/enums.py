@@ -177,6 +177,15 @@ class TicketStatus(StrEnum):
     CANCELLED = "cancelled"
 
 
+class ScanResult(StrEnum):
+    """Issue d'un passage au contrôle d'accès."""
+
+    ADMITTED = "admitted"  # entrée autorisée (premier passage)
+    DUPLICATE = "duplicate"  # déjà entré : double entrée refusée
+    INVALID = "invalid"  # signature fausse, billet inconnu, annulé ou révoqué
+    WRONG_MATCH = "wrong_match"  # billet d'un autre match
+
+
 class AccreditationCategory(StrEnum):
     PRESS = "press"
     OFFICIAL = "official"

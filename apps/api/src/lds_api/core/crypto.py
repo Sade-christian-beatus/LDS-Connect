@@ -89,3 +89,8 @@ def phone_index(phone: str) -> str:
 
 def cnib_index(cnib: str) -> str:
     return blind_index(normalize_identifier(cnib), purpose="cnib")
+
+
+def mask_phone(phone: str) -> str:
+    """Numéro masqué pour l'affichage : « +226 •• •• 34 56 »."""
+    return f"{phone[:4]} •• •• {phone[-4:-2]} {phone[-2:]}"

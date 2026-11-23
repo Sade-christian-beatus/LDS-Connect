@@ -34,8 +34,16 @@ class PaymentProvider(Protocol):
     name: str
 
     def create(
-        self, *, reference: str, amount_fcfa: int, phone: str | None, callback_url: str
-    ) -> PaymentSession: ...
+        self,
+        *,
+        reference: str,
+        amount_fcfa: int,
+        phone: str | None,
+        callback_url: str,
+        return_url: str | None = None,
+    ) -> PaymentSession:
+        """`return_url` : page où l'agrégateur renvoie l'acheteur après le paiement."""
+        ...
 
     def parse_notification(self, payload: dict) -> PaymentNotification:
         """Valide et décode la notification de l'agrégateur (signature à vérifier ici)."""
@@ -49,7 +57,9 @@ class SimulatorPaymentProvider:
         self._base = base_url.rstrip("/")
         self._client = client or httpx.Client(base_url=base_url, timeout=5)
 
-    def create(self, *, reference, amount_fcfa, phone, callback_url) -> PaymentSession:
+    def create(
+        self, *, reference, amount_fcfa, phone, callback_url, return_url=None
+    ) -> PaymentSession:
         r = self._client.post(
             "/payment/init",
             json={
@@ -58,6 +68,7 @@ class SimulatorPaymentProvider:
                 "currency": "XOF",
                 "phone": phone,
                 "callback_url": callback_url,
+                "return_url": return_url,
             },
         )
         r.raise_for_status()

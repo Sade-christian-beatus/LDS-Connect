@@ -46,9 +46,13 @@ class Settings(BaseSettings):
     sms_provider: Literal["simulator", "console"] = "simulator"
     # Votes du public : indicatifs autorisés (séparés par des virgules), Burkina Faso par défaut
     vote_allowed_country_codes: str = "226"
+    # Indicatifs acceptés pour l'achat de billets (numéro de l'acheteur)
+    ticket_allowed_country_codes: str = "226"
     sms_simulator_url: str = "http://localhost:8090"
     payment_provider: Literal["simulator", "disabled"] = "disabled"
     payment_simulator_url: str = "http://localhost:8090"
+    # Adresse de l'API vue par l'agrégateur pour ses notifications (vide = API_BASE_URL)
+    payment_callback_base_url: str = ""
     storage_backend: Literal["local", "s3"] = "local"
     storage_local_path: str = "./var/storage"
     s3_endpoint_url: str | None = None

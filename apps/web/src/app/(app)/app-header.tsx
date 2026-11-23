@@ -14,7 +14,10 @@ export function menuFor(user: User): { href: string; label: string }[] {
   }
   if (p.has("fixture:manage")) items.push({ href: "/admin/calendrier", label: "Calendrier" });
   if (p.has("sheet:edit")) items.push({ href: "/delegue", label: "Feuilles de match" });
-  if (p.has("licence:verify")) items.push({ href: "/controle", label: "Contrôle" });
+  if (p.has("licence:verify")) items.push({ href: "/controle", label: "Licences" });
+  if (p.has("access:scan")) items.push({ href: "/acces", label: "Entrées" });
+  if (p.has("ticket:manage")) items.push({ href: "/admin/billetterie", label: "Billetterie" });
+  if (p.has("accreditation:manage")) items.push({ href: "/admin/accreditations", label: "Accréditations" });
   if (p.has("vote:manage")) items.push({ href: "/admin/votes", label: "Votes" });
   if (p.has("audit:read")) items.push({ href: "/admin/journal", label: "Journal" });
   if (p.has("user:manage")) items.push({ href: "/admin/comptes", label: "Comptes" });
@@ -28,6 +31,7 @@ export function landingFor(user: User): string {
   if (p.has("team:manage")) return "/admin/equipes";
   if (p.has("squad:write") && user.team_id) return `/admin/equipes/${user.team_id}`;
   if (p.has("sheet:edit")) return "/delegue";
+  if (p.has("access:scan") && !p.has("squad:read")) return "/acces";
   if (p.has("licence:verify") && !p.has("squad:read")) return "/controle";
   return menuFor(user)[0]?.href ?? "/";
 }

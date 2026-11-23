@@ -15,6 +15,7 @@ services:
       SMTP_HOST: mailpit
       SMS_SIMULATOR_URL: http://simulateurs:8090
       PAYMENT_SIMULATOR_URL: http://simulateurs:8090
+      PAYMENT_CALLBACK_BASE_URL: http://api:8000
     volumes:
       - ./apps/api/src:/app/src
       - ./apps/api/migrations:/app/migrations
