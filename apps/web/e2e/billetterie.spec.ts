@@ -73,7 +73,9 @@ test("achat de billets, paiement mobile money et contrôle à l'entrée", async 
   await gate.getByRole("button", { name: "Vérifier" }).click();
   await expect(gate.getByRole("alert", { name: "Résultat du contrôle" })).toContainText("DÉJÀ ENTRÉ");
 
-  // Coupure réseau : l'appareil continue, puis synchronise au retour du réseau
+  // Coupure réseau : l'appareil continue, puis synchronise au retour du réseau.
+  // D'abord, laisser partir les passages déjà enregistrés (envoi en arrière-plan).
+  await expect(gate.getByText("à synchroniser", { exact: false })).toHaveCount(0, { timeout: 20_000 });
   await gateCtx.setOffline(true);
   await qr.fill(t2);
   await gate.getByRole("button", { name: "Vérifier" }).click();

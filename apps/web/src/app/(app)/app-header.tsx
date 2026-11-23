@@ -23,6 +23,7 @@ export function menuFor(user: User): Item[] {
   }
   if (p.has("fixture:manage")) items.push({ href: "/admin/calendrier", label: "Calendrier", group: "Compétition" });
   if (p.has("sheet:edit")) items.push({ href: "/delegue", label: "Feuilles de match", group: "Compétition" });
+  if (p.has("stats:read")) items.push({ href: "/admin/talents", label: "Talents", group: "Compétition" });
   if (p.has("licence:verify")) items.push({ href: "/controle", label: "Licences", group: "Au stade" });
   if (p.has("access:scan")) items.push({ href: "/acces", label: "Entrées", group: "Au stade" });
   if (p.has("ticket:manage")) items.push({ href: "/admin/billetterie", label: "Billetterie", group: "Au stade" });
@@ -40,6 +41,7 @@ export function landingFor(user: User): string {
   if (p.has("team:manage")) return "/admin/equipes";
   if (p.has("squad:write") && user.team_id) return `/admin/equipes/${user.team_id}`;
   if (p.has("sheet:edit")) return "/delegue";
+  if (p.has("stats:read") && !p.has("squad:write")) return "/admin/talents";
   if (p.has("access:scan") && !p.has("squad:read")) return "/acces";
   if (p.has("licence:verify") && !p.has("squad:read")) return "/controle";
   return menuFor(user)[0]?.href ?? "/";

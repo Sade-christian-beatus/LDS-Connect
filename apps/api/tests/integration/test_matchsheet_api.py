@@ -2,22 +2,10 @@
 
 import uuid
 
-import pytest
 from sqlalchemy import select
 
-from lds_api.models import Match, Pool, Suspension
+from lds_api.models import Match, Suspension
 from lds_api.models.enums import MatchPhase, MatchStatus
-
-
-@pytest.fixture
-def match_id(db, seeded) -> str:
-    pool_a = db.scalar(select(Pool).where(Pool.code == "A"))
-    m = db.scalar(
-        select(Match)
-        .where(Match.pool_id == pool_a.id, Match.round_number == 1)
-        .order_by(Match.kickoff_at)
-    )
-    return str(m.id)
 
 
 def build_lineup(team_sheet: dict, *, locals_wanted: int = 6, subs: int = 7) -> list[dict]:

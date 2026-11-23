@@ -1522,6 +1522,131 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/players/{person_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public Player
+         * @description Fiche publique : nom d'usage, poste, équipe, âge et statistiques de la saison.
+         */
+        get: operations["public_player_api_v1_players__person_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/talents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dashboard */
+        get: operations["dashboard_api_v1_admin_talents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/talents.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dashboard Csv
+         * @description Export du tableau filtré (sans date de naissance ni coordonnées) ; export journalisé.
+         */
+        get: operations["dashboard_csv_api_v1_admin_talents_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/talents/{person_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Profile */
+        get: operations["profile_api_v1_admin_talents__person_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/talents/{person_id}/watch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Watch */
+        put: operations["watch_api_v1_admin_talents__person_id__watch_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/talents/{person_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Note */
+        post: operations["add_note_api_v1_admin_talents__person_id__notes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/talent-notes/{note_id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete Note */
+        post: operations["delete_note_api_v1_admin_talent_notes__note_id__delete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -1876,6 +2001,67 @@ export interface components {
             /** Temporary Password */
             temporary_password: string;
         };
+        /** Dashboard */
+        Dashboard: {
+            /** Total */
+            total: number;
+            /** Youth Age Limit */
+            youth_age_limit: number;
+            /** Match Duration Minutes */
+            match_duration_minutes: number;
+            /** Rows */
+            rows: components["schemas"]["DashboardRow"][];
+        };
+        /** DashboardRow */
+        DashboardRow: {
+            /** Appearances */
+            appearances: number;
+            /** Starts */
+            starts: number;
+            /** Minutes Played */
+            minutes_played: number;
+            /** Goals */
+            goals: number;
+            /** Assists */
+            assists: number;
+            /** Yellow Cards */
+            yellow_cards: number;
+            /** Red Cards */
+            red_cards: number;
+            /** Clean Sheets */
+            clean_sheets: number;
+            /** Man Of The Match */
+            man_of_the_match: number;
+            /** Goals Per 90 */
+            goals_per_90: number | null;
+            /** Contributions Per 90 */
+            contributions_per_90: number | null;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Full Name */
+            full_name: string;
+            /** Display Name */
+            display_name: string;
+            position: components["schemas"]["Position"];
+            /** Age */
+            age: number;
+            /** Is Youth */
+            is_youth: boolean;
+            team: components["schemas"]["TeamRef"];
+            /** Region */
+            region: string | null;
+            /** Shirt Number */
+            shirt_number: number | null;
+            /** Watched */
+            watched: boolean;
+            /** Avg Rating */
+            avg_rating: number | null;
+            /** Notes Count */
+            notes_count: number;
+        };
         /** DelegateMatch */
         DelegateMatch: {
             /**
@@ -2151,6 +2337,29 @@ export interface components {
             /** E */
             e?: string | null;
         };
+        /** MatchLog */
+        MatchLog: {
+            match: components["schemas"]["MatchOut"];
+            /**
+             * Team Id
+             * Format: uuid
+             */
+            team_id: string;
+            /** Started */
+            started: boolean;
+            /** Minutes */
+            minutes: number;
+            /** Goals */
+            goals: number;
+            /** Assists */
+            assists: number;
+            /** Yellow Cards */
+            yellow_cards: number;
+            /** Red Cards */
+            red_cards: number;
+            /** Clean Sheet */
+            clean_sheet: boolean;
+        };
         /** MatchOut */
         MatchOut: {
             /**
@@ -2216,6 +2425,41 @@ export interface components {
          * @enum {string}
          */
         MembershipStatus: "active" | "released";
+        /** NoteDelete */
+        NoteDelete: {
+            /** Reason */
+            reason: string;
+        };
+        /** NoteIn */
+        NoteIn: {
+            /** Body */
+            body: string;
+            /** Rating */
+            rating?: number | null;
+            /** Match Id */
+            match_id?: string | null;
+        };
+        /** NoteOut */
+        NoteOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Author */
+            author: string;
+            /** Rating */
+            rating: number | null;
+            /** Body */
+            body: string;
+            /** Match Id */
+            match_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** OptionIn */
         OptionIn: {
             /** Label */
@@ -2479,6 +2723,11 @@ export interface components {
         };
         /** PublicPlayer */
         PublicPlayer: {
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
             /** Display Name */
             display_name: string;
             position: components["schemas"]["Position"];
@@ -2486,6 +2735,25 @@ export interface components {
             age: number;
             /** Shirt Number */
             shirt_number: number | null;
+        };
+        /** PublicPlayerProfile */
+        PublicPlayerProfile: {
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Display Name */
+            display_name: string;
+            position: components["schemas"]["Position"];
+            /** Age */
+            age: number;
+            /** Shirt Number */
+            shirt_number: number | null;
+            team: components["schemas"]["TeamRef"];
+            stats: components["schemas"]["StatValues"];
+            /** Matches */
+            matches: components["schemas"]["MatchLog"][];
         };
         /** PublicStaff */
         PublicStaff: {
@@ -2653,6 +2921,8 @@ export interface components {
             max_substitutes_on_sheet: number;
             /** Max Substitutions */
             max_substitutions: number;
+            /** Match Duration Minutes */
+            match_duration_minutes: number;
             /** Yellow Cards Threshold */
             yellow_cards_threshold: number;
             /** Red Card Ban Matches */
@@ -3010,11 +3280,68 @@ export interface components {
              */
             penalties: number;
         };
+        /** StatValues */
+        StatValues: {
+            /** Appearances */
+            appearances: number;
+            /** Starts */
+            starts: number;
+            /** Minutes Played */
+            minutes_played: number;
+            /** Goals */
+            goals: number;
+            /** Assists */
+            assists: number;
+            /** Yellow Cards */
+            yellow_cards: number;
+            /** Red Cards */
+            red_cards: number;
+            /** Clean Sheets */
+            clean_sheets: number;
+            /** Man Of The Match */
+            man_of_the_match: number;
+            /** Goals Per 90 */
+            goals_per_90: number | null;
+            /** Contributions Per 90 */
+            contributions_per_90: number | null;
+        };
         /** StatusIn */
         StatusIn: {
             status: components["schemas"]["LicenceStatus"];
             /** Reason */
             reason: string;
+        };
+        /** TalentProfile */
+        TalentProfile: {
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Full Name */
+            full_name: string;
+            /** Display Name */
+            display_name: string;
+            position: components["schemas"]["Position"];
+            preferred_foot: components["schemas"]["Foot"] | null;
+            /** Age */
+            age: number;
+            /** Is Youth */
+            is_youth: boolean;
+            /** Shirt Number */
+            shirt_number: number | null;
+            team: components["schemas"]["TeamRef"];
+            /** Region */
+            region: string | null;
+            stats: components["schemas"]["StatValues"];
+            /** Matches */
+            matches: components["schemas"]["MatchLog"][];
+            /** Watched */
+            watched: boolean;
+            /** Tags */
+            tags: string[];
+            /** Notes */
+            notes: components["schemas"]["NoteOut"][];
         };
         /** TeamBrief */
         TeamBrief: {
@@ -3419,6 +3746,13 @@ export interface components {
             connection: string | null;
             /** Choices */
             choices: string[];
+        };
+        /** WatchIn */
+        WatchIn: {
+            /** Watched */
+            watched: boolean;
+            /** Tags */
+            tags?: string[];
         };
     };
     responses: never;
@@ -6122,6 +6456,253 @@ export interface operations {
                 content: {
                     "image/svg+xml": unknown;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    public_player_api_v1_players__person_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPlayerProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dashboard_api_v1_admin_talents_get: {
+        parameters: {
+            query?: {
+                position?: components["schemas"]["Position"] | null;
+                age_min?: number | null;
+                age_max?: number | null;
+                team_id?: string | null;
+                region_id?: string | null;
+                pool?: string | null;
+                min_minutes?: number;
+                watched_only?: boolean;
+                q?: string | null;
+                sort?: "goals" | "assists" | "minutes_played" | "appearances" | "goals_per_90" | "contributions_per_90" | "clean_sheets" | "man_of_the_match" | "avg_rating" | "age";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dashboard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dashboard_csv_api_v1_admin_talents_csv_get: {
+        parameters: {
+            query?: {
+                position?: components["schemas"]["Position"] | null;
+                age_min?: number | null;
+                age_max?: number | null;
+                team_id?: string | null;
+                region_id?: string | null;
+                pool?: string | null;
+                min_minutes?: number;
+                watched_only?: boolean;
+                q?: string | null;
+                sort?: "goals" | "assists" | "minutes_played" | "appearances" | "goals_per_90" | "contributions_per_90" | "clean_sheets" | "man_of_the_match" | "avg_rating" | "age";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    profile_api_v1_admin_talents__person_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TalentProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    watch_api_v1_admin_talents__person_id__watch_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WatchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_note_api_v1_admin_talents__person_id__notes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_note_api_v1_admin_talent_notes__note_id__delete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                note_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteDelete"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

@@ -90,6 +90,8 @@ class CompetitionRules(UUIDPk, Timestamps, Base):
     starters_count: Mapped[int] = mapped_column(Integer, default=11)
     max_substitutes_on_sheet: Mapped[int] = mapped_column(Integer, default=9)
     max_substitutions: Mapped[int] = mapped_column(Integer, default=5)
+    # Durée réglementaire d'un match (minutes jouées, statistiques des joueurs)
+    match_duration_minutes: Mapped[int] = mapped_column(Integer, default=90, server_default="90")
 
     # Discipline
     yellow_cards_threshold: Mapped[int] = mapped_column(Integer, default=3)

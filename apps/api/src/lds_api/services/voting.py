@@ -39,12 +39,14 @@ from lds_api.models import (
     MatchSheet,
     OtpChallenge,
     Person,
+    Season,
     SquadMembership,
     Staff,
     Team,
     Vote,
 )
 from lds_api.models.enums import (
+    BallotKind,
     BallotStatus,
     EventType,
     MembershipKind,
@@ -285,6 +287,13 @@ def publish_results(db: Session, actor, b: Ballot) -> None:
         raise BusinessError("Les résultats se publient une fois le scrutin clos")
     b.status = BallotStatus.PUBLISHED
     audit.record(db, actor, "publish_results", "ballot", b.id)
+    if b.kind == BallotKind.MAN_OF_THE_MATCH:
+        from lds_api.services import talents  # import local : talents dépend de voting
+
+        db.flush()
+        talents.refresh(
+            db, db.get(Season, b.season_id), {o.person_id for o in b.options if o.person_id}
+        )
 
 
 # --- Propositions suggérées ------------------------------------------------------------------

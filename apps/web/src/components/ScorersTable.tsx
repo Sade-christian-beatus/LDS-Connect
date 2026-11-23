@@ -19,7 +19,9 @@ export function ScorersTable({ rows, unit, empty }: { rows: StatRow[]; unit: str
           </span>
           <TeamBadge team={r.team} size="sm" />
           <span className="min-w-0 flex-1">
-            <span className="block truncate font-semibold">{r.display_name}</span>
+            <Link href={`/joueurs/${r.person_id}`} className="block truncate font-semibold hover:underline">
+              {r.display_name}
+            </Link>
             <Link href={`/equipes/${r.team.slug}`} className="block truncate text-xs text-subtle hover:underline">
               {r.team.name}
             </Link>

@@ -43,7 +43,7 @@ toutes modifiables dans `competition_rules` sans changer le code.
 | # | Question | Valeur provisoire |
 |---|---|---|
 | 21 | **Opérateurs SMS** (OTP des votes) | simulateur local ; interface `SmsProvider` prête |
-| 22 | **Agrégateur de paiement** mobile money (billetterie, vote payant) | simulateur local ; interface `PaymentProvider` prête ; désactivé par défaut |
+| 22 | **Agrégateur de paiement** mobile money (billetterie, vote payant) ; **Faso Arzeka** (plateforme nationale de paiement de l'administration, DGTCP) envisagée | simulateur local ; interface `PaymentProvider` prête ; désactivé par défaut. Faso Arzeka : à confirmer avec la DGTCP (la Ligue peut-elle encaisser par ce canal ? documentation technique officielle, environnement de test, signature des notifications) ; aucun logo ni nom affiché sans accord |
 | 23 | **Hébergement** : serveur au Burkina Faso exigé ? Hébergeur retenu ? | code portable (Docker) ; voir [DEPLOIEMENT.md](DEPLOIEMENT.md) |
 | 24 | **Nom de domaine officiel** (ex. lds-connect.bf) | non défini |
 | 25 | **Logos officiels et charte graphique** de la Ligue et des 20 équipes, accord d'utilisation | initiales + couleurs génériques |
@@ -62,4 +62,6 @@ toutes modifiables dans `competition_rules` sans changer le code.
   remboursements (hors plateforme aujourd'hui) ; forfaits supporters (transport,
   hébergement) ; zones et catégories d'accréditations ; nombre de portes et d'appareils de
   contrôle par stade.
-- Talents : indicateurs attendus par la cellule technique.
+- Talents (livrés, à paramétrer) : indicateurs supplémentaires attendus par la cellule
+  technique ; étiquettes de suivi ; durée de conservation des notes d'observation ; accès
+  éventuel des sélections nationales ou de recruteurs (aujourd'hui : aucun accès externe).

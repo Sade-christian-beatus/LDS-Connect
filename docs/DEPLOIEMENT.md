@@ -180,6 +180,13 @@ Les données appartiennent à la Ligue. Export complet (JSON + CSV, une table pa
 make export
 ```
 
+Recalcul complet des statistiques des joueurs (elles se mettent à jour seules à chaque
+validation de feuille ; utile après une reprise de données) :
+
+```bash
+docker compose exec api python -m lds_api.cli refresh-stats
+```
+
 Les fichiers sont écrits dans le volume `storage` (`/app/var/storage/exports` dans le
 conteneur). CNIB et téléphones y sont **masqués** ; l'option `--include-sensitive` les inclut
 en clair (action journalisée, fichier à protéger).

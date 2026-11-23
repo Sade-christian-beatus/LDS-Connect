@@ -37,6 +37,8 @@ class Perm(StrEnum):
     TICKET_MANAGE = "ticket:manage"  # catégories, prix, ventes, annulation de billets
     ACCESS_SCAN = "access:scan"  # contrôle des billets et accréditations à l'entrée
     ACCREDITATION_MANAGE = "accreditation:manage"  # presse, officiels, partenaires…
+    # Talents
+    TALENT_NOTES = "talent:notes"  # liste de suivi et notes d'observation (internes)
 
 
 ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
@@ -62,6 +64,7 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
             Perm.TICKET_MANAGE,
             Perm.ACCESS_SCAN,
             Perm.ACCREDITATION_MANAGE,
+            Perm.TALENT_NOTES,
         }
     ),
     # Limité à son équipe (voir ensure_team_scope)
@@ -69,7 +72,7 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
     RoleCode.DELEGUE_MATCH: frozenset(
         {Perm.SQUAD_READ, Perm.LICENCE_VERIFY, Perm.SHEET_EDIT, Perm.SHEET_VALIDATE}
     ),
-    RoleCode.CELLULE_TECHNIQUE: frozenset({Perm.SQUAD_READ, Perm.STATS_READ}),
+    RoleCode.CELLULE_TECHNIQUE: frozenset({Perm.SQUAD_READ, Perm.STATS_READ, Perm.TALENT_NOTES}),
     RoleCode.CONTROLEUR_ACCES: frozenset({Perm.LICENCE_VERIFY, Perm.ACCESS_SCAN}),
 }
 

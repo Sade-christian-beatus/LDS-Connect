@@ -57,6 +57,7 @@ class PublicTeam(ORM):
 
 
 class PublicPlayer(BaseModel):
+    person_id: uuid.UUID  # lien vers la fiche publique du joueur
     display_name: str
     position: Position
     age: int
@@ -239,6 +240,7 @@ class RulesOut(ORM):
     starters_count: int
     max_substitutes_on_sheet: int
     max_substitutions: int
+    match_duration_minutes: int
     yellow_cards_threshold: int
     red_card_ban_matches: int
     qualifiers_per_pool: int

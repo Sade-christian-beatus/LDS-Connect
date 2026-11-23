@@ -28,7 +28,8 @@ def test_public_team_detail_hides_personal_data(client, seeded):
     body = r.json()
     assert len(body["players"]) == 30 and len(body["staff"]) == 7
     player = body["players"][0]
-    assert set(player) == {"display_name", "position", "age", "shirt_number"}
+    # Identifiant opaque (lien vers la fiche publique) : aucune donnée personnelle
+    assert set(player) == {"person_id", "display_name", "position", "age", "shirt_number"}
     raw = r.text
     for forbidden in ("birth_date", "cnib", "phone", "first_name", "last_name"):
         assert forbidden not in raw

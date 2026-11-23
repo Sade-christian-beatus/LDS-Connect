@@ -34,7 +34,7 @@ s'ouvre ensuite comme une application.
 
 | Espace | Adresse | Pour qui | Appareil | Compte | Hors réseau |
 |---|---|---|---|---|---|
-| **Site public** | `/` (accueil, `/calendrier`, `/resultats`, `/classements`, `/statistiques`, `/equipes`, `/votes`, `/billetterie`) | Tout le monde : supporters, médias, clubs | Téléphone ou ordinateur | Non (vote : code SMS ; achat : nom + numéro mobile money) | **Mes billets** (`/billets`) : oui, les billets restent sur le téléphone |
+| **Site public** | `/` (accueil, `/calendrier`, `/resultats`, `/classements`, `/statistiques`, `/equipes`, `/joueurs`, `/votes`, `/billetterie`) | Tout le monde : supporters, médias, clubs | Téléphone ou ordinateur | Non (vote : code SMS ; achat : nom + numéro mobile money) | **Mes billets** (`/billets`) : oui, les billets restent sur le téléphone |
 | **Back-office** | `/admin/…` | Secrétariat exécutif, administration de la compétition, gestionnaires de club, cellule technique | Ordinateur de préférence | Oui | Non |
 | **Feuille de match** | `/delegue` | Délégués de match | **Téléphone** (installé comme une application) | Oui | **Oui** : saisie au bord du terrain, envoi au retour du réseau |
 | **Contrôle des licences** | `/controle` | Délégués, contrôleurs au stade | **Téléphone** | Oui | **Oui** : vérification des QR codes sans réseau |
@@ -49,11 +49,11 @@ son rôle permet.
 
 | Rôle | Arrive sur | Voit dans le menu |
 |---|---|---|
-| Super administrateur (Secrétariat exécutif) | Registre | Registre · Calendrier · Feuilles de match · Licences · Entrées · Billetterie · Accréditations · Votes · Journal · **Comptes** |
-| Administration de la compétition | Registre | Registre · Calendrier · Feuilles de match · Licences · Entrées · Billetterie · Accréditations · Votes · Journal |
+| Super administrateur (Secrétariat exécutif) | Registre | Registre · Calendrier · Feuilles de match · Talents · Licences · Entrées · Billetterie · Accréditations · Votes · Journal · **Comptes** |
+| Administration de la compétition | Registre | Registre · Calendrier · Feuilles de match · Talents · Licences · Entrées · Billetterie · Accréditations · Votes · Journal |
 | Gestionnaire de club | **Fiche de son équipe** (et rien d'autre) | Registre (son équipe) |
 | Délégué de match | **Mes matchs** | Registre (lecture) · Feuilles de match · Licences |
-| Cellule technique | Registre | Registre (lecture) |
+| Cellule technique | **Talents** | Registre (lecture) · Talents |
 | Contrôleur d'accès | **Contrôle des entrées** | Licences · Entrées |
 
 ## « Application » ou « site » ?

@@ -118,6 +118,16 @@ def cmd_create_user(args: argparse.Namespace) -> None:
     print(f"Compte créé : {email} ({args.role}).")
 
 
+def cmd_refresh_stats(args: argparse.Namespace) -> None:
+    from lds_api.db.session import SessionLocal
+    from lds_api.services import seasons, talents
+
+    with SessionLocal() as db:
+        n = talents.refresh(db, seasons.current_season(db))
+        db.commit()
+    print(f"Statistiques des joueurs recalculées : {n} ligne(s).")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="lds_api.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -151,6 +161,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--password-stdin", action="store_true", help="Lit le mot de passe sur l'entrée standard"
     )
     p.set_defaults(func=cmd_create_user)
+
+    p = sub.add_parser("refresh-stats", help="Recalcule les statistiques des joueurs (saison)")
+    p.set_defaults(func=cmd_refresh_stats)
     return parser
 
 

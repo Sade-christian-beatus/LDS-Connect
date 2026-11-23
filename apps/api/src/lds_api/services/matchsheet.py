@@ -36,7 +36,7 @@ from lds_api.models.enums import (
 from lds_api.realtime import bus
 from lds_api.schemas import matchsheet as ms
 from lds_api.schemas.fixtures import TeamRef
-from lds_api.services import audit, fixtures, seasons, standings
+from lds_api.services import audit, fixtures, seasons, standings, talents
 
 EDITABLE_EVENTS = {SheetStatus.SUBMITTED}
 
@@ -503,6 +503,7 @@ def validate(db: Session, actor, sheet: MatchSheet) -> None:
     )
     standings.invalidate_after_commit(db, match.pool_id)
     fixtures.refresh_knockout(db, season)
+    talents.refresh_for_sheet(db, sheet)
     _publish(db, match)
 
 
