@@ -24,7 +24,7 @@ function Overview() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-bold text-green-900">Registre des équipes</h1>
+        <h1 className="text-2xl font-black tracking-tight text-pitch">Registre des équipes</h1>
         <p className="text-sm text-stone-600">
           {ok}/{data.length} équipe(s) conforme(s)
         </p>

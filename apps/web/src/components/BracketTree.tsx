@@ -21,19 +21,19 @@ function Slot({ match, title }: { match?: Match; title: string }) {
     return (
       <div className={`flex items-center gap-2 px-2 py-1 ${winner(side) ? "font-bold" : ""}`}>
         {team ? <TeamBadge team={team} size="sm" /> : <span className="h-7 w-7 rounded-full bg-stone-200" />}
-        <span className={`flex-1 truncate text-sm ${team ? "" : "italic text-stone-400"}`}>{team?.short_name ?? "À déterminer"}</span>
+        <span className={`flex-1 truncate text-sm ${team ? "" : "italic text-subtle"}`}>{team?.short_name ?? "À déterminer"}</span>
         {score != null && (
           <span className="tabular-nums">
             {score}
-            {pens != null && <sup className="ml-0.5 text-[10px] text-stone-500">({pens})</sup>}
+            {pens != null && <sup className="ml-0.5 text-[10px] text-subtle">({pens})</sup>}
           </span>
         )}
       </div>
     );
   };
   return (
-    <div className="w-full rounded-lg border border-stone-200 bg-white shadow-sm">
-      <div className="flex justify-between border-b border-stone-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-stone-500">
+    <div className="w-full rounded-lg border border-line bg-surface shadow-sm">
+      <div className="flex justify-between border-b border-line px-2 py-0.5 text-[10px] uppercase tracking-wide text-subtle">
         <span>{title}</span>
         {match?.status === "live" ? (
           <span className="font-semibold text-lds-red">● En direct</span>
@@ -49,7 +49,7 @@ function Slot({ match, title }: { match?: Match; title: string }) {
 
 export function BracketTree({ matches }: { matches: Match[] }) {
   const by = Object.fromEntries(matches.map((m) => [m.bracket_slot, m]));
-  if (matches.length === 0) return <p className="text-sm text-stone-600">Le tableau final sera publié à l&apos;issue de la phase de poules.</p>;
+  if (matches.length === 0) return <p className="text-sm text-muted">Le tableau final sera publié à l&apos;issue de la phase de poules.</p>;
   return (
     <div className="overflow-x-auto">
       <div className="grid min-w-[56rem] grid-cols-5 items-center gap-4">

@@ -77,7 +77,8 @@ export function Field({
   );
 }
 
-export const inputClass = "mt-1 w-full rounded border border-stone-300 px-2 py-1.5 text-sm disabled:bg-stone-100";
+export const inputClass =
+  "mt-1 w-full rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm focus:border-lds-green focus:outline-none focus:ring-2 focus:ring-lds-green/20 disabled:bg-stone-100";
 
 export function Badge({ tone, children }: { tone: "green" | "red" | "amber" | "stone" | "blue"; children: React.ReactNode }) {
   const tones = {
@@ -87,7 +88,7 @@ export function Badge({ tone, children }: { tone: "green" | "red" | "amber" | "s
     stone: "bg-stone-100 text-stone-700",
     blue: "bg-blue-100 text-blue-800",
   };
-  return <span className={`inline-block rounded px-1.5 py-0.5 text-[11px] font-semibold ${tones[tone]}`}>{children}</span>;
+  return <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${tones[tone]}`}>{children}</span>;
 }
 
 export function Notice({ notice, onClose }: { notice: { tone: "ok" | "error"; text: string } | null; onClose: () => void }) {
@@ -95,7 +96,7 @@ export function Notice({ notice, onClose }: { notice: { tone: "ok" | "error"; te
   return (
     <div
       role={notice.tone === "error" ? "alert" : "status"}
-      className={`flex items-start justify-between gap-3 rounded p-3 text-sm ${notice.tone === "error" ? "bg-red-50 text-lds-red" : "bg-green-50 text-green-800"}`}
+      className={`flex items-start justify-between gap-3 rounded-lg border-l-4 p-3 text-sm ${notice.tone === "error" ? "border-lds-red bg-red-50 text-lds-red" : "border-lds-green bg-green-50 text-green-800"}`}
     >
       <span>{notice.text}</span>
       <button type="button" onClick={onClose} aria-label="Masquer le message">
@@ -110,9 +111,9 @@ export function Button({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "link" }) {
   const styles = {
-    primary: "rounded bg-lds-green px-3 py-1.5 font-semibold text-white",
-    secondary: "rounded border border-stone-300 bg-white px-3 py-1.5",
-    danger: "rounded bg-lds-red px-3 py-1.5 font-semibold text-white",
+    primary: "rounded-lg bg-lds-green px-3.5 py-1.5 font-semibold text-white shadow-sm hover:bg-pitch",
+    secondary: "rounded-lg border border-stone-300 bg-white px-3.5 py-1.5 font-medium hover:border-stone-400 hover:bg-stone-50",
+    danger: "rounded-lg bg-lds-red px-3.5 py-1.5 font-semibold text-white shadow-sm hover:bg-red-800",
     link: "text-lds-green underline",
   };
   return <button type="button" {...props} className={`text-sm disabled:opacity-50 ${styles[variant]} ${props.className ?? ""}`} />;

@@ -170,7 +170,7 @@ function Acces() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-xl font-bold text-green-900">Contrôle des entrées</h1>
+        <h1 className="text-xl font-black tracking-tight text-pitch">Contrôle des entrées</h1>
         <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${online ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-900"}`}>
           {online ? "En ligne" : "Hors ligne — les passages sont gardés sur l'appareil"}
         </span>
@@ -319,7 +319,7 @@ function Acces() {
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="rounded-lg border border-stone-200 bg-white p-2">
-      <p className="text-2xl font-bold text-green-900">{value}</p>
+      <p className="text-2xl font-black tracking-tight text-pitch">{value}</p>
       <p className="text-xs text-stone-600">{label}</p>
     </div>
   );

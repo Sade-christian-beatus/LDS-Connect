@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { PageHeader } from "@/components/PageHeader";
 import { TeamBadge } from "@/components/TeamBadge";
 import { formatDate, formatFcfa, formatTime } from "@/lib/format";
 import { apiGet } from "@/lib/server-api";
@@ -11,19 +12,14 @@ export const metadata: Metadata = { title: "Billetterie" };
 export default function BilletteriePage() {
   return (
     <>
-      <header className="space-y-1">
-        <h1 className="text-3xl font-black text-green-900">Billetterie</h1>
-        <p className="text-stone-600">
-          Achetez vos billets en ligne et payez par mobile money. Le billet s&apos;affiche sur votre téléphone : présentez le QR
-          code à l&apos;entrée du stade, même sans connexion.
-        </p>
-        <p className="text-sm">
-          <Link href="/billets" className="font-semibold text-lds-green underline">
-            Retrouver mes billets
-          </Link>
-        </p>
-      </header>
-      <Suspense fallback={<p className="text-stone-500">Chargement des matchs…</p>}>
+      <PageHeader kicker="Mobile money" title="Billetterie">
+        Achetez vos billets en ligne et payez par mobile money. Le billet s&apos;affiche sur votre téléphone : présentez le QR code à
+        l&apos;entrée du stade, même sans connexion.{" "}
+        <Link href="/billets" className="font-semibold text-lds-green underline dark:text-green-300">
+          Retrouver mes billets
+        </Link>
+      </PageHeader>
+      <Suspense fallback={<p className="text-subtle">Chargement des matchs…</p>}>
         <OnSale />
       </Suspense>
     </>
@@ -34,7 +30,7 @@ async function OnSale() {
   const list = await apiGet<MatchTickets[]>("/tickets/matches");
   if (list.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center text-stone-600">
+      <p className="rounded-xl border border-dashed border-line bg-surface p-8 text-center text-muted">
         Aucun billet en vente pour le moment. Revenez avant les prochains matchs !
       </p>
     );
@@ -48,9 +44,9 @@ async function OnSale() {
           <li key={m.id}>
             <Link
               href={`/billetterie/${m.id}`}
-              className="group block overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group block overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className="flex items-center justify-between bg-green-950 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-yellow-300">
+              <div className="flex items-center justify-between bg-pitch px-4 py-2 text-xs font-semibold uppercase tracking-wide text-yellow-300">
                 <span>{m.phase === "group" ? `Poule ${m.pool_code} · J${m.round_number}` : "Phase finale"}</span>
                 <span className="text-green-100">
                   {formatDate(m.kickoff_at)} · {formatTime(m.kickoff_at)}
@@ -59,12 +55,12 @@ async function OnSale() {
               <div className="flex items-center gap-3 px-4 py-4">
                 {m.home && <TeamBadge team={m.home} />}
                 <span className="flex-1 text-center text-lg font-bold leading-tight">
-                  {m.home?.short_name ?? "?"} <span className="text-stone-400">vs</span> {m.away?.short_name ?? "?"}
+                  {m.home?.short_name ?? "?"} <span className="text-subtle">vs</span> {m.away?.short_name ?? "?"}
                 </span>
                 {m.away && <TeamBadge team={m.away} />}
               </div>
-              <div className="flex items-center justify-between border-t border-stone-100 px-4 py-3 text-sm">
-                <span className="text-stone-600">{m.venue ? `${m.venue.name}, ${m.venue.city}` : "Stade à confirmer"}</span>
+              <div className="flex items-center justify-between border-t border-line px-4 py-3 text-sm">
+                <span className="text-muted">{m.venue ? `${m.venue.name}, ${m.venue.city}` : "Stade à confirmer"}</span>
                 {soldOut ? (
                   <span className="rounded-full bg-red-100 px-3 py-1 font-bold text-lds-red">Complet</span>
                 ) : prices.length ? (
@@ -72,7 +68,7 @@ async function OnSale() {
                     dès {formatFcfa(Math.min(...prices))}
                   </span>
                 ) : (
-                  <span className="rounded-full bg-blue-50 px-3 py-1 font-semibold text-blue-900">Bientôt</span>
+                  <span className="rounded-full bg-blue-50 dark:bg-blue-950/40 px-3 py-1 font-semibold text-blue-900 dark:text-blue-100">Bientôt</span>
                 )}
               </div>
             </Link>

@@ -134,7 +134,7 @@ function TeamScreen({ teamId }: { teamId: string }) {
       <header className="flex flex-wrap items-center gap-4">
         <TeamBadge team={squad.team} size="lg" />
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-green-900">{squad.team.name}</h1>
+          <h1 className="text-2xl font-black tracking-tight text-pitch">{squad.team.name}</h1>
           <p className="text-sm text-stone-600">
             Région {squad.team.region.name} · Poule {squad.team.pool_code}
           </p>

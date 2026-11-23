@@ -113,7 +113,7 @@ function Billetterie() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-green-900">Billetterie</h1>
+          <h1 className="text-2xl font-black tracking-tight text-pitch">Billetterie</h1>
           <p className="text-sm text-stone-600">Catégories de billets par match, ventes mobile money et entrées au stade.</p>
         </div>
         <label className="text-sm">
@@ -225,7 +225,7 @@ function Billetterie() {
           <section className="space-y-3 rounded-lg border border-stone-200 bg-white p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="font-semibold">Commandes ({orders?.length ?? 0})</h2>
-              <select aria-label="Filtrer les commandes" className={`${inputClass} w-auto`} value={stateFilter} onChange={(e) => setStateFilter(e.target.value)}>
+              <select aria-label="Filtrer les commandes" className={`${inputClass} max-w-56`} value={stateFilter} onChange={(e) => setStateFilter(e.target.value)}>
                 <option value="">Toutes</option>
                 {Object.entries(ORDER_STATE).map(([k, v]) => (
                   <option key={k} value={k}>
@@ -335,7 +335,7 @@ function Kpi({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-stone-200 bg-white p-3">
       <p className="text-xs uppercase tracking-wide text-stone-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-green-900">{value}</p>
+      <p className="mt-1 text-2xl font-black tracking-tight text-pitch">{value}</p>
     </div>
   );
 }

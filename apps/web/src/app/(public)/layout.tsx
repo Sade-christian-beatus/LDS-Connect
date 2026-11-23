@@ -1,47 +1,109 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { BottomTabs, TopNav } from "@/components/PublicNav";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { NAV } from "@/lib/public-nav";
+import { THEME_SCRIPT } from "@/lib/theme";
 
-const NAV = [
-  { href: "/", label: "Accueil" },
-  { href: "/calendrier", label: "Calendrier" },
-  { href: "/resultats", label: "Résultats" },
-  { href: "/classements", label: "Classements" },
-  { href: "/statistiques", label: "Statistiques" },
-  { href: "/billetterie", label: "Billetterie" },
-  { href: "/votes", label: "Votes" },
-  { href: "/equipes", label: "Équipes" },
-];
+function Brand() {
+  return (
+    <Link href="/" className="flex items-center gap-2.5" aria-label="Ligue de la Souveraineté — accueil">
+      {/* Marque provisoire (aucun logo officiel tant que la Ligue n'a pas fourni le sien) */}
+      <span aria-hidden className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow">
+        <span className="absolute inset-x-0 top-0 h-1/2 bg-lds-red" />
+        <span className="absolute inset-x-0 bottom-0 h-1/2 bg-lds-green" />
+        <span className="relative text-xl leading-none text-lds-gold drop-shadow">★</span>
+      </span>
+      <span className="leading-tight">
+        <span className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-lds-gold">LDS Connect</span>
+        <span className="block text-base font-black tracking-tight sm:text-lg">Ligue de la Souveraineté</span>
+      </span>
+    </Link>
+  );
+}
+
+function StaticNav() {
+  return (
+    <nav aria-label="Navigation principale" className="flex gap-1 overflow-hidden text-sm">
+      {NAV.map((n) => (
+        <Link key={n.href} href={n.href} className="whitespace-nowrap rounded-full px-3 py-1.5 text-white/85">
+          {n.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <header className="bg-lds-green text-white">
-        <div className="h-1 bg-lds-red" />
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3">
-          <Link href="/" className="flex items-center gap-2 font-bold">
-            <span className="rounded bg-white px-1.5 py-0.5 text-sm text-lds-green">LDS</span>
-            <span>Ligue de la Souveraineté</span>
-          </Link>
-          <nav aria-label="Navigation principale" className="flex flex-wrap gap-1 text-sm">
-            {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="rounded px-2 py-1 hover:bg-white/15">
-                {n.label}
+    <div className="theme-public min-h-screen bg-canvas text-ink">
+      <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      <header className="sticky top-0 z-20 bg-pitch text-white shadow-lg print:hidden">
+        <div aria-hidden className="flex h-1">
+          <span className="flex-1 bg-lds-red" />
+          <span className="flex-1 bg-lds-gold" />
+          <span className="flex-1 bg-lds-green" />
+        </div>
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex items-center justify-between gap-3 py-2.5">
+            <Brand />
+            <div className="flex items-center gap-1">
+              <Link
+                href="/billets"
+                className="hidden rounded-full border border-white/25 px-3 py-1.5 text-sm font-semibold hover:bg-white/10 sm:block"
+              >
+                Mes billets
               </Link>
-            ))}
-          </nav>
+              <ThemeToggle />
+            </div>
+          </div>
+          <div className="pb-2.5">
+            <Suspense fallback={<StaticNav />}>
+              <TopNav />
+            </Suspense>
+          </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl space-y-6 px-4 py-6">{children}</main>
-      <footer className="mx-auto max-w-5xl px-4 py-8 text-xs text-stone-500">
-        <p>
-          LDS Connect — plateforme de la Ligue de la Souveraineté. Données des joueurs limitées
-          (nom d&apos;usage, poste, âge) : la compétition compte des joueurs mineurs.
-        </p>
-        <p className="mt-1">
-          <Link href="/connexion" className="underline">
-            Espace officiels
-          </Link>
-        </p>
+
+      <main className="mx-auto max-w-6xl space-y-8 px-4 py-6 pb-28 md:pb-10">{children}</main>
+
+      <footer className="bg-pitch pb-24 text-green-100/80 md:pb-0 print:hidden">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
+          <div className="space-y-2">
+            <p className="font-black text-white">Ligue de la Souveraineté</p>
+            <p className="text-xs leading-relaxed">
+              20 équipes des 17 régions du Burkina Faso. Données des joueurs limitées (nom d&apos;usage, poste, âge) : la
+              compétition compte des joueurs mineurs.
+            </p>
+          </div>
+          <ul className="grid grid-cols-2 gap-1">
+            {NAV.map((n) => (
+              <li key={n.href}>
+                <Link href={n.href} className="hover:text-white hover:underline">
+                  {n.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="space-y-2 sm:text-right">
+            <Link href="/billets" className="block hover:text-white hover:underline">
+              Mes billets
+            </Link>
+            <Link href="/connexion" className="block hover:text-white hover:underline">
+              Espace officiels
+            </Link>
+            <p className="text-xs">LDS Connect — plateforme de la Ligue de la Souveraineté.</p>
+          </div>
+        </div>
+        <div aria-hidden className="flex h-1">
+          <span className="flex-1 bg-lds-red" />
+          <span className="flex-1 bg-lds-gold" />
+          <span className="flex-1 bg-lds-green" />
+        </div>
       </footer>
-    </>
+      <Suspense>
+        <BottomTabs />
+      </Suspense>
+    </div>
   );
 }

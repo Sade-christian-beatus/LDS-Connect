@@ -1,9 +1,66 @@
 @import "tailwindcss";
 
+/* Mode sombre du site public seulement : la classe est posée sur <html> par le sélecteur de
+   thème, mais seuls les éléments sous .theme-public changent (l'espace officiels reste clair). */
+@custom-variant dark (&:where(.public-dark .theme-public, .public-dark .theme-public *));
+
 @theme {
   --color-lds-green: #1f7a3a;
   --color-lds-red: #c1272d;
   --color-lds-gold: #f2c230;
+  --color-pitch: #0a3a1e;
+
+  /* Couleurs de surface (claires par défaut, sombres sous .public-dark .theme-public) */
+  --color-canvas: #f6f5f1;
+  --color-surface: #ffffff;
+  --color-soft: #f2f1ec;
+  --color-line: #e5e3dc;
+  --color-ink: #1c1917;
+  --color-muted: #57534e;
+  --color-subtle: #78716c;
+  --color-heading: #14532d;
+  --color-qualify: #ecfdf3;
+
+  --animate-live: live 1.6s ease-in-out infinite;
+  @keyframes live {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.35;
+      transform: scale(0.8);
+    }
+  }
+}
+
+.public-dark .theme-public {
+  --color-canvas: #07110b;
+  --color-surface: #0f1c14;
+  --color-soft: #15261b;
+  --color-line: #233629;
+  --color-ink: #eef3ef;
+  --color-muted: #b9c6bd;
+  --color-subtle: #8d9b92;
+  --color-heading: #c7f0d4;
+  --color-qualify: #12301e;
+  color-scheme: dark;
+}
+
+/* Espace officiels : place du menu latéral sur grand écran */
+@media (min-width: 64rem) {
+  body:has(nav[data-sidebar]) .app-main {
+    padding-left: 14rem;
+  }
+}
+
+/* Défilement horizontal sans barre visible (listes de matchs, menus) */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Impression d'une licence : seule la carte est imprimée (pages contenant une carte) */

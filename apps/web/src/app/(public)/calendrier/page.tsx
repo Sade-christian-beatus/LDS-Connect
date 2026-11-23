@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 import { MatchCard } from "@/components/MatchCard";
+import { PageHeader, Pills } from "@/components/PageHeader";
 import { formatDate } from "@/lib/format";
 import { apiGet } from "@/lib/server-api";
 import type { Match } from "@/lib/types";
@@ -11,8 +11,10 @@ export const metadata: Metadata = { title: "Calendrier" };
 export default function CalendrierPage({ searchParams }: PageProps<"/calendrier">) {
   return (
     <>
-      <h1 className="text-2xl font-bold text-green-900">Calendrier</h1>
-      <Suspense fallback={<p className="text-stone-500">Chargement du calendrier…</p>}>
+      <PageHeader kicker="Saison 2027" title="Calendrier">
+        9 journées par poule, puis les phases finales. Horaires à l&apos;heure de Ouagadougou (GMT).
+      </PageHeader>
+      <Suspense fallback={<p className="text-subtle">Chargement du calendrier…</p>}>
         <Calendar searchParams={searchParams} />
       </Suspense>
     </>
@@ -30,37 +32,30 @@ async function Calendar({ searchParams }: { searchParams: PageProps<"/calendrier
   }
   return (
     <>
-      <div className="flex gap-2" role="tablist" aria-label="Poule">
-        {(["A", "B"] as const).map((p) => (
-          <Link
-            key={p}
-            role="tab"
-            aria-selected={p === pool}
-            href={`/calendrier?poule=${p}`}
-            className={`rounded-full px-4 py-1 text-sm font-semibold ${
-              p === pool ? "bg-lds-green text-white" : "bg-white text-green-900 ring-1 ring-stone-300"
-            }`}
-          >
-            Poule {p} · {p === "A" ? "Ouagadougou" : "Bobo-Dioulasso"}
-          </Link>
-        ))}
-      </div>
+      <Pills
+        label="Poule"
+        items={(["A", "B"] as const).map((p) => ({
+          href: `/calendrier?poule=${p}`,
+          label: `Poule ${p} · ${p === "A" ? "Ouagadougou" : "Bobo-Dioulasso"}`,
+          active: p === pool,
+        }))}
+      />
       {[...rounds.entries()]
         .sort(([a], [b]) => a - b)
         .map(([round, list]) => (
-          <section key={round} className="space-y-2">
-            <h2 className="font-bold text-green-900">
-              Journée {round}
-              <span className="ml-2 text-sm font-normal text-stone-500">
-                {formatDate(list[0]?.kickoff_at)}
-              </span>
+          <section key={round} className="space-y-3">
+            <h2 className="sticky top-[6.75rem] z-10 -mx-4 flex items-baseline gap-3 bg-canvas/90 px-4 py-2 backdrop-blur">
+              <span className="rounded-lg bg-pitch px-2.5 py-1 text-sm font-black text-lds-gold">J{round}</span>
+              <span className="font-bold text-heading">Journée {round}</span>
+              <span className="text-sm text-subtle">{formatDate(list[0]?.kickoff_at)}</span>
             </h2>
-            {list.map((m) => (
-              <MatchCard key={m.id} match={m} />
-            ))}
+            <div className="grid gap-3 lg:grid-cols-2">
+              {list.map((m) => (
+                <MatchCard key={m.id} match={m} />
+              ))}
+            </div>
           </section>
         ))}
-      <p className="text-xs text-stone-500">Horaires à l&apos;heure de Ouagadougou (GMT).</p>
     </>
   );
 }

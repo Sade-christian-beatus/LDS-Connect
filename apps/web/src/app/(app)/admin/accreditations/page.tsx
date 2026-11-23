@@ -72,7 +72,7 @@ function Accreditations() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-green-900">Accréditations</h1>
+          <h1 className="text-2xl font-black tracking-tight text-pitch">Accréditations</h1>
           <p className="text-sm text-stone-600">Cartes à QR signé, contrôlées aux entrées comme les billets (y compris hors connexion).</p>
         </div>
         <Button

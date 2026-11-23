@@ -75,7 +75,7 @@ function BallotScreen({ id }: { id: string }) {
       </Link>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-green-900">{b.title}</h1>
+          <h1 className="text-2xl font-black tracking-tight text-pitch">{b.title}</h1>
           <p className="text-sm text-stone-600">
             {BALLOT_KIND_LABEL[b.kind]} · {b.max_choices} choix · du {formatDateTime(b.opens_at)} au {formatDateTime(b.closes_at)}
           </p>

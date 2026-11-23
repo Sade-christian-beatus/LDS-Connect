@@ -36,7 +36,7 @@ export default function MonComptePage() {
 
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <h1 className="text-2xl font-bold text-green-900">Mon compte</h1>
+      <h1 className="text-2xl font-black tracking-tight text-pitch">Mon compte</h1>
       {user.must_change_password && !done && (
         <p role="status" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
           Votre mot de passe est <strong>provisoire</strong> : choisissez-en un nouveau pour accéder à votre espace.

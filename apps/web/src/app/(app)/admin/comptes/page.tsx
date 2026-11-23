@@ -64,7 +64,7 @@ function Accounts() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold text-green-900">Comptes</h1>
+        <h1 className="text-2xl font-black tracking-tight text-pitch">Comptes</h1>
         <Button onClick={() => setDialog({ type: "create" })}>+ Nouveau compte</Button>
       </div>
       <Notice notice={notice} onClose={() => setNotice(null)} />

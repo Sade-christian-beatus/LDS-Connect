@@ -7,7 +7,7 @@ import { BuyForm } from "./buy-form";
 
 export default function MatchTicketsPage({ params }: PageProps<"/billetterie/[matchId]">) {
   return (
-    <Suspense fallback={<p className="text-stone-500">Chargement…</p>}>
+    <Suspense fallback={<p className="text-subtle">Chargement…</p>}>
       <Content params={params} />
     </Suspense>
   );
@@ -25,7 +25,7 @@ async function Content({ params }: { params: PageProps<"/billetterie/[matchId]">
       </Link>
       <MatchHero match={m} />
       {data.types.length === 0 ? (
-        <p className="rounded-xl bg-stone-100 p-4">Aucun billet n&apos;est proposé pour ce match.</p>
+        <p className="rounded-xl bg-soft p-4">Aucun billet n&apos;est proposé pour ce match.</p>
       ) : (
         <BuyForm types={data.types} />
       )}
