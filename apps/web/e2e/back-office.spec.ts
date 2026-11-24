@@ -13,6 +13,9 @@ async function login(page: Page, email: string) {
 
 test.use({ viewport: { width: 1280, height: 900 }, isMobile: false, hasTouch: false });
 
+// Image PNG valide de 1 × 1 pixel
+const PNG_1PX = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkaPhfDwAEhgGAWnNCrgAAAABJRU5ErkJggg==";
+
 test("l'administration gère un effectif, une licence et le calendrier", async ({ page }) => {
   await login(page, "admin@lds.local");
   await expect(page.getByRole("heading", { name: "Registre des équipes" })).toBeVisible();
@@ -33,6 +36,8 @@ test("l'administration gère un effectif, une licence et le calendrier", async (
   await form.getByLabel("Nom *", { exact: true }).fill(unique);
   await form.getByLabel("Date de naissance *").fill("2009-03-15");
   await form.getByLabel("Poste *").selectOption("FW");
+  // Mineur : l'autorisation parentale permet ensuite d'ajouter la photo de licence
+  await form.getByLabel("Autorisation parentale le").fill("2026-09-01");
   await form.getByRole("button", { name: "Ajouter à l'effectif" }).click();
   await expect(page.getByText(`Test ${unique} ajouté(e) à l'effectif`)).toBeVisible();
 
@@ -50,6 +55,11 @@ test("l'administration gère un effectif, une licence et le calendrier", async (
 
   await newRow.getByRole("button", { name: "Licence" }).click();
   await expect(dialog.getByAltText(/QR code de la licence/)).toBeVisible();
+  // Photo d'identité (privée), recadrée et compressée dans le navigateur
+  await expect(dialog.getByText("Sans photo")).toBeVisible();
+  await dialog.getByLabel("Photo d'identité").setInputFiles({ name: "photo.png", mimeType: "image/png", buffer: Buffer.from(PNG_1PX, "base64") });
+  await expect(dialog.getByText("Photo enregistrée")).toBeVisible();
+  await expect(dialog.getByAltText(`Photo de Test ${unique}`)).toBeVisible();
   await dialog.getByLabel("Nouveau statut").selectOption("suspended");
   await dialog.getByLabel("Motif (journalisé)").fill("Pièce d'identité à présenter");
   await dialog.getByRole("button", { name: "Appliquer" }).click();

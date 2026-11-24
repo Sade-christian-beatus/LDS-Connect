@@ -174,6 +174,7 @@ class SquadMember(BaseModel):
     is_minor: bool
     has_cnib: bool
     has_phone: bool
+    has_photo: bool = False
     licence: LicenceBrief | None
 
 

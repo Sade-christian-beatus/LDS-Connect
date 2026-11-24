@@ -87,3 +87,68 @@ def test_only_logo_keys_are_public(client, storage):
     storage.put("persons/abc/photo.png", PNG, "image/png")
     assert client.get("/api/v1/media/persons/abc/photo.png").status_code == 404
     assert client.get("/api/v1/media/../secret").status_code == 404
+
+
+# --- Photos de licence ----------------------------------------------------------------------
+def _vinnim_players(db):
+    from datetime import date
+
+    from lds_api.domain.eligibility import age_on
+    from lds_api.models import Licence, SquadMembership
+
+    team = db.scalar(select(Team).where(Team.short_name == "Vinnim"))
+    rows = db.scalars(
+        select(SquadMembership).where(
+            SquadMembership.team_id == team.id, SquadMembership.licence.has()
+        )
+    ).all()
+    adult = next(m for m in rows if age_on(m.person.birth_date, date.today()) >= 18)
+    minor = next((m for m in rows if age_on(m.person.birth_date, date.today()) < 18), None)
+    number = db.scalar(select(Licence.number).where(Licence.membership_id == adult.id))
+    return team, adult.person, minor.person if minor else None, number
+
+
+def test_licence_photo_is_private(client, db, as_club, as_controller, storage):
+    team, adult, _, number = _vinnim_players(db)
+    url = f"/api/v1/admin/persons/{adult.id}/photo"
+    assert client.get(url, headers=as_club).status_code == 404
+    assert upload(client, url, SVG, as_club, "photo.svg").status_code == 422
+    r = upload(client, url, JPG, as_club, "photo.jpg")
+    assert r.status_code == 204, r.text
+
+    db.expire_all()
+    key = db.get(type(adult), adult.id).photo_path
+    assert key.startswith(f"persons/{adult.id}/photo-") and key.endswith(".jpg")
+    # Jamais servie publiquement, même avec la bonne clé
+    assert client.get(f"/api/v1/media/{key}").status_code == 404
+
+    r = client.get(url, headers=as_club)
+    assert r.status_code == 200 and r.content == JPG
+    assert r.headers["content-type"] == "image/jpeg" and "no-store" in r.headers["cache-control"]
+    # Le contrôleur au stade la voit par le numéro de licence, pas sans compte
+    assert client.get(f"/api/v1/licences/{number}/photo", headers=as_controller).content == JPG
+    assert client.get(f"/api/v1/licences/{number}/photo").status_code == 401
+    squad = client.get(f"/api/v1/admin/teams/{team.id}/squad", headers=as_club).json()
+    assert next(m for m in squad["members"] if m["person_id"] == str(adult.id))["has_photo"]
+
+    assert client.delete(url, headers=as_club).status_code == 204
+    assert client.get(url, headers=as_club).status_code == 404
+    assert not list(storage.root.rglob("photo-*"))
+    actions = db.scalars(select(AuditLog.action).where(AuditLog.entity_id == str(adult.id))).all()
+    assert {"update_photo", "delete_photo"} <= set(actions)
+
+
+def test_minor_photo_requires_guardian_consent(client, db, as_club):
+    from datetime import date
+
+    _, _, minor, _ = _vinnim_players(db)
+    if minor is None:
+        pytest.skip("aucun mineur licencié dans le seed")
+    minor.guardian_consent_on = None
+    db.commit()
+    url = f"/api/v1/admin/persons/{minor.id}/photo"
+    r = upload(client, url, PNG, as_club)
+    assert r.status_code == 422 and r.json()["code"] == "guardian_consent_required"
+    minor.guardian_consent_on = date.today()
+    db.commit()
+    assert upload(client, url, PNG, as_club).status_code == 204

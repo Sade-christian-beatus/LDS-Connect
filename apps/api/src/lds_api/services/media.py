@@ -1,4 +1,5 @@
-"""Images publiques de la plateforme : logo de la Ligue et logos des équipes.
+"""Images de la plateforme : logo de la Ligue et logos des équipes (publics), photos des
+licences (privées).
 
 Les fichiers sont dans le stockage de la plateforme (disque ou S3), jamais dans le dépôt de
 code. Chaque version a un nom unique (empreinte du contenu) : on peut la mettre en cache
@@ -9,11 +10,13 @@ reconnus à leurs premiers octets (le SVG est refusé : il peut contenir du scri
 import hashlib
 import re
 import uuid
+from datetime import date
 
 from sqlalchemy.orm import Session
 
 from lds_api.core.errors import BusinessError, NotFound
-from lds_api.models import Team
+from lds_api.domain.eligibility import age_on
+from lds_api.models import Person, Team
 from lds_api.providers.storage import get_storage
 from lds_api.services import audit
 
@@ -21,6 +24,8 @@ MAX_BYTES = 1_000_000
 BRAND_POINTER = "brand/current"
 # Seules ces clés sont servies publiquement (jamais les photos ou documents des personnes)
 PUBLIC_KEY = re.compile(r"^(brand/logo|teams/[0-9a-f-]{36}/logo)-[0-9a-f]{12}\.(png|jpg|webp)$")
+# Photos des personnes : clés distinctes, servies seulement aux comptes habilités
+PERSON_PHOTO = re.compile(r"^persons/[0-9a-f-]{36}/photo-[0-9a-f]{12}\.(png|jpg|webp)$")
 TYPES = {"png": "image/png", "jpg": "image/jpeg", "webp": "image/webp"}
 
 
@@ -107,3 +112,49 @@ def delete_team_logo(db: Session, actor, team_id: uuid.UUID) -> Team:
     audit.record(db, actor, "delete_logo", "team", team.id, {"logo": team.logo_path})
     team.logo_path = None
     return team
+
+
+# --- Photos d'identité (licences) : privées, jamais servies par /media ----------------------
+def _is_minor_today(person: Person) -> bool:
+    return age_on(person.birth_date, date.today()) < 18
+
+
+def _private_photo(person: Person) -> str | None:
+    key = person.photo_path
+    return key if key and PERSON_PHOTO.match(key) else None
+
+
+def set_person_photo(db: Session, actor, person: Person, data: bytes) -> Person:
+    """Photo de licence. Pour un mineur, l'autorisation parentale doit être enregistrée."""
+    if _is_minor_today(person) and person.guardian_consent_on is None:
+        raise BusinessError(
+            "Joueur mineur : enregistrez d'abord la date de l'autorisation parentale",
+            code="guardian_consent_required",
+        )
+    old = _private_photo(person)
+    person.photo_path = _store(f"persons/{person.id}/photo", data)
+    if old and old != person.photo_path:
+        get_storage().delete(old)
+    audit.record(
+        db, actor, "update_photo", "person", person.id, {"photo": "remplacée" if old else "ajoutée"}
+    )
+    return person
+
+
+def delete_person_photo(db: Session, actor, person: Person) -> None:
+    old = _private_photo(person)
+    if old:
+        get_storage().delete(old)
+    person.photo_path = None
+    audit.record(db, actor, "delete_photo", "person", person.id, None)
+
+
+def read_person_photo(person: Person) -> tuple[bytes, str]:
+    key = _private_photo(person)
+    if key is None:
+        raise NotFound("Aucune photo")
+    try:
+        data = get_storage().get(key)
+    except (FileNotFoundError, KeyError, OSError) as exc:
+        raise NotFound("Aucune photo") from exc
+    return data, TYPES[key.rsplit(".", 1)[1]]

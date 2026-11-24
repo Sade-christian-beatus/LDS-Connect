@@ -335,6 +335,7 @@ function TeamScreen({ teamId }: { teamId: string }) {
             team={squad.team}
             canIssue={can("licence:issue")}
             canChangeStatus={can("licence:status")}
+            canEditPhoto={can("squad:write")}
             onChanged={ok}
             onError={fail}
           />

@@ -22,6 +22,7 @@ remplace pas un avis juridique.
 | Identité | prénom, nom, nom d'usage, date et lieu de naissance, nationalité, genre | joueurs, encadreurs | administration, club (son équipe), délégué (noms) |
 | Identifiants | **numéro CNIB** (chiffré) | joueurs, encadreurs | administration, club — **lecture journalisée** |
 | Contact | **téléphone** (chiffré) | joueurs, encadreurs | administration, club — **lecture journalisée** |
+| Photo de licence | photo d'identité (JPEG recadré, stockage privé, jamais servie publiquement ; **autorisation parentale exigée** pour un mineur) | joueurs, encadreurs | club (son équipe), administration, contrôleurs au stade (en ligne, par numéro de licence) ; ajout et retrait journalisés |
 | Sportif | poste, pied, numéro, région et date de début de résidence, licence FBF | joueurs | administration, club, délégué, cellule technique |
 | Contrat | contrat signé, déclaration CNSS (oui/non) | joueurs, encadreurs | administration, club |
 | Match | compositions, buts, cartons, suspensions | joueurs | public (noms d'usage) et officiels |
