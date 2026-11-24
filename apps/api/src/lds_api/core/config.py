@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import Annotated, Literal
+from urllib.parse import urlsplit
 
 from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -73,6 +74,44 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
+
+    def production_problems(self) -> list[str]:
+        """Réglages incompatibles avec une mise en service (vérifiés au démarrage en production)."""
+        problems: list[str] = []
+        if len(self.jwt_secret.get_secret_value()) < 32:
+            problems.append("JWT_SECRET doit compter au moins 32 caractères")
+        for name in ("field_encryption_key", "blind_index_key", "licence_signing_key"):
+            if not getattr(self, name).get_secret_value():
+                problems.append(f"{name.upper()} est vide (make keys)")
+        if not self.refresh_cookie_secure:
+            problems.append("REFRESH_COOKIE_SECURE doit valoir true (HTTPS)")
+        if self.payment_provider == "simulator":
+            problems.append("PAYMENT_PROVIDER=simulator : aucun paiement réel ne serait encaissé")
+        if self.sms_provider == "simulator":
+            problems.append("SMS_PROVIDER=simulator : aucun SMS ne partirait")
+        for name in ("public_base_url", "api_base_url"):
+            url = getattr(self, name)
+            if not url.startswith("https://") or _is_local(url):
+                problems.append(f"{name.upper()} doit être une adresse publique en https")
+        for origin in self.cors_origins:
+            if origin == "*" or _is_local(origin):
+                problems.append(f"CORS_ORIGINS contient une origine de développement : {origin}")
+        return problems
+
+
+def _is_local(url: str) -> bool:
+    host = (urlsplit(url).hostname or "").lower()
+    local = {"localhost", "127.0.0.1", "::1", "0.0.0.0"}  # noqa: S104 — liste de refus
+    return host in local or host.endswith(".local")
+
+
+def enforce_production_settings(settings: Settings) -> None:
+    """Refuse de démarrer en production avec une configuration de développement."""
+    if settings.environment != "production":
+        return
+    problems = settings.production_problems()
+    if problems:
+        raise RuntimeError("Configuration refusée pour la production :\n- " + "\n- ".join(problems))
 
 
 @lru_cache

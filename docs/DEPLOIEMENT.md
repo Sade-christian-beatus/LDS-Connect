@@ -40,11 +40,19 @@ Puis éditer `.env` :
 | `TICKET_ALLOWED_COUNTRY_CODES` | `226` : indicatifs acceptés pour l'achat de billets |
 | `PAYMENT_CALLBACK_BASE_URL` | adresse publique de l'API vue par l'agrégateur (vide = `API_BASE_URL`) |
 
+> **Contrôle au démarrage** : avec `ENVIRONMENT=production`, l'API **refuse de démarrer** et
+> liste les réglages à corriger si l'un de ces points n'est pas respecté : `JWT_SECRET` d'au
+> moins 32 caractères, clés de chiffrement et de signature renseignées,
+> `REFRESH_COOKIE_SECURE=true`, adresses publiques en `https`, aucune origine `localhost` ni
+> `*` dans `CORS_ORIGINS`, aucun simulateur (`SMS_PROVIDER` / `PAYMENT_PROVIDER`).
+
 > **Votes du public et SMS** : seuls le simulateur et l'affichage dans les journaux
 > (`console`) existent aujourd'hui. **Les votes ne doivent pas être ouverts en production**
 > avant le branchement d'un connecteur SMS réel (opérateur ou agrégateur choisi par la Ligue,
-> à implémenter dans `apps/api/src/lds_api/providers/sms`). Avec `console`, les codes
-> n'apparaissent que dans les journaux du serveur.
+> à implémenter dans `apps/api/src/lds_api/providers/sms`). En production, `console`
+> n'envoie rien et n'écrit pas les messages dans les journaux : la demande de code répond
+> « Votes indisponibles : opérateur SMS non configuré » et le lien des billets n'est pas
+> envoyé par SMS (l'acheteur le garde à l'écran après le paiement).
 
 > **Billetterie et paiement** : seul le simulateur existe (`PAYMENT_PROVIDER=simulator`, aucun
 > argent réel). **Ne pas vendre de billets en production** avant le branchement du connecteur

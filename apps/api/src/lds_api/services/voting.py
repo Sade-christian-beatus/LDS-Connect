@@ -55,7 +55,7 @@ from lds_api.models.enums import (
     StaffFunction,
     VoteStatus,
 )
-from lds_api.providers.sms import get_sms_provider
+from lds_api.providers.sms import SmsUnavailable, get_sms_provider
 from lds_api.schemas import voting as vs
 from lds_api.schemas.fixtures import TeamRef
 from lds_api.services import audit, seasons
@@ -436,6 +436,10 @@ def request_code(db: Session, b: Ballot, body: vs.CodeRequest, ip: str | None) -
     db.flush()
     try:
         get_sms_provider().send(phone, f"LDS : votre code de vote est {code} (valable 10 min).")
+    except SmsUnavailable as exc:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "Votes indisponibles : opérateur SMS non configuré"
+        ) from exc
     except Exception as exc:  # noqa: BLE001 — tout échec d'envoi doit être signalé proprement
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Envoi du SMS impossible, réessayez plus tard"
