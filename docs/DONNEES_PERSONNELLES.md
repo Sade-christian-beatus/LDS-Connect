@@ -44,8 +44,11 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
   Un test automatisé vérifie que ces champs ne figurent pas dans la réponse publique.
 - **QR des licences** : nom, équipe, numéro, validité ; ni date de naissance ni CNIB (le
   contenu d'un QR est lisible par toute personne qui le scanne).
-- **Autorisation parentale** : un champ est prévu ; son caractère obligatoire est à décider
-  (question ouverte n° 17).
+- **Autorisation parentale** : sa date est enregistrée sur la fiche ; elle est **exigée avant
+  l'ajout d'une photo** de licence. Son caractère obligatoire pour l'inscription elle-même
+  reste à décider (question ouverte n° 17).
+- **Information des personnes** : pages publiques « Mentions légales », « Confidentialité » et
+  « Conditions de vente » (projets à valider par la Ligue, passages entre crochets à compléter).
 
 ## 4. Mesures de sécurité
 
