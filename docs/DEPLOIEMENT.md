@@ -56,8 +56,12 @@ Puis éditer `.env` :
 
 > **Billetterie et paiement** : seul le simulateur existe (`PAYMENT_PROVIDER=simulator`, aucun
 > argent réel). **Ne pas vendre de billets en production** avant le branchement du connecteur
-> de l'agrégateur choisi par la Ligue (`apps/api/src/lds_api/providers/payment`), qui DOIT
-> vérifier la signature de ses notifications. Avec `disabled`, l'achat répond « paiement pas
+> de l'agrégateur choisi par la Ligue (`apps/api/src/lds_api/providers/payment`). Les
+> notifications de paiement sont **signées** : l'API refuse (401) toute notification dont la
+> signature ne correspond pas à `PAYMENT_WEBHOOK_SECRET` (HMAC-SHA256 du corps brut, en-tête
+> `X-LDS-Signature` pour le simulateur ; le connecteur réel appliquera le schéma de signature
+> de l'agrégateur dans `parse_notification`). Ce secret est obligatoire en production dès que
+> le paiement est activé. Avec `disabled`, l'achat répond « paiement pas
 > encore disponible ». Une commande payée après la fin de sa réservation, sans place restante,
 > est annulée et marquée « à rembourser » dans le journal d'audit.
 
@@ -132,6 +136,21 @@ ne peut pas se faire passer pour un autre en ajoutant l'en-tête lui-même. Sans
 visiteurs auraient l'adresse du proxy et les limites anti-abus (votes, commandes) deviendraient
 globales. Si le serveur est lui-même sur un réseau privé partagé avec des machines non
 maîtrisées, restreindre `TRUSTED_PROXIES` à l'adresse exacte du proxy.
+
+**En-têtes de sécurité.** Le site envoie lui-même sa politique de contenu
+(`Content-Security-Policy` : ressources de la même origine seulement, aucun affichage dans le
+cadre d'un autre site), `X-Frame-Options: DENY` et `Permissions-Policy` (caméra réservée au
+site pour la lecture des QR, micro, géolocalisation et paiement navigateur coupés) ; voir
+`apps/web/next.config.ts`. Le proxy ajoute HSTS et les mêmes protections pour les réponses de
+l'API (exemple Caddy). Avec Nginx :
+
+```nginx
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Frame-Options "DENY" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "camera=(self), microphone=(), geolocation=(), payment=()" always;
+```
 
 Le HTTPS est **obligatoire** : le service worker, la caméra (lecture des QR) et le cookie
 sécurisé ne fonctionnent qu'en contexte sécurisé.

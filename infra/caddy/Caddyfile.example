@@ -21,6 +21,11 @@ lds.exemple.bf {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(self), microphone=(), geolocation=(), payment=()"
+		# Le site envoie déjà sa propre politique (apps/web/next.config.ts) ; « ? » ne la pose
+		# que si la réponse n'en a pas (réponses de l'API).
+		?Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
 		-Server
 	}
 }
