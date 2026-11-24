@@ -116,6 +116,15 @@ location / {
 }
 ```
 
+**Adresse des visiteurs.** Le proxy doit transmettre `X-Forwarded-For` (Caddy le fait par
+défaut). L'API ne lit cet en-tête que si la connexion vient d'un réseau listé dans
+`TRUSTED_PROXIES` (par défaut : boucle locale et réseaux privés, ce qui couvre un proxy sur
+l'hôte comme dans Docker) et retient la dernière adresse non fiable de la chaîne : un visiteur
+ne peut pas se faire passer pour un autre en ajoutant l'en-tête lui-même. Sans cela, tous les
+visiteurs auraient l'adresse du proxy et les limites anti-abus (votes, commandes) deviendraient
+globales. Si le serveur est lui-même sur un réseau privé partagé avec des machines non
+maîtrisées, restreindre `TRUSTED_PROXIES` à l'adresse exacte du proxy.
+
 Le HTTPS est **obligatoire** : le service worker, la caméra (lecture des QR) et le cookie
 sécurisé ne fonctionnent qu'en contexte sécurisé.
 

@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     api_base_url: str = "http://localhost:8000"
     # Liste séparée par des virgules
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:3000"]
+    # Proxys de confiance (reverse proxy, réseau Docker) : seuls eux peuvent indiquer
+    # l'adresse réelle du visiteur par X-Forwarded-For. Adresses ou réseaux, séparés par
+    # des virgules. Sans cela, derrière un proxy, tous les visiteurs auraient la même IP.
+    trusted_proxies: str = "127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
     # Base de données et cache
     database_url: str = "postgresql+psycopg://lds:lds@localhost:5432/lds"
