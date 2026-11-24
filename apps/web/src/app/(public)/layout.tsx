@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LEGAL_LINKS } from "@/components/LegalPage";
 import { Suspense } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { BottomTabs, TopNav } from "@/components/PublicNav";
@@ -102,6 +103,15 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               Espace officiels
             </Link>
             <p className="text-xs">LDS Connect — plateforme de la Ligue de la Souveraineté.</p>
+            <ul className="flex flex-wrap gap-x-3 gap-y-1 text-xs sm:justify-end">
+              {LEGAL_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="hover:text-white hover:underline">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         <div aria-hidden className="flex h-1">

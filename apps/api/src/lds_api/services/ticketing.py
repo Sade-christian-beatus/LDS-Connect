@@ -9,8 +9,10 @@ porte une clé secrète dont seule l'empreinte est conservée en base.
 
 import hashlib
 import hmac
+import json
 import logging
 import uuid
+from collections.abc import Mapping
 from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
@@ -26,7 +28,7 @@ from lds_api.domain import ticketing as rules
 from lds_api.domain.voting import phone_allowed
 from lds_api.models import Match, Order, Season, Ticket, TicketType
 from lds_api.models.enums import MatchStatus, OrderKind, OrderStatus, TicketStatus
-from lds_api.providers.payment import PaymentDisabled, get_payment_provider
+from lds_api.providers.payment import InvalidSignature, PaymentDisabled, get_payment_provider
 from lds_api.providers.sms import get_sms_provider
 from lds_api.schemas import ticketing as ts
 from lds_api.services import audit, fixtures, licences, seasons
@@ -340,12 +342,26 @@ def _issue(db: Session, order: Order, tt: TicketType) -> list[Ticket]:
     return issued
 
 
-def handle_notification(db: Session, payload: dict) -> None:
-    """Notification de l'agrégateur (idempotente : un agrégateur peut renvoyer plusieurs fois)."""
+def _raw_callback(body: bytes) -> dict:
     try:
-        note = get_payment_provider().parse_notification(payload)
+        data = json.loads(body)
+    except ValueError:
+        data = None
+    return data if isinstance(data, dict) else {"raw": body.decode("utf-8", "replace")[:4000]}
+
+
+def handle_notification(db: Session, body: bytes, headers: Mapping[str, str]) -> None:
+    """Notification de l'agrégateur (idempotente : un agrégateur peut renvoyer plusieurs fois).
+
+    La signature est vérifiée sur le corps brut avant toute lecture de la commande.
+    """
+    try:
+        note = get_payment_provider().parse_notification(body, headers)
     except PaymentDisabled as exc:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Paiement désactivé") from exc
+    except InvalidSignature as exc:
+        log.warning("Notification de paiement à la signature invalide refusée")
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Signature invalide") from exc
     except (KeyError, ValueError) as exc:
         raise BusinessError("Notification illisible") from exc
     order = db.scalar(select(Order).where(Order.reference == note.reference).with_for_update())
@@ -353,7 +369,7 @@ def handle_notification(db: Session, payload: dict) -> None:
         raise NotFound("Commande inconnue")
     if order.status != OrderStatus.PENDING:
         return  # déjà traitée
-    order.raw_callback = payload
+    order.raw_callback = _raw_callback(body)
     if not note.succeeded:
         order.status = OrderStatus.FAILED
         audit.record(db, None, "payment_failed", "order", order.id, {"reference": order.reference})

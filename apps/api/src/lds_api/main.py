@@ -17,7 +17,7 @@ from lds_api.api.v1 import (
     users,
     votes,
 )
-from lds_api.core.config import get_settings
+from lds_api.core.config import enforce_production_settings, get_settings
 from lds_api.core.errors import install_handlers
 
 API_PREFIX = "/api/v1"
@@ -25,6 +25,7 @@ API_PREFIX = "/api/v1"
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    enforce_production_settings(settings)
     app = FastAPI(
         title="LDS Connect API",
         description="API de la plateforme numérique de la Ligue de la Souveraineté",

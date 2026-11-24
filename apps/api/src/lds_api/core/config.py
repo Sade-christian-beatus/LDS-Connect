@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import Annotated, Literal
+from urllib.parse import urlsplit
 
 from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -20,6 +21,10 @@ class Settings(BaseSettings):
     api_base_url: str = "http://localhost:8000"
     # Liste séparée par des virgules
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:3000"]
+    # Proxys de confiance (reverse proxy, réseau Docker) : seuls eux peuvent indiquer
+    # l'adresse réelle du visiteur par X-Forwarded-For. Adresses ou réseaux, séparés par
+    # des virgules. Sans cela, derrière un proxy, tous les visiteurs auraient la même IP.
+    trusted_proxies: str = "127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
     # Base de données et cache
     database_url: str = "postgresql+psycopg://lds:lds@localhost:5432/lds"
@@ -53,6 +58,8 @@ class Settings(BaseSettings):
     payment_simulator_url: str = "http://localhost:8090"
     # Adresse de l'API vue par l'agrégateur pour ses notifications (vide = API_BASE_URL)
     payment_callback_base_url: str = ""
+    # Secret partagé avec l'agrégateur : signature HMAC-SHA256 de ses notifications
+    payment_webhook_secret: SecretStr = SecretStr("")
     storage_backend: Literal["local", "s3"] = "local"
     storage_local_path: str = "./var/storage"
     s3_endpoint_url: str | None = None
@@ -69,6 +76,51 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
+
+    def production_problems(self) -> list[str]:
+        """Réglages incompatibles avec une mise en service (vérifiés au démarrage en production)."""
+        problems: list[str] = []
+        if len(self.jwt_secret.get_secret_value()) < 32:
+            problems.append("JWT_SECRET doit compter au moins 32 caractères")
+        for name in ("field_encryption_key", "blind_index_key", "licence_signing_key"):
+            if not getattr(self, name).get_secret_value():
+                problems.append(f"{name.upper()} est vide (make keys)")
+        if not self.refresh_cookie_secure:
+            problems.append("REFRESH_COOKIE_SECURE doit valoir true (HTTPS)")
+        if self.payment_provider == "simulator":
+            problems.append("PAYMENT_PROVIDER=simulator : aucun paiement réel ne serait encaissé")
+        if (
+            self.payment_provider != "disabled"
+            and not self.payment_webhook_secret.get_secret_value()
+        ):
+            problems.append(
+                "PAYMENT_WEBHOOK_SECRET est vide : notifications de paiement non vérifiées"
+            )
+        if self.sms_provider == "simulator":
+            problems.append("SMS_PROVIDER=simulator : aucun SMS ne partirait")
+        for name in ("public_base_url", "api_base_url"):
+            url = getattr(self, name)
+            if not url.startswith("https://") or _is_local(url):
+                problems.append(f"{name.upper()} doit être une adresse publique en https")
+        for origin in self.cors_origins:
+            if origin == "*" or _is_local(origin):
+                problems.append(f"CORS_ORIGINS contient une origine de développement : {origin}")
+        return problems
+
+
+def _is_local(url: str) -> bool:
+    host = (urlsplit(url).hostname or "").lower()
+    local = {"localhost", "127.0.0.1", "::1", "0.0.0.0"}  # noqa: S104 — liste de refus
+    return host in local or host.endswith(".local")
+
+
+def enforce_production_settings(settings: Settings) -> None:
+    """Refuse de démarrer en production avec une configuration de développement."""
+    if settings.environment != "production":
+        return
+    problems = settings.production_problems()
+    if problems:
+        raise RuntimeError("Configuration refusée pour la production :\n- " + "\n- ".join(problems))
 
 
 @lru_cache

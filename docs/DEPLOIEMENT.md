@@ -40,16 +40,28 @@ Puis éditer `.env` :
 | `TICKET_ALLOWED_COUNTRY_CODES` | `226` : indicatifs acceptés pour l'achat de billets |
 | `PAYMENT_CALLBACK_BASE_URL` | adresse publique de l'API vue par l'agrégateur (vide = `API_BASE_URL`) |
 
+> **Contrôle au démarrage** : avec `ENVIRONMENT=production`, l'API **refuse de démarrer** et
+> liste les réglages à corriger si l'un de ces points n'est pas respecté : `JWT_SECRET` d'au
+> moins 32 caractères, clés de chiffrement et de signature renseignées,
+> `REFRESH_COOKIE_SECURE=true`, adresses publiques en `https`, aucune origine `localhost` ni
+> `*` dans `CORS_ORIGINS`, aucun simulateur (`SMS_PROVIDER` / `PAYMENT_PROVIDER`).
+
 > **Votes du public et SMS** : seuls le simulateur et l'affichage dans les journaux
 > (`console`) existent aujourd'hui. **Les votes ne doivent pas être ouverts en production**
 > avant le branchement d'un connecteur SMS réel (opérateur ou agrégateur choisi par la Ligue,
-> à implémenter dans `apps/api/src/lds_api/providers/sms`). Avec `console`, les codes
-> n'apparaissent que dans les journaux du serveur.
+> à implémenter dans `apps/api/src/lds_api/providers/sms`). En production, `console`
+> n'envoie rien et n'écrit pas les messages dans les journaux : la demande de code répond
+> « Votes indisponibles : opérateur SMS non configuré » et le lien des billets n'est pas
+> envoyé par SMS (l'acheteur le garde à l'écran après le paiement).
 
 > **Billetterie et paiement** : seul le simulateur existe (`PAYMENT_PROVIDER=simulator`, aucun
 > argent réel). **Ne pas vendre de billets en production** avant le branchement du connecteur
-> de l'agrégateur choisi par la Ligue (`apps/api/src/lds_api/providers/payment`), qui DOIT
-> vérifier la signature de ses notifications. Avec `disabled`, l'achat répond « paiement pas
+> de l'agrégateur choisi par la Ligue (`apps/api/src/lds_api/providers/payment`). Les
+> notifications de paiement sont **signées** : l'API refuse (401) toute notification dont la
+> signature ne correspond pas à `PAYMENT_WEBHOOK_SECRET` (HMAC-SHA256 du corps brut, en-tête
+> `X-LDS-Signature` pour le simulateur ; le connecteur réel appliquera le schéma de signature
+> de l'agrégateur dans `parse_notification`). Ce secret est obligatoire en production dès que
+> le paiement est activé. Avec `disabled`, l'achat répond « paiement pas
 > encore disponible ». Une commande payée après la fin de sa réservation, sans place restante,
 > est annulée et marquée « à rembourser » dans le journal d'audit.
 
@@ -114,6 +126,30 @@ location / {
     proxy_pass http://127.0.0.1:3000;
     proxy_set_header Host $host;
 }
+```
+
+**Adresse des visiteurs.** Le proxy doit transmettre `X-Forwarded-For` (Caddy le fait par
+défaut). L'API ne lit cet en-tête que si la connexion vient d'un réseau listé dans
+`TRUSTED_PROXIES` (par défaut : boucle locale et réseaux privés, ce qui couvre un proxy sur
+l'hôte comme dans Docker) et retient la dernière adresse non fiable de la chaîne : un visiteur
+ne peut pas se faire passer pour un autre en ajoutant l'en-tête lui-même. Sans cela, tous les
+visiteurs auraient l'adresse du proxy et les limites anti-abus (votes, commandes) deviendraient
+globales. Si le serveur est lui-même sur un réseau privé partagé avec des machines non
+maîtrisées, restreindre `TRUSTED_PROXIES` à l'adresse exacte du proxy.
+
+**En-têtes de sécurité.** Le site envoie lui-même sa politique de contenu
+(`Content-Security-Policy` : ressources de la même origine seulement, aucun affichage dans le
+cadre d'un autre site), `X-Frame-Options: DENY` et `Permissions-Policy` (caméra réservée au
+site pour la lecture des QR, micro, géolocalisation et paiement navigateur coupés) ; voir
+`apps/web/next.config.ts`. Le proxy ajoute HSTS et les mêmes protections pour les réponses de
+l'API (exemple Caddy). Avec Nginx :
+
+```nginx
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Frame-Options "DENY" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "camera=(self), microphone=(), geolocation=(), payment=()" always;
 ```
 
 Le HTTPS est **obligatoire** : le service worker, la caméra (lecture des QR) et le cookie

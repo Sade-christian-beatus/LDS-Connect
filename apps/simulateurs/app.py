@@ -4,7 +4,11 @@ Aucun appel vers un service réel. Les SMS « envoyés » sont conservés en mé
 sur http://localhost:8090. Les paiements sont confirmés ou refusés à la main depuis cette page.
 """
 
+import hashlib
+import hmac
 import html
+import json
+import os
 import uuid
 from collections import deque
 from datetime import UTC, datetime
@@ -18,6 +22,10 @@ app = FastAPI(title="Simulateurs LDS Connect (SMS + paiement)")
 
 SMS_INBOX: deque[dict] = deque(maxlen=500)
 PAYMENTS: dict[str, dict] = {}
+
+# Même secret que l'API (PAYMENT_WEBHOOK_SECRET) : les notifications sont signées comme le
+# ferait un agrégateur réel (HMAC-SHA256 du corps brut, en-tête X-LDS-Signature).
+WEBHOOK_SECRET = os.environ.get("PAYMENT_WEBHOOK_SECRET", "")
 
 
 class SmsIn(BaseModel):
@@ -99,16 +107,16 @@ def settle(pid: str, outcome: str):
         raise HTTPException(404)
     p["status"] = "succeeded" if outcome == "success" else "failed"
     try:
-        httpx.post(
-            p["callback_url"],
-            json={
-                "id": pid,
-                "reference": p["reference"],
-                "status": p["status"],
-                "amount": p["amount"],
-            },
-            timeout=5,
-        )
+        body = json.dumps(
+            {"id": pid, "reference": p["reference"], "status": p["status"], "amount": p["amount"]}
+        ).encode()
+        headers = {"content-type": "application/json"}
+        if WEBHOOK_SECRET:
+            digest = hmac.new(WEBHOOK_SECRET.encode(), body, hashlib.sha256).hexdigest()
+            headers["x-lds-signature"] = f"sha256={digest}"
+        r = httpx.post(p["callback_url"], content=body, headers=headers, timeout=5)
+        if r.status_code >= 400:
+            p["callback_error"] = f"HTTP {r.status_code} : {r.text[:200]}"
     except httpx.HTTPError as exc:
         p["callback_error"] = str(exc)
     return RedirectResponse(p.get("return_url") or f"/payment/{pid}", status_code=303)

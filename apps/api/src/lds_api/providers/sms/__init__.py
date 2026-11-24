@@ -37,10 +37,20 @@ class SimulatorSmsProvider:
         return SmsResult(provider_id=r.json()["id"], accepted=True)
 
 
+class SmsUnavailable(RuntimeError):
+    """Aucun opérateur SMS n'est configuré."""
+
+
 class ConsoleSmsProvider:
-    """Affiche le SMS dans les journaux (développement sans simulateur)."""
+    """Affiche le SMS dans les journaux (développement sans simulateur).
+
+    En production, rien n'est envoyé ni écrit : le message contient des codes de vote et des
+    liens d'accès aux billets, qui ne doivent pas se retrouver dans les journaux.
+    """
 
     def send(self, to: str, message: str) -> SmsResult:
+        if get_settings().environment == "production":
+            raise SmsUnavailable("Opérateur SMS non configuré")
         log.info("SMS (console) vers %s : %s", to[:-4] + "****", message)
         return SmsResult(provider_id="console", accepted=True)
 

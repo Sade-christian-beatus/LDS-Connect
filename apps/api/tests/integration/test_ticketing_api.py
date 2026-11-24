@@ -12,7 +12,7 @@ from sqlalchemy import select
 
 from lds_api.models import Match, Order
 from lds_api.models.enums import MatchStatus
-from lds_api.providers.payment import PaymentSession, SimulatorPaymentProvider
+from lds_api.providers.payment import PaymentSession, SimulatorPaymentProvider, sign
 from lds_api.providers.sms import SmsResult
 from lds_api.services import ticketing
 
@@ -33,6 +33,7 @@ class FakePayment:
 
     def __init__(self):
         self.created: list[dict] = []
+        self._secret = ""
 
     def create(self, *, reference, amount_fcfa, phone, callback_url, return_url=None):
         pid = f"pay-{len(self.created) + 1}"
@@ -101,17 +102,22 @@ def order(client, tt, quantity=2, phone="70 11 22 33"):
     )
 
 
-def notify(client, pay, created, status="succeeded", amount=None):
+def notify(client, pay, created, status="succeeded", amount=None, signature=None):
     p = next(x for x in pay.created if x["reference"] == created["reference"])
-    return client.post(
-        "/api/v1/payments/notify",
-        json={
+    body = json.dumps(
+        {
             "id": p["id"],
             "reference": p["reference"],
             "status": status,
             "amount": p["amount"] if amount is None else amount,
-        },
-    )
+        }
+    ).encode()
+    headers = {"content-type": "application/json"}
+    if signature is None and pay._secret:
+        signature = sign(pay._secret, body)
+    if signature:
+        headers["x-lds-signature"] = signature
+    return client.post("/api/v1/payments/notify", content=body, headers=headers)
 
 
 def view(client, created):
@@ -256,6 +262,30 @@ def test_failed_and_mismatched_payments(client, as_admin, pay, sms, match):
     assert notify(client, pay, odd, amount=1).status_code == 204
     o = view(client, odd).json()
     assert o["state"] == "pending" and o["tickets"] == []
+
+
+def test_notifications_must_be_signed(client, as_admin, pay, sms, match):
+    pay._secret = "secret-de-test-partage-avec-l-agregateur"
+    tt = make_type(client, as_admin, match)
+    created = order(client, tt, quantity=1).json()
+    # Sans signature, avec une signature fausse ou faite avec un autre secret : refusée
+    for bad in ("", "sha256=" + "0" * 64, sign("autre-secret", b"{}")):
+        r = notify(client, pay, created, signature=bad or "absente")
+        assert r.status_code == 401, r.text
+    assert view(client, created).json()["state"] == "pending"
+    # Un montant modifié après signature ne passe pas non plus
+    p = pay.created[-1]
+    body = json.dumps({**p, "status": "succeeded"}).encode()
+    forged = body.replace(str(p["amount"]).encode(), b"1")
+    r = client.post(
+        "/api/v1/payments/notify",
+        content=forged,
+        headers={"x-lds-signature": sign(pay._secret, body)},
+    )
+    assert r.status_code == 401
+    # Signée par l'agrégateur : acceptée
+    assert notify(client, pay, created).status_code == 204
+    assert view(client, created).json()["state"] == "paid"
 
 
 def test_late_payment_without_seats_is_cancelled(client, db, as_admin, pay, sms, match):

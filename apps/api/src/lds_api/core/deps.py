@@ -1,8 +1,10 @@
 """Dépendances FastAPI : session, utilisateur courant, permissions, contexte de requête."""
 
+import ipaddress
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Annotated
 
 import jwt
@@ -10,6 +12,7 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from lds_api.core.config import get_settings
 from lds_api.core.rbac import Perm, is_team_scoped, permissions_for
 from lds_api.core.security import decode_access_token
 from lds_api.db.session import get_db
@@ -47,8 +50,41 @@ class Actor:
         return is_team_scoped(self.user.role_codes)
 
 
+@lru_cache
+def _trusted_networks(spec: str) -> tuple[ipaddress._BaseNetwork, ...]:
+    nets = []
+    for item in filter(None, (x.strip() for x in spec.split(","))):
+        nets.append(ipaddress.ip_network(item, strict=False))
+    return tuple(nets)
+
+
+def _is_trusted(host: str, nets) -> bool:
+    try:
+        addr = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return any(addr in n for n in nets)
+
+
 def client_ip(request: Request) -> str | None:
-    return request.client.host if request.client else None
+    """Adresse du visiteur. Derrière un proxy de confiance, on lit X-Forwarded-For de droite
+    à gauche et on retient la première adresse qui n'est pas un proxy de confiance : un
+    visiteur ne peut pas se faire passer pour un autre en ajoutant l'en-tête lui-même."""
+    peer = request.client.host if request.client else None
+    nets = _trusted_networks(get_settings().trusted_proxies)
+    if not peer or not _is_trusted(peer, nets):
+        return peer
+    forwarded = request.headers.get("x-forwarded-for")
+    if not forwarded:
+        return peer
+    hops = [h.strip() for h in forwarded.split(",") if h.strip()]
+    for hop in reversed(hops):
+        if not _is_trusted(hop, nets):
+            try:
+                return str(ipaddress.ip_address(hop))
+            except ValueError:
+                return peer
+    return hops[0] if hops else peer
 
 
 def get_current_actor(

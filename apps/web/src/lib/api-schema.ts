@@ -1301,7 +1301,7 @@ export interface paths {
         put?: never;
         /**
          * Payment Notification
-         * @description Rappel de l'agrégateur de paiement (un connecteur réel doit en vérifier la signature).
+         * @description Rappel de l'agrégateur de paiement, signé (en-tête X-LDS-Signature pour le simulateur).
          */
         post: operations["payment_notification_api_v1_payments_notify_post"];
         delete?: never;
@@ -1717,6 +1717,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/persons/{person_id}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Person Photo */
+        get: operations["person_photo_api_v1_admin_persons__person_id__photo_get"];
+        /** Upload Person Photo */
+        put: operations["upload_person_photo_api_v1_admin_persons__person_id__photo_put"];
+        post?: never;
+        /** Delete Person Photo */
+        delete: operations["delete_person_photo_api_v1_admin_persons__person_id__photo_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/licences/{number}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Licence Photo
+         * @description Photo du titulaire, pour le contrôleur au stade (comparaison avec la personne).
+         */
+        get: operations["licence_photo_api_v1_licences__number__photo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -1996,6 +2035,11 @@ export interface components {
         };
         /** Body_upload_brand_logo_api_v1_admin_brand_logo_put */
         Body_upload_brand_logo_api_v1_admin_brand_logo_put: {
+            /** File */
+            file: string;
+        };
+        /** Body_upload_person_photo_api_v1_admin_persons__person_id__photo_put */
+        Body_upload_person_photo_api_v1_admin_persons__person_id__photo_put: {
             /** File */
             file: string;
         };
@@ -3262,6 +3306,11 @@ export interface components {
             has_cnib: boolean;
             /** Has Phone */
             has_phone: boolean;
+            /**
+             * Has Photo
+             * @default false
+             */
+            has_photo: boolean;
             licence: components["schemas"]["LicenceBrief"] | null;
         };
         /** StaffCreate */
@@ -6110,13 +6159,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             204: {
@@ -6124,15 +6167,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
             };
         };
     };
@@ -6959,6 +6993,134 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TeamRef"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    person_photo_api_v1_admin_persons__person_id__photo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_person_photo_api_v1_admin_persons__person_id__photo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_person_photo_api_v1_admin_persons__person_id__photo_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_person_photo_api_v1_admin_persons__person_id__photo_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    licence_photo_api_v1_licences__number__photo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                number: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
                 };
             };
             /** @description Validation Error */

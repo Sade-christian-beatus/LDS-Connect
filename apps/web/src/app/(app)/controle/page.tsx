@@ -6,6 +6,22 @@ import { RequireAuth } from "@/components/RequireAuth";
 import { useAuth } from "@/lib/auth";
 import { type KeySet, type OfflineResult, type StatusEntry, verifyOffline } from "@/lib/licence-verify";
 import { db } from "@/lib/offline/db";
+import { usePrivateImage } from "@/lib/private-image";
+
+// Photo du titulaire : demandée au serveur (jamais stockée sur l'appareil), donc en ligne seulement
+function HolderPhoto({ number }: { number: string }) {
+  const photo = usePrivateImage(`/licences/${encodeURIComponent(number)}/photo`);
+  if (photo.url) {
+    // eslint-disable-next-line @next/next/no-img-element -- photo privée (blob local, authentifié)
+    return <img src={photo.url} alt="Photo du titulaire" className="h-32 w-24 shrink-0 rounded border-2 border-white/70 object-cover" />;
+  }
+  const text = { loading: "Photo…", offline: "Photo visible en ligne seulement", none: "Aucune photo sur cette licence", ready: "" }[photo.state];
+  return (
+    <div className="flex h-32 w-24 shrink-0 items-center justify-center rounded border-2 border-dashed border-white/50 p-1 text-center text-[11px] leading-tight">
+      {text}
+    </div>
+  );
+}
 
 export default function ControlePage() {
   return (
@@ -127,23 +143,26 @@ function Controle() {
         <div role="alert" className={`rounded-xl p-4 text-white ${result.valid ? "bg-green-700" : "bg-lds-red"}`}>
           <p className="text-2xl font-bold">{result.valid ? "✓ " : "✗ "}{result.reason}</p>
           {result.payload && (
-            <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 text-sm">
-              <dt>Nom</dt>
-              <dd className="font-semibold">{result.payload.nm}</dd>
-              <dt>Équipe</dt>
-              <dd>{result.payload.tm}</dd>
-              <dt>Qualité</dt>
-              <dd>
-                {result.payload.r === "J" ? "Joueur" : "Encadreur"}
-                {result.payload.no ? ` · n° ${result.payload.no}` : ""}
-              </dd>
-              <dt>Licence</dt>
-              <dd>
-                {result.payload.n} (jusqu&apos;au {result.payload.vu})
-              </dd>
-            </dl>
+            <div className="mt-2 flex gap-3">
+              <HolderPhoto number={result.payload.n} />
+              <dl className="grid flex-1 grid-cols-[auto_1fr] content-start gap-x-3 text-sm">
+                <dt>Nom</dt>
+                <dd className="font-semibold">{result.payload.nm}</dd>
+                <dt>Équipe</dt>
+                <dd>{result.payload.tm}</dd>
+                <dt>Qualité</dt>
+                <dd>
+                  {result.payload.r === "J" ? "Joueur" : "Encadreur"}
+                  {result.payload.no ? ` · n° ${result.payload.no}` : ""}
+                </dd>
+                <dt>Licence</dt>
+                <dd>
+                  {result.payload.n} (jusqu&apos;au {result.payload.vu})
+                </dd>
+              </dl>
+            </div>
           )}
-          <p className="mt-2 text-xs opacity-90">Comparer le nom avec la pièce d&apos;identité présentée.</p>
+          <p className="mt-2 text-xs opacity-90">Comparer la photo et le nom avec la personne et sa pièce d&apos;identité.</p>
         </div>
       )}
     </div>

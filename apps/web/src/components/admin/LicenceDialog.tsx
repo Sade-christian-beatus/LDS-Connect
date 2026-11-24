@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { POSITION_LABEL, STAFF_LABEL } from "@/lib/format";
 import type { SquadMember, TeamRef } from "@/lib/types";
+import { usePrivateImage } from "@/lib/private-image";
+import { PhotoUploader } from "./PhotoUploader";
 import { Badge, Button, Field, inputClass } from "./ui";
 
 export const LICENCE_STATUS: Record<string, { label: string; tone: "green" | "amber" | "red" | "stone" }> = {
@@ -20,12 +22,18 @@ type Props = {
   team: TeamRef;
   canIssue: boolean;
   canChangeStatus: boolean;
+  canEditPhoto: boolean;
   onChanged: (message: string) => void;
   onError: (message: string) => void;
 };
 
-export function LicenceDialogBody({ member, team, canIssue, canChangeStatus, onChanged, onError }: Props) {
+export function LicenceDialogBody({ member, team, canIssue, canChangeStatus, canEditPhoto, onChanged, onError }: Props) {
   const { api, raw } = useAuth();
+  // Version locale : la photo change sans fermer la fenêtre
+  const [photoVersion, setPhotoVersion] = useState(0);
+  const photo = usePrivateImage(`/admin/persons/${member.person_id}/photo`, photoVersion);
+  const hasPhoto = photo.state === "ready";
+  const [photoNote, setPhotoNote] = useState<string | null>(null);
   const logo = useBrandLogo();
   const lic = member.licence;
   const [qr, setQr] = useState<string | null>(null);
@@ -92,6 +100,14 @@ export function LicenceDialogBody({ member, team, canIssue, canChangeStatus, onC
       <div className="print-area mx-auto flex max-w-sm flex-col items-center gap-2 rounded-xl border-2 border-lds-green p-4 text-center">
         <BrandLogo logoUrl={logo} size="lg" className="shadow-none" />
         <p className="text-xs font-bold uppercase tracking-wide text-lds-green">Ligue de la Souveraineté · Licence</p>
+        {photo.url ? (
+          // eslint-disable-next-line @next/next/no-img-element -- photo privée (blob local, authentifié)
+          <img src={photo.url} alt={`Photo de ${member.first_name} ${member.last_name}`} className="h-32 w-24 rounded border border-stone-300 object-cover" />
+        ) : (
+          <div className="flex h-32 w-24 items-center justify-center rounded border border-dashed border-stone-300 text-center text-[11px] text-stone-400 print:hidden">
+            {photo.state === "loading" ? "…" : "Sans photo"}
+          </div>
+        )}
         <p className="text-lg font-bold">
           {member.first_name} {member.last_name}
         </p>
@@ -105,6 +121,23 @@ export function LicenceDialogBody({ member, team, canIssue, canChangeStatus, onC
         <p className="text-xs text-stone-600">Valable jusqu&apos;au {new Date(lic.valid_until).toLocaleDateString("fr-FR")}</p>
         <Badge tone={st.tone}>{st.label}</Badge>
       </div>
+      {canEditPhoto && (
+        <div className="space-y-1 border-t border-stone-200 pt-3">
+          <h3 className="text-sm font-semibold">Photo de la licence</h3>
+          <PhotoUploader
+            hasPhoto={hasPhoto}
+            needsConsent={member.is_minor && !member.guardian_consent_on}
+            upload={(body) => raw(`/admin/persons/${member.person_id}/photo`, { method: "PUT", body })}
+            remove={() => raw(`/admin/persons/${member.person_id}/photo`, { method: "DELETE" })}
+            onDone={(text) => {
+              setPhotoVersion((v) => v + 1);
+              setPhotoNote(text);
+            }}
+            onError={onError}
+          />
+          {photoNote && <p role="status" className="text-xs text-green-700">{photoNote}</p>}
+        </div>
+      )}
       <div className="flex justify-center">
         <Button variant="secondary" onClick={() => window.print()}>
           Imprimer la licence

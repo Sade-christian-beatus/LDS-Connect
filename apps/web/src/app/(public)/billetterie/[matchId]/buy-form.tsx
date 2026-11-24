@@ -1,5 +1,6 @@
 "use client";
 // Achat sans compte : catégorie, quantité, nom et numéro, puis paiement mobile money.
+import Link from "next/link";
 import { useState } from "react";
 import { formatDateTime, formatFcfa } from "@/lib/format";
 import { rememberOrder } from "@/lib/my-tickets";
@@ -11,6 +12,7 @@ export function BuyForm({ types }: { types: TicketType[] }) {
   const [qty, setQty] = useState(1);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const tt = types.find((t) => t.id === typeId);
@@ -123,6 +125,27 @@ export function BuyForm({ types }: { types: TicketType[] }) {
               Numéros du Burkina Faso. Vous recevrez par SMS le lien de vos billets. Votre numéro ne sert qu&apos;à cette commande.
             </p>
           </fieldset>
+
+          <label className="flex items-start gap-3 rounded-xl bg-surface p-4 text-sm shadow-sm">
+            <input
+              type="checkbox"
+              required
+              checked={accepted}
+              onChange={(e) => setAccepted(e.target.checked)}
+              className="mt-0.5 h-5 w-5 shrink-0 accent-lds-green"
+            />
+            <span>
+              J&apos;accepte les{" "}
+              <Link href="/conditions-de-vente" target="_blank" className="font-semibold text-lds-green underline">
+                conditions générales de vente
+              </Link>{" "}
+              (report, annulation, billet perdu) et la{" "}
+              <Link href="/confidentialite" target="_blank" className="font-semibold text-lds-green underline">
+                politique de confidentialité
+              </Link>
+              .
+            </span>
+          </label>
 
           <div className="sticky bottom-[4.25rem] z-10 -mx-4 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur md:static md:mx-0 md:rounded-xl md:border md:shadow-sm">
             <div className="flex items-center justify-between gap-3">

@@ -13,4 +13,4 @@ RUN useradd --create-home lds && mkdir -p /app/var/storage && chown -R lds /app/
 USER lds
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
-CMD ["uvicorn", "lds_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+CMD ["uvicorn", "lds_api.main:app", "--host", "0.0.0.0", "--port", "8000"]

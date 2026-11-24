@@ -3,7 +3,7 @@ import json
 import httpx
 import pytest
 
-from lds_api.providers.payment import SimulatorPaymentProvider
+from lds_api.providers.payment import InvalidSignature, SimulatorPaymentProvider, sign
 from lds_api.providers.sms import ConsoleSmsProvider, SimulatorSmsProvider
 from lds_api.providers.storage import LocalStorage
 
@@ -50,10 +50,20 @@ def test_payment_simulator_roundtrip():
         reference="CMD-1", amount_fcfa=1000, phone=None, callback_url="http://api/cb"
     )
     assert session.checkout_url == "http://simulateurs/payment/p1"
-    notif = provider.parse_notification(
+    body = json.dumps(
         {"id": "p1", "reference": "CMD-1", "status": "succeeded", "amount": 1000}
-    )
+    ).encode()
+    notif = provider.parse_notification(body, {})
     assert notif.succeeded and notif.reference == "CMD-1"
+
+
+def test_payment_notification_signature():
+    provider = SimulatorPaymentProvider("http://simulateurs", webhook_secret="s3cret")
+    body = b'{"id": "p1", "reference": "CMD-1", "status": "succeeded", "amount": 1000}'
+    assert provider.parse_notification(body, {"x-lds-signature": sign("s3cret", body)}).succeeded
+    for headers in ({}, {"x-lds-signature": "sha256=abc"}, {"x-lds-signature": sign("x", body)}):
+        with pytest.raises(InvalidSignature):
+            provider.parse_notification(body, headers)
 
 
 def test_local_storage_roundtrip_and_path_traversal(tmp_path):

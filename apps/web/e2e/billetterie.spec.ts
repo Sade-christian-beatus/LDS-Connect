@@ -34,6 +34,8 @@ test("achat de billets, paiement mobile money et contrôle à l'entrée", async 
   await expect(fan.getByText("3 000 FCFA")).toBeVisible();
   await fan.getByLabel("Nom et prénom").fill("Awa Ouédraogo");
   await fan.getByLabel("Numéro mobile money").fill(`76 ${stamp.slice(0, 2)} ${stamp.slice(2, 4)} ${stamp.slice(4)}`);
+  // Acceptation des conditions de vente obligatoire
+  await fan.getByRole("checkbox", { name: /conditions générales de vente/ }).check();
   await fan.getByRole("button", { name: "Payer par mobile money" }).click();
 
   // Page de l'opérateur (simulateur) puis retour automatique vers les billets

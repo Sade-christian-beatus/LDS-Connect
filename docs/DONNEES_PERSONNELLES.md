@@ -22,6 +22,7 @@ remplace pas un avis juridique.
 | Identité | prénom, nom, nom d'usage, date et lieu de naissance, nationalité, genre | joueurs, encadreurs | administration, club (son équipe), délégué (noms) |
 | Identifiants | **numéro CNIB** (chiffré) | joueurs, encadreurs | administration, club — **lecture journalisée** |
 | Contact | **téléphone** (chiffré) | joueurs, encadreurs | administration, club — **lecture journalisée** |
+| Photo de licence | photo d'identité (JPEG recadré, stockage privé, jamais servie publiquement ; **autorisation parentale exigée** pour un mineur) | joueurs, encadreurs | club (son équipe), administration, contrôleurs au stade (en ligne, par numéro de licence) ; ajout et retrait journalisés |
 | Sportif | poste, pied, numéro, région et date de début de résidence, licence FBF | joueurs | administration, club, délégué, cellule technique |
 | Contrat | contrat signé, déclaration CNSS (oui/non) | joueurs, encadreurs | administration, club |
 | Match | compositions, buts, cartons, suspensions | joueurs | public (noms d'usage) et officiels |
@@ -43,8 +44,11 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
   Un test automatisé vérifie que ces champs ne figurent pas dans la réponse publique.
 - **QR des licences** : nom, équipe, numéro, validité ; ni date de naissance ni CNIB (le
   contenu d'un QR est lisible par toute personne qui le scanne).
-- **Autorisation parentale** : un champ est prévu ; son caractère obligatoire est à décider
-  (question ouverte n° 17).
+- **Autorisation parentale** : sa date est enregistrée sur la fiche ; elle est **exigée avant
+  l'ajout d'une photo** de licence. Son caractère obligatoire pour l'inscription elle-même
+  reste à décider (question ouverte n° 17).
+- **Information des personnes** : pages publiques « Mentions légales », « Confidentialité » et
+  « Conditions de vente » (projets à valider par la Ligue, passages entre crochets à compléter).
 
 ## 4. Mesures de sécurité
 

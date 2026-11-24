@@ -97,6 +97,7 @@ def squad(db: Session, team: Team) -> s.Squad:
             is_minor=age < 18,
             has_cnib=p.cnib_index is not None,
             has_phone=p.phone_index is not None,
+            has_photo=p.photo_path is not None,
             licence=s.LicenceBrief.model_validate(m.licence) if m.licence else None,
         )
         if m.kind == MembershipKind.PLAYER and p.player:
