@@ -21,6 +21,7 @@ def generate_keys() -> dict[str, str]:
         "FIELD_ENCRYPTION_KEY": base64.b64encode(secrets.token_bytes(32)).decode(),
         "BLIND_INDEX_KEY": base64.b64encode(secrets.token_bytes(32)).decode(),
         "LICENCE_SIGNING_KEY": base64.b64encode(signing_pem).decode(),
+        "PAYMENT_WEBHOOK_SECRET": secrets.token_urlsafe(32),
     }
 
 

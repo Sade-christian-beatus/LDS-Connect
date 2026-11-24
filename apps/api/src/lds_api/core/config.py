@@ -58,6 +58,8 @@ class Settings(BaseSettings):
     payment_simulator_url: str = "http://localhost:8090"
     # Adresse de l'API vue par l'agrégateur pour ses notifications (vide = API_BASE_URL)
     payment_callback_base_url: str = ""
+    # Secret partagé avec l'agrégateur : signature HMAC-SHA256 de ses notifications
+    payment_webhook_secret: SecretStr = SecretStr("")
     storage_backend: Literal["local", "s3"] = "local"
     storage_local_path: str = "./var/storage"
     s3_endpoint_url: str | None = None
@@ -87,6 +89,13 @@ class Settings(BaseSettings):
             problems.append("REFRESH_COOKIE_SECURE doit valoir true (HTTPS)")
         if self.payment_provider == "simulator":
             problems.append("PAYMENT_PROVIDER=simulator : aucun paiement réel ne serait encaissé")
+        if (
+            self.payment_provider != "disabled"
+            and not self.payment_webhook_secret.get_secret_value()
+        ):
+            problems.append(
+                "PAYMENT_WEBHOOK_SECRET est vide : notifications de paiement non vérifiées"
+            )
         if self.sms_provider == "simulator":
             problems.append("SMS_PROVIDER=simulator : aucun SMS ne partirait")
         for name in ("public_base_url", "api_base_url"):

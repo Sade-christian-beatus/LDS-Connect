@@ -40,5 +40,8 @@ services:
 
   simulateurs:
     build: ./apps/simulateurs
+    environment:
+      # Même secret que l'API pour signer les notifications de paiement
+      PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:-}
     ports:
       - "127.0.0.1:8090:8090"   # boîte de réception SMS + paiements simulés

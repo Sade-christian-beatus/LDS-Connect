@@ -5,7 +5,7 @@ import uuid
 from typing import Annotated
 
 import segno
-from fastapi import APIRouter, Depends, Query, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field
 
 from lds_api.core.deps import Actor, DbSession, client_ip, require
@@ -67,10 +67,23 @@ def ticket_qr(reference: str, code: str, k: AccessKey, db: DbSession):
     return _svg(svc.ticket_token(db, order, code), code)
 
 
+async def _raw_body(request: Request) -> bytes:
+    """Corps brut : la signature de l'agrégateur porte sur les octets reçus, pas sur le JSON."""
+    body = await request.body()
+    if len(body) > 64 * 1024:
+        raise HTTPException(
+            status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, "Notification trop volumineuse"
+        )
+    return body
+
+
+RawBody = Annotated[bytes, Depends(_raw_body)]
+
+
 @router.post("/payments/notify", status_code=status.HTTP_204_NO_CONTENT)
-def payment_notification(payload: dict, db: DbSession):
-    """Rappel de l'agrégateur de paiement (un connecteur réel doit en vérifier la signature)."""
-    svc.handle_notification(db, payload)
+def payment_notification(request: Request, db: DbSession, body: RawBody):
+    """Rappel de l'agrégateur de paiement, signé (en-tête X-LDS-Signature pour le simulateur)."""
+    svc.handle_notification(db, body, request.headers)
     db.commit()
 
 
