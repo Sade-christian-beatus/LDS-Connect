@@ -5,6 +5,18 @@
 > **Critique** (à corriger avant toute mise en service), **Haute** (avant l'ouverture au
 > public), **Moyenne** (dans les premières semaines), **Basse** (amélioration).
 
+## État des corrections
+
+| # | Point | État |
+|---|---|---|
+| C1 | IP des visiteurs derrière le proxy | **Corrigé** : `X-Forwarded-For` lu seulement depuis `TRUSTED_PROXIES` (dernière adresse non fiable retenue), tests unitaires |
+| H1 | Pages légales | **Corrigé** (contenu à valider) : mentions légales, confidentialité, CGV, liens en pied de page, case d'acceptation à l'achat |
+| H2 | En-têtes de sécurité | **Corrigé** : CSP, `X-Frame-Options`, `Permissions-Policy` envoyés par le site en production ; Caddy et Nginx documentés |
+| H3 | Notifications de paiement | **Corrigé** : signature HMAC-SHA256 du corps brut vérifiée (`PAYMENT_WEBHOOK_SECRET`), 401 sinon |
+| H4 | Garde-fous de production | **Corrigé** : l'API refuse de démarrer avec une configuration de développement ; SMS `console` muet en production |
+| H5 | Licence sans photo | **Corrigé** : photo privée (autorisation parentale exigée pour un mineur), sur la carte et à l'écran du contrôleur |
+| M1 à M11, B1 à B8 | — | à traiter |
+
 ## Synthèse
 
 | Domaine | État |
@@ -30,10 +42,10 @@
     connexion en 10 min) **met de côté presque tous les votes** ;
   - billetterie : limite « 20 commandes par IP et par heure » globale ;
   - journal d'audit et empreintes d'IP sans valeur.
-- **Correction** : définir `FORWARDED_ALLOW_IPS` (adresse du proxy ou réseau Docker) dans
-  `docker-compose.yml` et `.env.example` ; test d'intégration avec un en-tête `X-Forwarded-For`.
-  L'API n'étant exposée que sur `127.0.0.1`, la valeur `*` est acceptable si aucun autre
-  chemin ne mène à l'API.
+- **Correction retenue** : plutôt que `FORWARDED_ALLOW_IPS` d'Uvicorn, l'API lit elle-même
+  `X-Forwarded-For` uniquement quand la connexion vient d'un réseau de `TRUSTED_PROXIES`
+  (boucle locale et réseaux privés par défaut) et retient la dernière adresse non fiable de la
+  chaîne, ce qui empêche un visiteur de choisir son adresse en ajoutant l'en-tête.
 
 ## 2. Haute
 
