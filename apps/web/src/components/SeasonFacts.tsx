@@ -9,7 +9,7 @@ async function Name() {
   return <>{season.name}</>;
 }
 
-/** Nom de la saison courante (« Saison 2027 »), avec « Saison » le temps du chargement. */
+/** Nom de la saison courante (« Saison 2026-2027 »), avec « Saison » le temps du chargement. */
 export function SeasonName() {
   return (
     <Suspense fallback="Saison">

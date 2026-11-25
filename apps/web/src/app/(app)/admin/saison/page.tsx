@@ -312,7 +312,23 @@ function Seasons({ seasons, onDone, onError }: { seasons: SeasonAdmin[]; onDone:
               <td className="pl-6">
                 <Badge tone={STATUS[s.status].tone}>{STATUS[s.status].label}</Badge> {s.is_current && <Badge tone="blue">Courante</Badge>}
               </td>
-              <td className="text-right">
+              <td className="space-x-2 text-right">
+                <Button
+                  variant="link"
+                  aria-label={`Renommer ${s.name}`}
+                  onClick={async () => {
+                    const name = window.prompt("Nouveau nom de la saison (affiché sur tout le site)", s.name)?.trim();
+                    if (!name || name === s.name) return;
+                    try {
+                      await api(`/admin/seasons/${s.id}`, { method: "PATCH", body: JSON.stringify({ name }) });
+                      onDone(`Saison renommée « ${name} »`);
+                    } catch (err) {
+                      onError(err);
+                    }
+                  }}
+                >
+                  Renommer
+                </Button>
                 {!s.is_current && s.status === "draft" && (
                   <Button variant="secondary" onClick={() => setConfirm(s)}>
                     En faire la saison courante
