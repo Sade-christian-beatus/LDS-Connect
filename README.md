@@ -61,7 +61,7 @@ téléphones « +226 00… »). **Aucun logo n'est versionné dans le dépôt** 
 conservés dans le stockage de la plateforme. En leur absence, une marque provisoire aux couleurs
 du Burkina et des blasons dessinés aux couleurs et initiales de chaque équipe sont affichés.
 
-## Ce qui est disponible (phase 1)
+## Ce qui est disponible (phases 1 à 3)
 
 - **Registre** : équipes, joueurs, encadreurs, effectifs par saison, contrôle de conformité
   (30 joueurs, 7 encadreurs, âge minimum, quota de moins de 19 ans), statut « local » calculé.
@@ -90,15 +90,26 @@ du Burkina et des blasons dessinés aux couleurs et initiales de chaque équipe 
   bord de la cellule technique (filtres poste, âge, équipe, région, poule) ; liste de
   suivi et notes d'observation internes, chiffrées et journalisées ; fiche publique par
   joueur (`/joueurs/…`, données autorisées pour les mineurs seulement).
-- **Back-office** (`/admin`) : tableau de bord des 20 équipes, fiches équipes (joueurs,
+- **Back-office** (`/admin`) : tableau de bord de la journée (matchs, feuilles à valider,
+  remboursements, votes à examiner), registre des équipes, fiches équipes (joueurs,
   encadreurs, vérification des résidences, données sensibles en consultation journalisée),
   licences (délivrance, carte imprimable, suspension), calendrier (génération, stades,
   horaires, délégué attribué à chaque match, tableau final), journal d'audit, gestion des
   comptes (super administrateur : création avec mot de passe provisoire affiché une seule
   fois et à changer obligatoirement à la première connexion, rôle, désactivation,
   réinitialisation). Chacun change son mot de passe depuis « Mon compte ». Chaque rôle ne voit que ce qui le concerne.
+- **Saison et règles** (`/admin/saison`) : barème, effectifs, feuille de match, discipline et
+  dotations modifiables avec motif journalisé (règles de classement figées dès le premier
+  match) ; préparation de la saison suivante et bascule de la saison courante.
+- **Identité visuelle** (`/admin/identite`) : logo de la Ligue et blasons des équipes, envoyés
+  depuis le back-office ou importés en lot (`make import-logos ZIP=…`), conservés dans le
+  stockage de la plateforme, jamais dans le dépôt.
+- **Sécurité** : double authentification (application TOTP) obligatoire en production pour
+  l'administration, photo d'identité sur la licence (privée), en-têtes de sécurité, refus de
+  démarrer en production avec une configuration de développement.
 
-Toutes les règles sportives sont dans la table `competition_rules` (une ligne par saison).
+Toutes les règles sportives sont dans la table `competition_rules` (une ligne par saison),
+modifiables depuis l'écran « Saison et règles ».
 
 ## Commandes utiles
 
@@ -111,7 +122,8 @@ Toutes les règles sportives sont dans la table `competition_rules` (une ligne p
 | `make test` | Tests de l'API (pytest) |
 | `make lint` | ruff, eslint, TypeScript |
 | `make e2e` | Test de bout en bout (Playwright) — pile lancée et seedée |
-| `make backup` / `make restore FILE=…` | Sauvegarde / restauration PostgreSQL |
+| `make backup` / `make restore FILE=…` | Sauvegarde / restauration (base et fichiers téléversés) |
+| `make purge` (`DRY=1` pour simuler) | Efface les données arrivées au terme de leur conservation |
 | `make export` | Export complet des données (JSON + CSV) |
 
 Sans Docker (PostgreSQL 16 et Redis installés, `uv` et `pnpm`) : `make install-local`,
