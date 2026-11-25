@@ -89,3 +89,18 @@ def test_offline_scan_earlier_than_known_entry_wins():
     """Deux appareils hors ligne : le passage le plus ancien reste l'entrée."""
     later = t.PriorEntry(NOW + timedelta(minutes=3), "Porte B")
     assert decide(first_entry=later).result == "admitted"
+
+
+def test_zone_refusal():
+    from lds_api.domain.ticketing import ALL_ZONES, zone_refusal
+
+    # Entrée du public : tout passe
+    assert zone_refusal(kind="ticket", gate_zone=None) is None
+    assert zone_refusal(kind="accreditation", gate_zone="", zones=[]) is None
+    # Zone réservée : billets refusés, accréditations selon leurs zones
+    assert "public" in zone_refusal(kind="ticket", gate_zone="Pelouse")
+    assert zone_refusal(kind="accreditation", gate_zone="Pelouse", zones=["Pelouse"]) is None
+    assert zone_refusal(kind="accreditation", gate_zone="Pelouse", zones=[ALL_ZONES]) is None
+    assert "Pelouse" in zone_refusal(
+        kind="accreditation", gate_zone="Pelouse", zones=["Zone mixte"]
+    )

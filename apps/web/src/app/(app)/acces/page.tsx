@@ -4,7 +4,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
-import { type Decision, decide, KEYS_KEY, manifestKey, recordScan, syncScans } from "@/lib/access";
+import { type Decision, decide, KEYS_KEY, manifestKey, recordScan, syncScans, ZONES } from "@/lib/access";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatTime } from "@/lib/format";
 import { db, type LocalScan } from "@/lib/offline/db";
@@ -38,6 +38,7 @@ function Acces() {
   const online = useOnline();
   const [matchId, setMatchId] = useState<string>("");
   const [device, setDevice] = useState<string>("");
+  const [zone, setZone] = useState<string>("");
   const [current, setCurrent] = useState<(Decision & { at: string }) | null>(null);
   const [token, setToken] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +62,7 @@ function Acces() {
     Promise.resolve().then(() => {
       setMatchId(localStorage.getItem("lds-access-match") ?? "");
       setDevice(localStorage.getItem("lds-access-device") ?? "");
+      setZone(localStorage.getItem("lds-access-zone") ?? "");
     });
   }, []);
 
@@ -117,12 +119,12 @@ function Acces() {
         setError("Préparez d'abord l'appareil pour un match (réseau nécessaire une fois).");
         return;
       }
-      const d = await decide(value, { matchId, keys: k.keys, manifest: (manifest?.value as AccessManifest) ?? null });
-      const scan = await recordScan(value, d, { matchId, device: device || "Appareil", offline: !navigator.onLine });
+      const d = await decide(value, { matchId, keys: k.keys, manifest: (manifest?.value as AccessManifest) ?? null, zone });
+      const scan = await recordScan(value, d, { matchId, device: device || "Appareil", offline: !navigator.onLine, zone });
       setCurrent({ ...d, at: scan.scannedAt });
       if (navigator.onLine) sync();
     },
-    [keys, manifest, matchId, device, sync],
+    [keys, manifest, matchId, device, zone, sync],
   );
 
   async function startScan() {
@@ -176,7 +178,7 @@ function Acces() {
         </span>
       </div>
 
-      <section className="grid gap-3 rounded-lg border border-stone-200 bg-white p-3 sm:grid-cols-[1fr_12rem_auto] sm:items-end">
+      <section className="grid gap-3 rounded-lg border border-stone-200 bg-white p-3 sm:grid-cols-[1fr_10rem_13rem_auto] sm:items-end">
         <label className="text-sm">
           Match
           <select
@@ -209,6 +211,24 @@ function Acces() {
             }}
           />
         </label>
+        <label className="text-sm">
+          Zone gardée
+          <select
+            className="mt-1 w-full rounded border border-stone-300 px-2 py-2"
+            value={zone}
+            onChange={(e) => {
+              setZone(e.target.value);
+              localStorage.setItem("lds-access-zone", e.target.value);
+            }}
+          >
+            <option value="">Entrée du public (tribunes)</option>
+            {ZONES.map((z) => (
+              <option key={z} value={z}>
+                {z} (accréditations seulement)
+              </option>
+            ))}
+          </select>
+        </label>
         <button
           type="button"
           onClick={prepare}
@@ -217,7 +237,7 @@ function Acces() {
         >
           Préparer l&apos;appareil
         </button>
-        <p className="text-xs text-stone-600 sm:col-span-3">
+        <p className="text-xs text-stone-600 sm:col-span-4">
           {m
             ? `Prêt hors ligne : ${m.tickets.length} billet(s) connus, préparé le ${new Date(manifest!.savedAt).toLocaleString("fr-FR")}.`
             : matchId

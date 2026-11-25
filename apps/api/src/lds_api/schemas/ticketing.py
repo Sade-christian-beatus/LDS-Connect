@@ -142,6 +142,8 @@ class ScanIn(BaseModel):
     scanned_at: datetime
     offline: bool = False
     device: str | None = Field(default=None, max_length=80)
+    # Zone gardée par l'appareil (vide : entrée du public)
+    zone: str | None = Field(default=None, max_length=40)
 
 
 class ScanBatch(BaseModel):

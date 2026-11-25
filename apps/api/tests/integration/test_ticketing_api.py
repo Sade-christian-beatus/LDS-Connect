@@ -134,7 +134,7 @@ def buy(client, pay, tt, quantity=2, phone="70 11 22 33") -> dict:
     return view(client, created).json()
 
 
-def scan(client, headers, token, match=None, at=None, device="Porte A", client_id=None):
+def scan(client, headers, token, match=None, at=None, device="Porte A", client_id=None, zone=None):
     body = {
         "scans": [
             {
@@ -143,6 +143,7 @@ def scan(client, headers, token, match=None, at=None, device="Porte A", client_i
                 "match_id": str(match.id) if match else None,
                 "scanned_at": (at or datetime.now(UTC)).isoformat(),
                 "device": device,
+                "zone": zone,
             }
         ]
     }
@@ -349,6 +350,16 @@ def test_offline_scans_from_two_devices(client, as_admin, as_controller, pay, sm
     assert stats["admitted"] == 1 and stats["duplicates"] == 1
 
 
+def test_public_ticket_refused_at_reserved_zone(client, as_admin, as_controller, pay, sms, match):
+    tt = make_type(client, as_admin, match)
+    ticket = buy(client, pay, tt, quantity=1)["tickets"][0]
+    res = scan(client, as_controller, ticket["token"], match, device="Tunnel", zone="Pelouse")
+    assert res["result"] == "invalid" and "public" in res["detail"]
+    # Le billet n'est pas consommé : il reste valable à l'entrée des tribunes
+    res = scan(client, as_controller, ticket["token"], match, device="Porte A")
+    assert res["result"] == "admitted"
+
+
 def test_cancelled_ticket_is_refused(client, as_admin, as_controller, pay, sms, match):
     tt = make_type(client, as_admin, match)
     t = buy(client, pay, tt, quantity=1)["tickets"][0]
@@ -385,6 +396,14 @@ def test_accreditation_lifecycle(client, as_admin, as_controller, match):
     for _ in range(2):
         res = scan(client, as_controller, acc["token"], match)
         assert res["result"] == "admitted" and res["label"] == "Mariam Kaboré"
+
+    # Zones (M10) : admise à la tribune de presse, refusée sur la pelouse
+    res = scan(
+        client, as_controller, acc["token"], match, device="Presse", zone="Tribune de presse"
+    )
+    assert res["result"] == "admitted"
+    res = scan(client, as_controller, acc["token"], match, device="Tunnel", zone="Pelouse")
+    assert res["result"] == "invalid" and "Pelouse" in res["detail"]
 
     r = client.post(
         f"/api/v1/admin/accreditations/{acc['id']}/revoke",

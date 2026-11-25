@@ -35,6 +35,8 @@ export type LocalScan = {
   detail: string;
   scannedAt: string;
   device: string;
+  /** Zone gardée par l'appareil (absente : entrée du public) */
+  zone?: string;
   offline: boolean;
   synced: 0 | 1;
   /** Décision du serveur quand elle diffère (ex. double entrée vue par une autre porte) */
