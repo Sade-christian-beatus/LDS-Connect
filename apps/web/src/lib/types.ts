@@ -78,3 +78,6 @@ export type RulesAdmin = S["RulesAdminOut"];
 export type RulesUpdate = S["RulesUpdate"];
 export type SeasonAdmin = S["SeasonAdminOut"];
 export type Dashboard = S["DashboardOut"];
+export type TrophyRace = S["TrophyRace"];
+export type Trophy = S["Trophy"];
+export type Contender = S["Contender"];

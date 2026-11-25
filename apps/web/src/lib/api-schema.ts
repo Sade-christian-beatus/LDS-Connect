@@ -637,6 +637,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/trophies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Trophy Race
+         * @description Course aux cinq trophées de la Ligue (classements statistiques, attribution officielle
+         *     selon le règlement). Nom d'usage uniquement pour les joueurs.
+         */
+        get: operations["trophy_race_api_v1_trophies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/venues": {
         parameters: {
             query?: never;
@@ -1897,6 +1918,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/seasons/{season_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Rename Season */
+        patch: operations["rename_season_api_v1_admin_seasons__season_id__patch"];
+        trace?: never;
+    };
     "/api/v1/admin/seasons/{season_id}/activate": {
         parameters: {
             query?: never;
@@ -2312,6 +2350,23 @@ export interface components {
             expires_at: string;
             /** Phone Hint */
             phone_hint: string;
+        };
+        /** Contender */
+        Contender: {
+            /** Rank */
+            rank: number;
+            /** Person Id */
+            person_id?: string | null;
+            /** Display Name */
+            display_name: string;
+            team?: components["schemas"]["TeamRef"] | null;
+            /** Value */
+            value: number;
+            /**
+             * Detail
+             * @default
+             */
+            detail: string;
         };
         /** Counts */
         Counts: {
@@ -3619,6 +3674,11 @@ export interface components {
          * @enum {string}
          */
         SeasonStatus: "draft" | "active" | "closed";
+        /** SeasonUpdate */
+        SeasonUpdate: {
+            /** Name */
+            name: string;
+        };
         /** SensitiveData */
         SensitiveData: {
             /**
@@ -4178,6 +4238,32 @@ export interface components {
             /** Expires In */
             expires_in: number;
             user: components["schemas"]["UserOut"];
+        };
+        /** Trophy */
+        Trophy: {
+            /** Code */
+            code: string;
+            /** Title */
+            title: string;
+            /** Criterion */
+            criterion: string;
+            /** Status */
+            status: string;
+            /** Status Label */
+            status_label: string;
+            /** Leaders */
+            leaders: components["schemas"]["Contender"][];
+            /** Contenders */
+            contenders: components["schemas"]["Contender"][];
+            /** Ballot Id */
+            ballot_id?: string | null;
+        };
+        /** TrophyRace */
+        TrophyRace: {
+            /** Season */
+            season: string;
+            /** Trophies */
+            trophies: components["schemas"]["Trophy"][];
         };
         /** UserAdminOut */
         UserAdminOut: {
@@ -5446,6 +5532,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trophy_race_api_v1_trophies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrophyRace"];
                 };
             };
         };
@@ -7913,6 +8019,41 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_season_api_v1_admin_seasons__season_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                season_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeasonUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

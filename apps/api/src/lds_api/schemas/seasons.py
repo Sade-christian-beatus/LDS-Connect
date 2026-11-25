@@ -106,6 +106,10 @@ class SeasonCreate(BaseModel):
     copy_from_current: bool = True
 
 
+class SeasonUpdate(BaseModel):
+    name: str = Field(min_length=3, max_length=80)
+
+
 class VenueUpdate(BaseModel):
     name: str | None = Field(None, min_length=2, max_length=120)
     city: str | None = Field(None, min_length=2, max_length=80)

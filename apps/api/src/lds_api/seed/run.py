@@ -65,7 +65,7 @@ def seed_reference(db: Session) -> Season:
         return season
 
     season = Season(
-        name="Saison 2027 — phase pilote",
+        name="Saison 2026-2027",
         year=SEASON_YEAR,
         starts_on=SEASON_START,
         ends_on=SEASON_END,

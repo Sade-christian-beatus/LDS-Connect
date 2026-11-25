@@ -12,7 +12,7 @@ from lds_api.core.rbac import Perm
 from lds_api.models import Match, Pool, Team, Venue
 from lds_api.models.enums import MatchPhase, MatchStatus
 from lds_api.schemas import fixtures as fs
-from lds_api.services import fixtures, seasons, standings, stats
+from lds_api.services import fixtures, seasons, standings, stats, trophies
 
 router = APIRouter(tags=["calendrier"])
 
@@ -71,6 +71,13 @@ def get_bracket(db: DbSession):
 def season_stats(db: DbSession, limit: Annotated[int, Query(ge=1, le=100)] = 20):
     """Meilleurs buteurs et passeurs (feuilles validées). Nom d'usage uniquement."""
     return stats.season_stats(db, seasons.current_season(db).id, limit=limit)
+
+
+@router.get("/trophies", response_model=trophies.TrophyRace)
+def trophy_race(db: DbSession):
+    """Course aux cinq trophées de la Ligue (classements statistiques, attribution officielle
+    selon le règlement). Nom d'usage uniquement pour les joueurs."""
+    return trophies.race(db)
 
 
 @router.get("/venues", response_model=list[fs.VenueOut])

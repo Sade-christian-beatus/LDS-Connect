@@ -1,4 +1,5 @@
 import { Stadium } from "@/components/Illustrations";
+import { TrophyRace } from "@/components/TrophyRace";
 import { leagueFacts } from "@/components/SeasonFacts";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -11,7 +12,7 @@ import { StandingsTable } from "@/components/StandingsTable";
 import { TeamBadge } from "@/components/TeamBadge";
 import { BALLOT_KIND_LABEL, formatDate, formatFcfa, formatTime } from "@/lib/format";
 import { apiGet } from "@/lib/server-api";
-import type { BallotOut, Match, MatchTickets, PoolStandings, PublicTeam, Season, SeasonStats, Venue } from "@/lib/types";
+import type { BallotOut, Match, MatchTickets, PoolStandings, PublicTeam, Season, SeasonStats, TrophyRace as TrophyRaceData, Venue } from "@/lib/types";
 
 export default function Accueil() {
   return (
@@ -44,7 +45,7 @@ function SectionTitle({ children, href, more }: { children: React.ReactNode; hre
 const optional = <T,>(p: Promise<T>, fallback: T) => p.catch(() => fallback);
 
 async function HomeContent() {
-  const [season, matches, standings, stats, venues, onSale, ballots, teams] = await Promise.all([
+  const [season, matches, standings, stats, venues, onSale, ballots, teams, race] = await Promise.all([
     apiGet<Season>("/seasons/current"),
     apiGet<Match[]>("/matches"),
     apiGet<PoolStandings[]>("/standings"),
@@ -53,6 +54,7 @@ async function HomeContent() {
     optional(apiGet<MatchTickets[]>("/tickets/matches"), []),
     optional(apiGet<BallotOut[]>("/ballots"), []),
     apiGet<PublicTeam[]>("/teams"),
+    apiGet<TrophyRaceData>("/trophies"),
   ]);
   const upcoming = matches.filter((m) => m.status === "scheduled" && m.home && m.kickoff_at);
   const next = upcoming[0];
@@ -156,6 +158,13 @@ async function HomeContent() {
             <StandingsTable key={p.pool_code} pool={p} compact />
           ))}
         </div>
+      </section>
+
+      <section aria-label="La course aux trophées">
+        <SectionTitle href="/statistiques" more="Statistiques et trophées">
+          La course aux trophées
+        </SectionTitle>
+        <TrophyRace trophies={race.trophies} compact />
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">

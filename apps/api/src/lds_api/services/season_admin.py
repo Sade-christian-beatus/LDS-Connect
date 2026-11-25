@@ -193,6 +193,17 @@ def create_season(db: Session, actor, body: s.SeasonCreate) -> Season:
     return season
 
 
+def rename_season(db: Session, actor, season_id, name: str) -> Season:
+    season = db.get(Season, season_id)
+    if season is None:
+        raise NotFound("Saison")
+    if season.name != name:
+        audit.record(db, actor, "rename", "season", season.id, {"name": [season.name, name]})
+        season.name = name
+    db.flush()
+    return season
+
+
 def activate_season(db: Session, actor, season_id) -> Season:
     """Bascule la saison courante : la précédente est close, la nouvelle devient active."""
     season = db.get(Season, season_id)

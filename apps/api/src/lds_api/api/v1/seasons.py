@@ -41,6 +41,13 @@ def create_season(body: s.SeasonCreate, db: DbSession, actor: RulesManager):
     return next(x for x in svc.list_seasons(db) if x.id == season.id)
 
 
+@router.patch("/seasons/{season_id}", response_model=s.SeasonAdminOut)
+def rename_season(season_id: uuid.UUID, body: s.SeasonUpdate, db: DbSession, actor: RulesManager):
+    svc.rename_season(db, actor, season_id, body.name)
+    db.commit()
+    return next(x for x in svc.list_seasons(db) if x.id == season_id)
+
+
 @router.post("/seasons/{season_id}/activate", response_model=s.SeasonAdminOut)
 def activate_season(season_id: uuid.UUID, db: DbSession, actor: RulesManager):
     svc.activate_season(db, actor, season_id)
