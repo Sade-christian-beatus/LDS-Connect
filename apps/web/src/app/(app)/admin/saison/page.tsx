@@ -220,7 +220,12 @@ function RulesForm({ rules, onDone, onError }: { rules: RulesAdmin; onDone: (t: 
         </fieldset>
       </div>
 
-      <div className="sticky bottom-0 flex flex-wrap items-end gap-3 rounded-xl border border-stone-200 bg-white/95 p-3 shadow-sm backdrop-blur">
+      {/* Barre d'enregistrement collée en bas de l'écran seulement quand il y a des modifications */}
+      <div
+        className={`flex flex-wrap items-end gap-3 rounded-xl border bg-white/95 p-3 shadow-sm backdrop-blur ${
+          changed.length ? "sticky bottom-2 z-10 border-lds-green/40 ring-2 ring-lds-green/20" : "border-stone-200"
+        }`}
+      >
         <div className="min-w-64 flex-1">
           <Field label="Motif de la modification (journalisé)">
             <input
@@ -291,7 +296,7 @@ function Seasons({ seasons, onDone, onError }: { seasons: SeasonAdmin[]; onDone:
             <th>Dates</th>
             <th className="text-right">Équipes</th>
             <th className="text-right">Matchs</th>
-            <th>État</th>
+            <th className="pl-6">État</th>
             <th />
           </tr>
         </thead>
@@ -304,7 +309,7 @@ function Seasons({ seasons, onDone, onError }: { seasons: SeasonAdmin[]; onDone:
               </td>
               <td className="text-right tabular-nums">{s.teams}</td>
               <td className="text-right tabular-nums">{s.matches}</td>
-              <td>
+              <td className="pl-6">
                 <Badge tone={STATUS[s.status].tone}>{STATUS[s.status].label}</Badge> {s.is_current && <Badge tone="blue">Courante</Badge>}
               </td>
               <td className="text-right">

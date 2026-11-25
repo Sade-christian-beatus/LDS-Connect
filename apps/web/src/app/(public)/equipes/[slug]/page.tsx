@@ -37,8 +37,8 @@ async function Team({ params }: { params: PageProps<"/equipes/[slug]">["params"]
       >
         <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full border-[20px] border-white/10" />
         <div className="relative flex items-center gap-5">
-          <span className="rounded-full bg-white/15 p-1.5 backdrop-blur">
-            <TeamBadge team={team} size="lg" />
+          <span className="rounded-3xl bg-white/15 p-1.5 backdrop-blur">
+            <TeamBadge team={team} size="hero" />
           </span>
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/80">

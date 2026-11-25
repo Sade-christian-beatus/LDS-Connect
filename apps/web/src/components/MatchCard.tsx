@@ -8,10 +8,14 @@ function Side({ team, align, winner }: { team: Match["home"]; align: "left" | "r
   return (
     <Link
       href={`/equipes/${team.slug}`}
-      className={`flex min-w-0 flex-1 items-center gap-2.5 hover:underline ${align === "right" ? "flex-row-reverse text-right" : ""}`}
+      className={`flex min-w-0 flex-1 items-center gap-2 hover:underline sm:gap-2.5 ${align === "right" ? "flex-row-reverse text-right" : ""}`}
     >
-      <TeamBadge team={team} />
-      <span className={`line-clamp-2 text-sm leading-tight sm:text-[15px] ${winner === false ? "text-muted" : "font-semibold"}`}>
+      <TeamBadge team={team} size="card" />
+      {/* Noms d'un seul mot très longs (« Sennatantola ») : coupés plutôt que de déborder */}
+      <span
+        lang="fr"
+        className={`line-clamp-2 min-w-0 hyphens-auto text-[13px] leading-tight [overflow-wrap:anywhere] sm:text-[15px] ${winner === false ? "text-muted" : "font-semibold"}`}
+      >
         <span className="sm:hidden">{team.short_name}</span>
         <span className="hidden sm:inline">{team.name}</span>
       </span>
@@ -30,14 +34,14 @@ export function MatchCard({ match }: { match: Match }) {
   const awayWins = done ? as > hs || (hs === as && (match.away_penalties ?? 0) > (match.home_penalties ?? 0)) : null;
   return (
     <div
-      className={`relative flex items-center gap-3 overflow-hidden rounded-xl border bg-surface px-4 py-3 shadow-sm ${
+      className={`relative flex min-w-0 items-center gap-2 overflow-hidden rounded-xl border bg-surface px-3 py-3 shadow-sm sm:gap-3 sm:px-4 ${
         live ? "border-lds-red/60 ring-1 ring-lds-red/30" : "border-line"
       }`}
     >
       <span aria-hidden className="absolute inset-y-0 left-0 w-1.5" style={{ backgroundColor: match.home?.primary_color ?? "transparent" }} />
       <span aria-hidden className="absolute inset-y-0 right-0 w-1.5" style={{ backgroundColor: match.away?.primary_color ?? "transparent" }} />
       <Side team={match.home} align="left" winner={homeWins} />
-      <div className="w-20 shrink-0 text-center sm:w-24">
+      <div className="w-[4.25rem] shrink-0 text-center sm:w-24">
         {showScore ? (
           <div className={`text-2xl font-black tabular-nums tracking-tight ${live ? "text-lds-red" : ""}`}>
             {match.home_score}
