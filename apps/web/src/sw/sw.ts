@@ -5,6 +5,9 @@
 // - Ressources statiques et écrans officiels précachés : utilisables sans réseau.
 // - Les données ne passent jamais par ce cache : l'API est toujours en réseau seul,
 //   la feuille de match et les clés de licences sont stockées dans IndexedDB.
+// - Seule exception : les logos publics (/api/v1/media/…), fichiers versionnés et immuables,
+//   gardés en cache pour s'afficher aussi hors connexion (billets, cartes, feuille de match).
+//   Les photos de licence (privées, sous /admin/ ou /licences/) restent en réseau seul.
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { CacheFirst, ExpirationPlugin, NetworkFirst, NetworkOnly, Serwist } from "serwist";
 
@@ -25,6 +28,13 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
+    {
+      matcher: ({ url, request }) => request.method === "GET" && url.pathname.startsWith("/api/v1/media/"),
+      handler: new CacheFirst({
+        cacheName: "logos",
+        plugins: [new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 365 * 24 * 3600 })],
+      }),
+    },
     { matcher: ({ url }) => url.pathname.startsWith("/api/"), handler: new NetworkOnly() },
     {
       matcher: ({ request, url }) =>
