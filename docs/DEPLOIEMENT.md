@@ -158,7 +158,7 @@ sécurisé ne fonctionnent qu'en contexte sécurisé.
 ## 4. Sauvegardes
 
 ```bash
-make backup                 # écrit backups/lds-AAAAMMJJ-HHMMSS.dump (30 dernières conservées)
+make backup   # base : backups/lds-AAAAMMJJ-HHMMSS.dump ; fichiers : backups/lds-files-….tar.gz
 ```
 
 À planifier chaque nuit (crontab de l'utilisateur `lds`) et **copier hors du serveur** :
@@ -168,13 +168,15 @@ make backup                 # écrit backups/lds-AAAAMMJJ-HHMMSS.dump (30 derni�
 ```
 
 Pendant les journées de match, une sauvegarde supplémentaire après la dernière rencontre est
-recommandée. Sauvegarder aussi le volume `storage` (fichiers téléversés) et le fichier `.env`
-(dans le coffre-fort, pas avec les sauvegardes de la base).
+recommandée. Les fichiers téléversés (logos, photos de licence) sont archivés à chaque
+sauvegarde avec le stockage sur disque (avec S3, activer la gestion des versions du bucket).
+Le fichier `.env` se garde dans le coffre-fort, pas avec les sauvegardes. Les 30 dernières
+sauvegardes de chaque type sont conservées (`KEEP=…` pour changer).
 
 **Restauration** (remplace la base actuelle, confirmation demandée) :
 
 ```bash
-make restore FILE=backups/lds-20270110-023000.dump
+make restore FILE=backups/lds-20270110-023000.dump   # + lds-files-20270110-023000.tar.gz s'il existe
 ```
 
 Tester une restauration au moins une fois avant le coup d'envoi, sur un serveur de test.
