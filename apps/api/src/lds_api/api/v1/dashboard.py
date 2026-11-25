@@ -41,7 +41,7 @@ class Counts(BaseModel):
 class DashboardOut(BaseModel):
     season: str
     live: list[MatchOut]
-    upcoming: list[MatchOut]  # prochains matchs (7 jours)
+    upcoming: list[MatchOut]  # six prochains matchs programmés
     counts: Counts
 
 
@@ -57,10 +57,9 @@ def dashboard(db: DbSession, actor: Actor = Depends(require(Perm.AUDIT_READ))): 
             in_season,
             Match.status == MatchStatus.SCHEDULED,
             Match.kickoff_at >= now - timedelta(hours=3),
-            Match.kickoff_at <= now + timedelta(days=7),
         )
         .order_by(Match.kickoff_at)
-        .limit(8)
+        .limit(6)
     )
 
     def count(*where) -> int:

@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useState } from "react";
+import { TeamBadge } from "@/components/TeamBadge";
 import { Badge, Button, Field, inputClass, Notice } from "@/components/admin/ui";
 import { RequireAuth } from "@/components/RequireAuth";
 import { ApiError, useAuth } from "@/lib/auth";
@@ -284,7 +285,11 @@ function MatchRow({
     <tr className="border-t border-stone-100">
       <td className="px-3 py-1.5 font-medium">
         {match.bracket_slot && <span className="mr-2 font-mono text-xs text-stone-500">{match.bracket_slot}</span>}
-        {label}
+        <span className="inline-flex items-center gap-1.5">
+          {match.home && <TeamBadge team={match.home} size="sm" />}
+          {label}
+          {match.away && <TeamBadge team={match.away} size="sm" />}
+        </span>
         {match.home_score != null && (
           <span className="ml-2 tabular-nums text-stone-600">
             {match.home_score}–{match.away_score}

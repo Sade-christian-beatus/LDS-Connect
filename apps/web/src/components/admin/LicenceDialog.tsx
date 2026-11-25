@@ -2,6 +2,7 @@
 // Licence d'un membre : carte imprimable (QR signé), délivrance, suspension / révocation.
 import { useBrandLogo } from "@/lib/brand";
 import { BrandLogo } from "@/components/BrandLogo";
+import { TeamBadge } from "@/components/TeamBadge";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { POSITION_LABEL, STAFF_LABEL } from "@/lib/format";
@@ -111,7 +112,8 @@ export function LicenceDialogBody({ member, team, canIssue, canChangeStatus, can
         <p className="text-lg font-bold">
           {member.first_name} {member.last_name}
         </p>
-        <p className="text-sm">
+        <p className="flex items-center justify-center gap-1.5 text-sm">
+          <TeamBadge team={team} size="sm" />
           {team.name} · {member.kind === "player" ? (member.position ? POSITION_LABEL[member.position] : "Joueur") : member.function ? STAFF_LABEL[member.function] : "Encadreur"}
           {member.shirt_number ? ` · n° ${member.shirt_number}` : ""}
         </p>

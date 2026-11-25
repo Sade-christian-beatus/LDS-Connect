@@ -4,10 +4,21 @@ import { initials } from "@/lib/format";
 
 type Props = {
   team: { name: string; primary_color: string; secondary_color: string; logo_url?: string | null };
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "card" | "hero" | "wall";
 };
 
-const SIZES = { sm: "h-7 w-7", md: "h-10 w-10", lg: "h-16 w-16", xl: "h-24 w-24" };
+// « card » et « hero » s'adaptent à l'écran : plus petits sur téléphone, où la place manque
+const SIZES = {
+  sm: "h-7 w-7",
+  md: "h-10 w-10",
+  lg: "h-16 w-16",
+  xl: "h-24 w-24",
+  card: "h-8 w-8 sm:h-10 sm:w-10",
+  hero: "h-16 w-16 sm:h-24 sm:w-24",
+  wall: "h-11 w-11 sm:h-16 sm:w-16",
+};
+// Coins arrondis proportionnés : un écusson garde sa forme, sans être rogné par un cercle
+const TILE = { sm: "rounded-md p-[2px]", md: "rounded-lg p-[3px]", lg: "rounded-xl p-1", xl: "rounded-2xl p-1.5", card: "rounded-lg p-[3px]", hero: "rounded-2xl p-1 sm:p-1.5", wall: "rounded-xl p-[3px] sm:p-1" };
 
 /** Couleur lisible sur le fond donné (texte clair ou foncé). */
 function readable(hex: string, fallback: string) {
@@ -21,7 +32,7 @@ function readable(hex: string, fallback: string) {
 export function TeamBadge({ team, size = "md" }: Props) {
   if (team.logo_url) {
     return (
-      <span aria-hidden className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-sm ring-1 ring-black/10 ${SIZES[size]}`}>
+      <span aria-hidden className={`inline-flex shrink-0 items-center justify-center overflow-hidden bg-white shadow-sm ring-1 ring-black/10 ${TILE[size]} ${SIZES[size]}`}>
         {/* eslint-disable-next-line @next/next/no-img-element -- logo servi par l'API, taille fixe */}
         <img src={team.logo_url} alt="" className="h-full w-full object-contain" loading="lazy" />
       </span>

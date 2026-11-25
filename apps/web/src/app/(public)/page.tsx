@@ -194,6 +194,29 @@ async function HomeContent() {
         </div>
       </div>
 
+      <section aria-label="Les équipes">
+        <SectionTitle href="/equipes" more="Toutes les équipes">
+          Les {teams.length} équipes
+        </SectionTitle>
+        {/* Mur des blasons : un club par région, un lien vers sa page */}
+        <ul className="grid grid-cols-5 gap-2 rounded-2xl border border-line bg-surface p-3 shadow-sm sm:grid-cols-10 sm:gap-3 sm:p-4">
+          {teams.map((t) => (
+            <li key={t.id}>
+              <Link
+                href={`/equipes/${t.slug}`}
+                title={t.name}
+                className="group flex flex-col items-center gap-1 rounded-xl p-1 text-center transition hover:bg-soft"
+              >
+                <span className="transition group-hover:-translate-y-0.5 group-hover:scale-105">
+                  <TeamBadge team={t} size="wall" />
+                </span>
+                <span className="w-full truncate text-[10px] font-semibold text-muted sm:text-[11px]">{t.short_name}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section>
         <SectionTitle>Lieux de la compétition</SectionTitle>
         <ul className="grid gap-3 sm:grid-cols-2">

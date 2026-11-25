@@ -50,7 +50,7 @@ function Overview() {
               <tr key={t.team.id} className="border-t border-stone-100 align-top">
                 <td className="px-3 py-2">
                   <Link href={`/admin/equipes/${t.team.id}`} className="flex items-center gap-2 font-medium hover:underline">
-                    <TeamBadge team={t.team} size="sm" />
+                    <TeamBadge team={t.team} size="md" />
                     {t.team.name}
                   </Link>
                 </td>

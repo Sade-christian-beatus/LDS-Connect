@@ -58,7 +58,7 @@ async function Stats() {
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl p-6 text-white shadow-lg"
           style={{ background: `linear-gradient(120deg, ${leader.team.primary_color}, #0a3a1e 70%)` }}
         >
-          <TeamBadge team={leader.team} size="lg" />
+          <TeamBadge team={leader.team} size="hero" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-lds-gold">Meilleur buteur</p>
             <p className="truncate text-2xl font-black sm:text-3xl">{leader.display_name}</p>

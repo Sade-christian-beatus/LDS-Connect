@@ -7,7 +7,7 @@ import { TeamBadge } from "./TeamBadge";
 function Team({ team }: { team: Match["home"] }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-2 text-center">
-      {team ? <TeamBadge team={team} size="lg" /> : <span className="h-16 w-16 rounded-full bg-white/10" />}
+      {team ? <TeamBadge team={team} size="hero" /> : <span className="h-16 w-16 rounded-2xl bg-white/10 sm:h-24 sm:w-24" />}
       <span className="line-clamp-2 text-sm font-bold leading-tight sm:text-base">{team?.name ?? "À déterminer"}</span>
     </div>
   );

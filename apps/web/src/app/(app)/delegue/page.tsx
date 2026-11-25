@@ -1,5 +1,6 @@
 "use client";
 import { useLiveQuery } from "dexie-react-hooks";
+import { EmptyState } from "@/components/Illustrations";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
@@ -49,7 +50,14 @@ function MatchList() {
           Liste enregistrée sur l&apos;appareil le {new Date(cached.savedAt).toLocaleString("fr-FR")}
         </p>
       )}
-      {matches.length === 0 && <p className="text-stone-600">Aucun match à traiter.</p>}
+      {matches.length === 0 && (
+        <EmptyState title="Aucun match à traiter pour le moment">
+          <p className="text-sm text-muted">
+            Les matchs que la Ligue vous attribue apparaissent ici quelques jours avant le coup d&apos;envoi. Cochez « Toute la
+            saison » pour voir aussi les suivants.
+          </p>
+        </EmptyState>
+      )}
       <ul className="space-y-2">
         {matches.map((m) => (
           <li key={m.id}>

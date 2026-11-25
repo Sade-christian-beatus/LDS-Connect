@@ -114,9 +114,9 @@ function Board() {
       )}
 
       <section className="space-y-2">
-        <h2 className="text-lg font-bold text-pitch">Prochains matchs (7 jours)</h2>
+        <h2 className="text-lg font-bold text-pitch">Prochains matchs</h2>
         {data.upcoming.length === 0 ? (
-          <p className="text-sm text-stone-600">Aucun match programmé dans les 7 prochains jours.</p>
+          <p className="text-sm text-stone-600">Aucun match programmé.</p>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
             {data.upcoming.map((m) => (

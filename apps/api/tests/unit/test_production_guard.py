@@ -67,3 +67,16 @@ def test_api_docs_closed_in_production(monkeypatch: pytest.MonkeyPatch) -> None:
     assert TestClient(app).get("/api/v1/openapi.json").status_code == 404
     monkeypatch.setattr(main, "get_settings", lambda: settings(api_docs_public=True))
     assert TestClient(main.create_app()).get("/api/v1/openapi.json").status_code == 200
+
+
+def test_closed_session_cannot_reopen_a_transaction() -> None:
+    """Requête abandonnée : une session fermée ne doit plus prendre de connexion (fuite)."""
+    import sqlalchemy.exc
+    from sqlalchemy import text
+
+    from lds_api.db.session import SessionLocal
+
+    db = SessionLocal()
+    db.close()
+    with pytest.raises(sqlalchemy.exc.InvalidRequestError):
+        db.execute(text("select 1"))

@@ -79,7 +79,7 @@ export function AppHeader() {
           <Link href={user ? landingFor(user) : "/"} className="flex items-center gap-2 font-black tracking-tight">
             <BrandLogo logoUrl={logo} size="sm" />
             <span className="leading-tight">
-              <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-lds-gold">LDS Connect</span>
+              <span className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-lds-gold sm:block">LDS Connect</span>
               <span className="block">Officiels</span>
             </span>
           </Link>
@@ -108,8 +108,19 @@ export function AppHeader() {
               </Link>
             )}
             {user && (
-              <Link href="/compte" className="whitespace-nowrap underline sm:hidden">
-                Mon compte
+              // Téléphone : initiales seulement, pour laisser la place à l'état de connexion
+              <Link
+                href="/compte"
+                aria-label="Mon compte"
+                title={user.email}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-lds-gold text-xs font-black text-pitch sm:hidden"
+              >
+                {user.full_name
+                  .split(/\s+/)
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
               </Link>
             )}
             {user && (
