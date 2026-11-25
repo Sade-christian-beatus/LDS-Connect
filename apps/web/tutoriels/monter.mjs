@@ -3,6 +3,8 @@
 // saisies enregistrés), sous-titres et narration qui s'affiche au rythme de la voix, barre de
 // diffusion en pied de page — puis capturée et encodée par ffmpeg.
 // Usage : node tutoriels/monter.mjs <dossier_des_prises> <dossier_de_sortie> [id du chapitre…]
+// Avec des identifiants, seuls ces chapitres sont rendus à nouveau ; la version complète est
+// toujours réassemblée à partir des vidéos présentes.
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -115,7 +117,8 @@ for (const [n, ch] of chapters.entries()) {
   const file = path.join(out, `${ch.id}-${slug(ch.titre)}.mp4`);
   const duration = TITLE - 0.6 + take.end + TAIL;
   const frames = Math.round(duration * FPS);
-  if (!only.length || only.includes(ch.id)) {
+  // Chapitre rendu s'il est demandé, ou s'il manque ; sinon la vidéo existante est reprise
+  if (!only.length || only.includes(ch.id) || !fs.existsSync(file)) {
     const started = Date.now();
     const cfg = {
       mode: "chapter",
@@ -144,7 +147,7 @@ for (const [n, ch] of chapters.entries()) {
 }
 fs.writeFileSync(path.join(out, "SCRIPT_VOIX_OFF.md"), script.join("\n"));
 
-if (!only.length) {
+{
   // Ouverture et fermeture de la version complète, puis assemblage sans réencodage
   const parts = [];
   for (const [mode, seconds] of [["intro", 5], ["outro", 4]]) {
