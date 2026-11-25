@@ -71,7 +71,7 @@ def dashboard(db: DbSession, actor: Actor = Depends(require(Perm.AUDIT_READ))): 
         .where(Licence.season_id == season.id)
         .group_by(Licence.status)
     )
-    lic = dict(db.execute(by_status).tuples().all())
+    lic = {row[0]: row[1] for row in db.execute(by_status)}
     season_matches = select(Match.id).where(in_season)
     season_types = select(TicketType.id).where(TicketType.match_id.in_(season_matches))
     in_season_orders = Order.ticket_type_id.in_(season_types)

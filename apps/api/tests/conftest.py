@@ -1,8 +1,13 @@
 """Configuration commune des tests : clés éphémères, jamais de secret réel."""
 
 import os
+import warnings
 
-from lds_api.cli import generate_keys
+# Annonce du passage de TestClient à « httpx2 », émise à l'import (avant les filtres de
+# pyproject) : sans effet sur les tests.
+warnings.filterwarnings("ignore", message="Using `httpx` with `starlette.testclient`")
+
+from lds_api.cli import generate_keys  # noqa: E402
 
 # Les clés sont générées avant tout import de la configuration de l'application.
 for _k, _v in generate_keys().items():
