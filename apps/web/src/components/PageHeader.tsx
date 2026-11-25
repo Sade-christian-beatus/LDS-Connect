@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 /** En-tête des pages du site public : petit surtitre, grand titre, accroche. */
-export function PageHeader({ kicker, title, children }: { kicker?: string; title: string; children?: React.ReactNode }) {
+export function PageHeader({ kicker, title, children }: { kicker?: React.ReactNode; title: string; children?: React.ReactNode }) {
   return (
     <header className="space-y-1">
       {kicker && <p className="text-xs font-bold uppercase tracking-[0.2em] text-lds-red">{kicker}</p>}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LEGAL_LINKS } from "@/components/LegalPage";
+import { LeagueFacts } from "@/components/SeasonFacts";
 import { Suspense } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { BottomTabs, TopNav } from "@/components/PublicNav";
@@ -82,8 +83,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <p className="font-black text-white">Ligue de la Souveraineté</p>
             </div>
             <p className="text-xs leading-relaxed">
-              20 équipes des 17 régions du Burkina Faso. Données des joueurs limitées (nom d&apos;usage, poste, âge) : la
-              compétition compte des joueurs mineurs.
+              <LeagueFacts /> du Burkina Faso. Données des joueurs limitées (nom d&apos;usage, poste, âge) : la compétition
+              compte des joueurs mineurs.
             </p>
           </div>
           <ul className="grid grid-cols-2 gap-1">

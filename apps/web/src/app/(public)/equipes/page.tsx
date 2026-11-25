@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
+import { LeagueFacts, SeasonName } from "@/components/SeasonFacts";
 import { TeamBadge } from "@/components/TeamBadge";
 import { apiGet } from "@/lib/server-api";
 import type { PublicTeam } from "@/lib/types";
@@ -11,8 +12,8 @@ export const metadata: Metadata = { title: "Équipes" };
 export default function EquipesPage() {
   return (
     <>
-      <PageHeader kicker="17 régions" title="Les 20 équipes">
-        Une équipe par région, trois pour le Kadiogo et deux pour le Guiriko.
+      <PageHeader kicker={<SeasonName />} title="Les équipes">
+        <LeagueFacts />.
       </PageHeader>
       <Suspense fallback={<p className="text-subtle">Chargement des équipes…</p>}>
         <Teams />

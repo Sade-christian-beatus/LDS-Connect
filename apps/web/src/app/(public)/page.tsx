@@ -1,4 +1,5 @@
 import { Stadium } from "@/components/Illustrations";
+import { leagueFacts } from "@/components/SeasonFacts";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Countdown } from "@/components/Countdown";
@@ -10,7 +11,7 @@ import { StandingsTable } from "@/components/StandingsTable";
 import { TeamBadge } from "@/components/TeamBadge";
 import { BALLOT_KIND_LABEL, formatDate, formatFcfa, formatTime } from "@/lib/format";
 import { apiGet } from "@/lib/server-api";
-import type { BallotOut, Match, MatchTickets, PoolStandings, Season, SeasonStats, Venue } from "@/lib/types";
+import type { BallotOut, Match, MatchTickets, PoolStandings, PublicTeam, Season, SeasonStats, Venue } from "@/lib/types";
 
 export default function Accueil() {
   return (
@@ -43,7 +44,7 @@ function SectionTitle({ children, href, more }: { children: React.ReactNode; hre
 const optional = <T,>(p: Promise<T>, fallback: T) => p.catch(() => fallback);
 
 async function HomeContent() {
-  const [season, matches, standings, stats, venues, onSale, ballots] = await Promise.all([
+  const [season, matches, standings, stats, venues, onSale, ballots, teams] = await Promise.all([
     apiGet<Season>("/seasons/current"),
     apiGet<Match[]>("/matches"),
     apiGet<PoolStandings[]>("/standings"),
@@ -51,6 +52,7 @@ async function HomeContent() {
     apiGet<Venue[]>("/venues"),
     optional(apiGet<MatchTickets[]>("/tickets/matches"), []),
     optional(apiGet<BallotOut[]>("/ballots"), []),
+    apiGet<PublicTeam[]>("/teams"),
   ]);
   const upcoming = matches.filter((m) => m.status === "scheduled" && m.home && m.kickoff_at);
   const next = upcoming[0];
@@ -85,7 +87,7 @@ async function HomeContent() {
           <p className="text-sm font-semibold uppercase tracking-widest text-lds-gold">{season.name}</p>
           <h1 className="mt-1 text-3xl font-black sm:text-4xl">Ligue de la Souveraineté</h1>
           <p className="mt-2 max-w-2xl text-green-50">
-            20 équipes issues des 17 régions, deux poules : poule A à Ouagadougou, poule B à Bobo-Dioulasso.
+            {leagueFacts(teams, season)}
           </p>
         </section>
       )}

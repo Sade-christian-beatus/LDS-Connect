@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SeasonName } from "@/components/SeasonFacts";
 import { Suspense } from "react";
 import { MatchCard } from "@/components/MatchCard";
 import { PageHeader, Pills } from "@/components/PageHeader";
@@ -11,7 +12,7 @@ export const metadata: Metadata = { title: "Calendrier" };
 export default function CalendrierPage({ searchParams }: PageProps<"/calendrier">) {
   return (
     <>
-      <PageHeader kicker="Saison 2027" title="Calendrier">
+      <PageHeader kicker={<SeasonName />} title="Calendrier">
         9 journées par poule, puis les phases finales. Horaires à l&apos;heure de Ouagadougou (GMT).
       </PageHeader>
       <Suspense fallback={<p className="text-subtle">Chargement du calendrier…</p>}>
