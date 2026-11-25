@@ -55,3 +55,15 @@ def test_console_sms_refused_in_production(monkeypatch: pytest.MonkeyPatch) -> N
     monkeypatch.setattr("lds_api.providers.sms.get_settings", lambda: settings())
     with pytest.raises(SmsUnavailable):
         ConsoleSmsProvider().send("+22670000000", "code 123456")
+
+
+def test_api_docs_closed_in_production(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastapi.testclient import TestClient
+
+    from lds_api import main
+
+    monkeypatch.setattr(main, "get_settings", lambda: settings())
+    app = main.create_app()
+    assert TestClient(app).get("/api/v1/openapi.json").status_code == 404
+    monkeypatch.setattr(main, "get_settings", lambda: settings(api_docs_public=True))
+    assert TestClient(main.create_app()).get("/api/v1/openapi.json").status_code == 200

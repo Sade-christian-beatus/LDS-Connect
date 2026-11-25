@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # Proxys de confiance (reverse proxy, réseau Docker) : seuls eux peuvent indiquer
     # l'adresse réelle du visiteur par X-Forwarded-For. Adresses ou réseaux, séparés par
     # des virgules. Sans cela, derrière un proxy, tous les visiteurs auraient la même IP.
+    # Documentation interactive de l'API (/api/v1/docs) : ouverte en développement, fermée en
+    # production sauf API_DOCS_PUBLIC=true (elle décrit toutes les routes d'administration)
+    api_docs_public: bool | None = None
     trusted_proxies: str = "127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
     # Base de données et cache
