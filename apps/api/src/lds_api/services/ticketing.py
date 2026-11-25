@@ -492,18 +492,29 @@ def admin_orders(
     types = {t.id: t for t in _types(db, match_id, active_only=False)}
     if not types:
         return []
-    orders = db.scalars(
-        select(Order)
-        .where(Order.ticket_type_id.in_(types))
-        .order_by(Order.created_at.desc())
-        .limit(500)
-    )
+    orders = [
+        o
+        for o in db.scalars(
+            select(Order)
+            .where(Order.ticket_type_id.in_(types))
+            .order_by(Order.created_at.desc())
+            .limit(500)
+        )
+        if not state or _state(o, at) == state
+    ]
+    # Codes des billets en une seule requête (et non une par commande)
+    codes: dict[uuid.UUID, list[str]] = {o.id: [] for o in orders}
+    if orders:
+        rows = db.execute(
+            select(Ticket.order_id, Ticket.code)
+            .where(Ticket.order_id.in_(list(codes)))
+            .order_by(Ticket.code)
+        )
+        for order_id, code in rows:
+            codes[order_id].append(code)
     out = []
     for o in orders:
         st = _state(o, at)
-        if state and st != state:
-            continue
-        codes = db.scalars(select(Ticket.code).where(Ticket.order_id == o.id).order_by(Ticket.code))
         out.append(
             ts.OrderAdminOut(
                 reference=o.reference,
@@ -516,7 +527,7 @@ def admin_orders(
                 created_at=o.created_at,
                 paid_at=o.paid_at,
                 provider=o.provider,
-                tickets=list(codes),
+                tickets=codes[o.id],
             )
         )
     return out
