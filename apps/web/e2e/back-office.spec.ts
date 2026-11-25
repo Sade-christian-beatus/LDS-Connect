@@ -18,6 +18,10 @@ const PNG_1PX = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkaPh
 
 test("l'administration gère un effectif, une licence et le calendrier", async ({ page }) => {
   await login(page, "admin@lds.local");
+  // Arrivée sur le tableau de bord, puis le registre
+  await expect(page.getByRole("heading", { name: "Tableau de bord" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "À traiter" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Espace officiels" }).getByRole("link", { name: "Registre" }).click();
   await expect(page.getByRole("heading", { name: "Registre des équipes" })).toBeVisible();
   await page.getByRole("link", { name: "Nanga du Kadiogo" }).click();
   await expect(page.getByRole("heading", { name: "Nanga du Kadiogo" })).toBeVisible();

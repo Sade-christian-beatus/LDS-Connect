@@ -1931,6 +1931,23 @@ export interface paths {
         patch: operations["update_venue_api_v1_admin_venues__venue_id__patch"];
         trace?: never;
     };
+    "/api/v1/admin/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dashboard */
+        get: operations["dashboard_api_v1_admin_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -2296,6 +2313,31 @@ export interface components {
             /** Phone Hint */
             phone_hint: string;
         };
+        /** Counts */
+        Counts: {
+            /** Licences Active */
+            licences_active: number;
+            /** Licences Blocked */
+            licences_blocked: number;
+            /** Sheets To Validate */
+            sheets_to_validate: number;
+            /** Matches Played */
+            matches_played: number;
+            /** Matches Total */
+            matches_total: number;
+            /** Tickets Sold */
+            tickets_sold: number;
+            /** Revenue Fcfa */
+            revenue_fcfa: number;
+            /** Refunds Due */
+            refunds_due: number;
+            /** Ballots Open */
+            ballots_open: number;
+            /** Votes Valid */
+            votes_valid: number;
+            /** Votes Flagged */
+            votes_flagged: number;
+        };
         /**
          * CredentialsOut
          * @description Mot de passe provisoire : affiché une seule fois, jamais stocké en clair.
@@ -2315,6 +2357,16 @@ export interface components {
             match_duration_minutes: number;
             /** Rows */
             rows: components["schemas"]["DashboardRow"][];
+        };
+        /** DashboardOut */
+        DashboardOut: {
+            /** Season */
+            season: string;
+            /** Live */
+            live: components["schemas"]["MatchOut"][];
+            /** Upcoming */
+            upcoming: components["schemas"]["MatchOut"][];
+            counts: components["schemas"]["Counts"];
         };
         /** DashboardRow */
         DashboardRow: {
@@ -7941,6 +7993,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dashboard_api_v1_admin_dashboard_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardOut"];
                 };
             };
         };

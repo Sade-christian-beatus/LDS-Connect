@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from lds_api.api.v1 import (
     auth,
+    dashboard,
     fixtures,
     licences,
     live,
@@ -62,6 +63,7 @@ def create_app() -> FastAPI:
         talents,
         media,
         seasons,
+        dashboard,
     )
     for module in modules:
         v1.include_router(module.router)

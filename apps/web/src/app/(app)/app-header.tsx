@@ -16,6 +16,7 @@ const GROUPS = ["Compétition", "Au stade", "Public", "Administration"];
 export function menuFor(user: User): Item[] {
   const p = new Set(user.permissions);
   const items: Item[] = [];
+  if (p.has("audit:read")) items.push({ href: "/admin/tableau-de-bord", label: "Tableau de bord", group: "Compétition" });
   if (p.has("squad:read")) {
     items.push({
       href: user.team_id && !p.has("team:manage") ? `/admin/equipes/${user.team_id}` : "/admin/equipes",
@@ -42,6 +43,7 @@ export function menuFor(user: User): Item[] {
 export function landingFor(user: User): string {
   if (user.must_change_password || user.mfa_setup_required) return "/compte";
   const p = new Set(user.permissions);
+  if (p.has("audit:read")) return "/admin/tableau-de-bord";
   if (p.has("team:manage")) return "/admin/equipes";
   if (p.has("squad:write") && user.team_id) return `/admin/equipes/${user.team_id}`;
   if (p.has("sheet:edit")) return "/delegue";

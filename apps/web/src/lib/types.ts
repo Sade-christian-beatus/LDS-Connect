@@ -77,3 +77,4 @@ export type TalentNote = S["NoteOut"];
 export type RulesAdmin = S["RulesAdminOut"];
 export type RulesUpdate = S["RulesUpdate"];
 export type SeasonAdmin = S["SeasonAdminOut"];
+export type Dashboard = S["DashboardOut"];
