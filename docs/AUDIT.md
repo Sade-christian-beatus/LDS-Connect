@@ -15,7 +15,25 @@
 | H3 | Notifications de paiement | **Corrigé** : signature HMAC-SHA256 du corps brut vérifiée (`PAYMENT_WEBHOOK_SECRET`), 401 sinon |
 | H4 | Garde-fous de production | **Corrigé** : l'API refuse de démarrer avec une configuration de développement ; SMS `console` muet en production |
 | H5 | Licence sans photo | **Corrigé** : photo privée (autorisation parentale exigée pour un mineur), sur la carte et à l'écran du contrôleur |
-| M1 à M11, B1 à B8 | — | à traiter |
+| M1 | Règles non modifiables | **Corrigé** : écran « Saison et règles », motif journalisé, règles de classement figées dès le premier match |
+| M2 | Gestion des saisons | **Corrigé** : préparation de la saison suivante (copie des règles, poules, équipes), bascule de la saison courante |
+| M3 | Stades non modifiables | **Corrigé** : modification depuis le calendrier |
+| M4 | Sauvegarde incomplète | **Corrigé** : fichiers téléversés archivés et restaurés avec la base |
+| M5 | Purge automatique | **Corrigé** : `make purge`, durées `RETENTION_*` (à confirmer par la Ligue), passage journalisé |
+| M6 | Logos hors connexion | **Corrigé** : logos publics en cache « d'abord le cache » dans le service worker |
+| M7 | Exemple Caddy | **Corrigé** : proxy sur l'hôte vers `127.0.0.1`, cohérent avec le guide |
+| M8 | Meilleur buteur ex aequo | **Corrigé** : tous les joueurs en tête sont présentés |
+| M9 | Double authentification | **Corrigé** : TOTP, obligatoire en production pour l'administration |
+| M10 | Zones des accréditations | **Corrigé** : chaque appareil garde une zone, refus hors zone (aussi hors connexion) |
+| M11 | Requêtes en boucle | **Corrigé** : billets des commandes en une requête |
+| B1 | Libellés codés en dur | **Corrigé** : nom de saison, nombre d'équipes et de régions lus depuis l'API |
+| B2 | README | **Corrigé** |
+| B3 | Documentation de l'API publique | **Corrigé** : fermée en production (sauf `API_DOCS_PUBLIC=true`) |
+| B4 | « En ligne » en double | **Corrigé** |
+| B5 | Accueil de l'administration | **Corrigé** : tableau de bord (à traiter, chiffres clés, matchs) |
+| B6 | Avertissements | **Corrigé** pour les tests ; l'avertissement de `next start` en local reste attendu (`node server.js` en production) |
+| B7 | Remboursements sans suivi | **Corrigé** : montant à rembourser affiché, remboursement consigné (statut, motif, référence) |
+| B8 | Statut « expirée » non stocké | **Corrigé** : colonne `effective_status` dans les exports |
 
 ## Synthèse
 
