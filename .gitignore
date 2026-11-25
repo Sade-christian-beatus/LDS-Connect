@@ -32,3 +32,6 @@ dump.rdb
 # Service worker généré au build
 apps/web/public/sw.js
 apps/web/public/sw.js.map
+
+# Tutoriels vidéo (prises et montages régénérables)
+/var/
