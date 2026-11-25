@@ -107,8 +107,11 @@ accède.
 Un exemple Caddy (certificats Let's Encrypt automatiques) est fourni :
 `infra/caddy/Caddyfile.example`. Routage attendu :
 
-- `/api/*` → `api:8000`, **sans mise en tampon** (flux temps réel SSE) ;
-- tout le reste → `web:3000`.
+- `/api/*` → `127.0.0.1:8000`, **sans mise en tampon** (flux temps réel SSE) ;
+- tout le reste → `127.0.0.1:3000`.
+
+Le proxy tourne sur le serveur (hors Docker) : `sudo apt install caddy`, copier l'exemple dans
+`/etc/caddy/Caddyfile` en remplaçant le nom de domaine, puis `sudo systemctl reload caddy`.
 
 Avec Nginx, l'équivalent pour le flux en direct :
 
