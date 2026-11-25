@@ -173,9 +173,12 @@ function Acces() {
     <div className="mx-auto max-w-3xl space-y-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h1 className="text-xl font-black tracking-tight text-pitch">Contrôle des entrées</h1>
-        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${online ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-900"}`}>
-          {online ? "En ligne" : "Hors ligne — les passages sont gardés sur l'appareil"}
-        </span>
+        {/* L'état « En ligne » est déjà dans l'en-tête : ici, seulement l'explication hors ligne */}
+        {!online && (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">
+            Hors ligne — les passages sont gardés sur l&apos;appareil
+          </span>
+        )}
       </div>
 
       <section className="grid gap-3 rounded-lg border border-stone-200 bg-white p-3 sm:grid-cols-[1fr_10rem_13rem_auto] sm:items-end">
