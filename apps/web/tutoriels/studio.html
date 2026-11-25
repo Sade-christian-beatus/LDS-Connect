@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- Studio de montage des tutoriels : chaque image de la vidéo est composée ici puis capturée
+     (tutoriels/monter.mjs). Tout dépend du temps t passé à render(t) : rien d'aléatoire. -->
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  :root { --night: #03110a; --pitch: #0a3a1e; --green: #1f7a3a; --gold: #f5c518; --red: #c8102e; --ink: #f4f8f5; --soft: #b9d3c1; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--night); font-family: Inter, system-ui, sans-serif; color: var(--ink); }
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+
+  /* Fond : nuit sur le terrain, halos aux couleurs nationales qui dérivent lentement */
+  .bg { position: absolute; inset: 0; background: radial-gradient(130% 100% at 70% 0%, #0f4d27 0%, #072a15 45%, var(--night) 100%); }
+  .halo { position: absolute; width: 1100px; height: 1100px; border-radius: 50%; opacity: .55; }
+  .halo.r { background: radial-gradient(closest-side, rgba(200,16,46,.55), rgba(200,16,46,0)); }
+  .halo.g { background: radial-gradient(closest-side, rgba(245,197,24,.40), rgba(245,197,24,0)); }
+  .halo.v { background: radial-gradient(closest-side, rgba(46,160,90,.55), rgba(46,160,90,0)); }
+  .stripes { position: absolute; inset: -200px; background: repeating-linear-gradient(115deg, rgba(255,255,255,.035) 0 2px, transparent 2px 46px); }
+  .pitch { position: absolute; inset: 0; opacity: .06; }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%); }
+  .star { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.5); }
+
+  /* En-tête */
+  .brand { position: absolute; left: 56px; top: 28px; display: flex; align-items: center; gap: 14px; }
+  .brand img { height: 52px; border-radius: 12px; background: #fff; padding: 3px; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+  .brand b { display: block; font-size: 13px; letter-spacing: .3em; color: var(--gold); }
+  .brand i { display: block; font-style: normal; font-size: 21px; font-weight: 800; }
+
+  /* Appareils */
+  .browser { position: absolute; border-radius: 16px; overflow: hidden; background: #e9ebe8; box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08); }
+  .chrome { height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: linear-gradient(#f3f4f1, #e4e6e2); }
+  .chrome span.dot { width: 12px; height: 12px; border-radius: 50%; }
+  .url { margin-left: 16px; height: 22px; flex: 0 0 460px; border-radius: 11px; background: #fff; color: #4b5563; font-size: 13px; line-height: 22px; padding-left: 12px; }
+  .url::before { content: "🔒 "; font-size: 11px; }
+  .phone { position: absolute; border-radius: 64px; background: linear-gradient(145deg, #1d2421, #050807); padding: 16px; box-shadow: 0 50px 100px rgba(0,0,0,.65), inset 0 0 0 2px #39433e, inset 0 0 0 5px #0b100d; }
+  .phone .island { position: absolute; left: 50%; top: 26px; width: 118px; height: 32px; margin-left: -59px; border-radius: 16px; background: #000; z-index: 3; }
+  .phone .btn { position: absolute; width: 5px; border-radius: 3px; background: #2a322e; }
+  .screen { position: relative; overflow: hidden; background: #fff; }
+  .phone .screen { border-radius: 48px; }
+  .screen img { position: absolute; left: 0; top: 0; transform-origin: 0 0; image-rendering: auto; }
+  .glare { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.10), rgba(255,255,255,0) 35%); }
+
+  /* Colonne de texte */
+  .side { position: absolute; }
+  .kicker { font-size: 17px; font-weight: 700; letter-spacing: .26em; color: var(--gold); text-transform: uppercase; }
+  .title { margin-top: 10px; font-weight: 900; line-height: 1.04; letter-spacing: -.01em; }
+  .aud { margin-top: 14px; display: inline-flex; gap: 8px; align-items: center; font-size: 19px; color: var(--soft); }
+  .aud em { font-style: normal; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); }
+  .card { position: absolute; border-radius: 22px; padding: 26px 28px 28px; background: linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.16); box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  .card .step { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; letter-spacing: .18em; color: var(--night); background: var(--gold); padding: 5px 12px 5px 8px; border-radius: 999px; }
+  .card .step span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--night); color: var(--gold); letter-spacing: 0; }
+  .card h2 { margin-top: 18px; font-weight: 900; line-height: 1.1; }
+  .card p { margin-top: 16px; line-height: 1.45; color: #dbe9df; }
+  .card p .w { opacity: .18; transition: none; }
+  .card p .w.on { opacity: 1; }
+
+  /* Pied de page : barre de diffusion */
+  .footer { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: linear-gradient(180deg, rgba(3,17,10,.0), rgba(3,17,10,.92) 30%); }
+  .footer .bar { position: absolute; left: 40px; right: 40px; bottom: 18px; height: 52px; display: flex; align-items: center; gap: 18px; padding: 0 18px; border-radius: 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); }
+  .footer .mini { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; white-space: nowrap; }
+  .footer .mini img { height: 30px; border-radius: 7px; background: #fff; padding: 2px; }
+  .footer .mini small { font-weight: 500; color: var(--soft); }
+  .steps { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .chip { height: 30px; min-width: 30px; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px; border-radius: 15px; font-size: 13px; font-weight: 700; color: var(--soft); background: rgba(255,255,255,.07); white-space: nowrap; overflow: hidden; }
+  .chip.done { color: #0b3a1d; background: #8fd6a7; }
+  .chip.now { color: var(--night); background: var(--gold); }
+  .chip.now i { font-style: normal; font-weight: 800; }
+  .count { font-size: 14px; font-weight: 700; color: var(--soft); white-space: nowrap; }
+  .progress { position: absolute; left: 0; bottom: 0; height: 4px; display: flex; width: 100%; }
+  .progress span { flex: 1; }
+  .fill { position: absolute; left: 0; bottom: 0; height: 4px; background: #fff; mix-blend-mode: overlay; }
+
+  /* Cartons */
+  .cover { position: absolute; inset: 0; overflow: hidden; }
+  .cover .num { position: absolute; font-weight: 900; color: transparent; -webkit-text-stroke: 3px rgba(245,197,24,.55); line-height: .8; }
+  .band { position: absolute; height: 2400px; width: 180px; top: -600px; transform: rotate(18deg); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="bg"></div>
+  <div class="halo r" id="h1"></div><div class="halo g" id="h2"></div><div class="halo v" id="h3"></div>
+  <div class="stripes" id="stripes"></div>
+  <svg class="pitch" viewBox="0 0 1920 1080" preserveAspectRatio="none"><g fill="none" stroke="#fff" stroke-width="3"><rect x="60" y="60" width="1800" height="960" rx="6"/><line x1="960" y1="60" x2="960" y2="1020"/><circle cx="960" cy="540" r="160"/><rect x="60" y="300" width="250" height="480"/><rect x="1610" y="300" width="250" height="480"/></g></svg>
+  <div id="stars"></div>
+  <div class="vignette"></div>
+
+  <div class="brand" id="brand"><img id="logo1" alt=""><div><b>LDS CONNECT</b><i>Guide de la plateforme</i></div></div>
+
+  <div id="device"></div>
+  <div class="side" id="side">
+    <p class="kicker" id="kicker"></p>
+    <p class="title" id="title"></p>
+    <p class="aud" id="aud"></p>
+  </div>
+  <div class="card" id="card"><span class="step" id="step"><span id="stepn">1</span><b id="stepl">ÉTAPE</b></span><h2 id="cap"></h2><p id="voice"></p></div>
+
+  <div class="footer" id="footer"><div class="bar"><div class="mini"><img id="logo2" alt=""><span>LDS Connect <small id="fchap"></small></span></div><div class="steps" id="steps"></div><div class="count" id="count"></div></div>
+    <div class="progress"><span style="background:#c8102e"></span><span style="background:#f5c518"></span><span style="background:#1f7a3a"></span></div><div class="fill" id="fill"></div></div>
+
+  <div class="cover hidden" id="cover"></div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = (x) => { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+const easeIO = (x) => { x = clamp(x, 0, 1); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+let C = null, img = null, current = '';
+
+// Étoiles fixes (positions calculées, pas de hasard) pour la profondeur du fond
+(() => { let s = ''; for (let i = 0; i < 46; i++) { const x = (i * 397) % 1920, y = (i * 251 + 90) % 980, o = .15 + ((i * 37) % 50) / 100; s += `<span class="star" style="left:${x}px;top:${y}px;opacity:${o};transform:scale(${.5 + (i % 4) * .35})"></span>`; } $('stars').innerHTML = s; })();
+
+function background(t) {
+  $('h1').style.transform = `translate(${-300 + 180 * Math.sin(t / 7)}px, ${520 + 120 * Math.cos(t / 9)}px)`;
+  $('h2').style.transform = `translate(${700 + 220 * Math.cos(t / 8)}px, ${-520 + 140 * Math.sin(t / 6)}px)`;
+  $('h3').style.transform = `translate(${1250 + 160 * Math.sin(t / 10)}px, ${300 + 160 * Math.cos(t / 7)}px)`;
+  $('stripes').style.transform = `translateX(${(t * 14) % 46}px)`;
+}
+
+window.setup = (cfg) => {
+  C = cfg;
+  for (const id of ['logo1', 'logo2']) { if (cfg.logo) $(id).src = cfg.logo; else $(id).style.display = 'none'; }
+  const L = cfg.layout;
+  const dev = $('device');
+  // La marque est dans le pied de page et le carton : pas d'en-tête qui chevaucherait l'appareil
+  $('brand').classList.add('hidden');
+  if (cfg.mode !== 'chapter') { dev.innerHTML = ''; for (const id of ['side', 'card', 'footer']) $(id).classList.add('hidden'); return; }
+  if (cfg.mobile) {
+    dev.innerHTML = `<div class="phone" id="frame" style="left:${L.x - 16}px;top:${L.y - 16}px"><div class="island"></div><span class="btn" style="left:-4px;top:190px;height:70px"></span><span class="btn" style="left:-4px;top:280px;height:70px"></span><span class="btn" style="right:-4px;top:230px;height:110px"></span><div class="screen" id="screen" style="width:${L.w}px;height:${L.h}px"><img id="shot"><div class="glare"></div></div></div>`;
+  } else {
+    dev.innerHTML = `<div class="browser" id="frame" style="left:${L.x}px;top:${L.y - 36}px;width:${L.w}px"><div class="chrome"><span class="dot" style="background:#ec6a5e"></span><span class="dot" style="background:#f4bf4f"></span><span class="dot" style="background:#61c554"></span><span class="url">${cfg.url}</span></div><div class="screen" id="screen" style="width:${L.w}px;height:${L.h}px"><img id="shot"></div></div>`;
+  }
+  img = $('shot'); current = '';
+  const side = $('side'); side.style.left = L.panel.x + 'px'; side.style.top = (cfg.mobile ? 120 : 112) + 'px'; side.style.width = L.panel.w + 'px';
+  $('kicker').textContent = `Chapitre ${cfg.n} / ${cfg.total}`;
+  $('title').textContent = cfg.titre; $('title').style.fontSize = (cfg.mobile ? 64 : 46) + 'px';
+  $('aud').innerHTML = cfg.public.split(' · ').map((p) => `<em>${p}</em>`).join('');
+  const card = $('card'); card.style.left = L.panel.x + 'px'; card.style.width = L.panel.w + 'px'; card.style.top = (cfg.mobile ? 360 : 330) + 'px';
+  $('cap').style.fontSize = (cfg.mobile ? 50 : 36) + 'px'; $('voice').style.fontSize = (cfg.mobile ? 24 : 20) + 'px';
+  $('fchap').textContent = `· ${cfg.titre}`;
+  $('count').textContent = `Chapitre ${cfg.n} / ${cfg.total}`;
+};
+
+function cover(t) {
+  // Carton d'ouverture du chapitre : numéro en relief, titre qui monte, bandes tricolores
+  const c = $('cover'); const p = t / C.titleDur; const out = easeIO((t - (C.titleDur - .6)) / .6);
+  const num = String(C.n).padStart(2, '0');
+  c.classList.remove('hidden');
+  c.style.clipPath = out > 0 ? `inset(0 0 0 ${out * 100}%)` : 'none';
+  c.innerHTML = `<div class="bg"></div>
+    <div class="band" style="left:${-300 + ease(p * 2.2) * 1500}px;background:linear-gradient(#c8102e,#c8102e)"></div>
+    <div class="band" style="left:${-480 + ease(p * 2.2 - .08) * 1500}px;background:#f5c518"></div>
+    <div class="band" style="left:${-660 + ease(p * 2.2 - .16) * 1500}px;background:#1f7a3a"></div>
+    <div style="position:absolute;inset:0;background:radial-gradient(120% 100% at 30% 40%, rgba(3,17,10,.35), rgba(3,17,10,.92))"></div>
+    <div class="num" style="right:120px;bottom:40px;font-size:520px;opacity:${ease(p * 3)};transform:translateY(${(1 - ease(p * 2)) * 60}px)">${num}</div>
+    <div style="position:absolute;left:150px;top:300px;width:1300px">
+      <p class="kicker" style="font-size:24px;opacity:${ease(p * 4 - .3)}">Chapitre ${C.n} / ${C.total} · LDS Connect</p>
+      <p style="margin-top:22px;font-size:118px;font-weight:900;line-height:1;transform:translateY(${(1 - ease(p * 3 - .2)) * 60}px);opacity:${ease(p * 3 - .2)}">${C.titre}</p>
+      <p class="aud" style="font-size:28px;margin-top:30px;opacity:${ease(p * 3 - .5)}">${C.public.split(' · ').map((x) => `<em>${x}</em>`).join('')}</p>
+    </div>
+    ${C.logo ? `<img src="${C.logo}" style="position:absolute;left:150px;top:130px;height:110px;border-radius:24px;background:#fff;padding:6px;opacity:${ease(p * 4)};transform:scale(${.8 + .2 * ease(p * 3)})">` : ''}`;
+}
+
+function bookend(t) {
+  const c = $('cover'); c.classList.remove('hidden'); c.style.clipPath = 'none';
+  const p = t / C.duration, intro = C.mode === 'intro';
+  const fadeOut = 1 - easeIO((t - (C.duration - .7)) / .7);
+  const chips = intro ? C.chapters.map((ch, i) => `<em style="opacity:${ease((t - 1.2 - i * .18) / .4)};transform:translateY(${(1 - ease((t - 1.2 - i * .18) / .4)) * 20}px)">${i + 1}. ${ch}</em>`).join('') : '';
+  c.innerHTML = `<div style="position:absolute;inset:0;opacity:${fadeOut}">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+      ${C.logo ? `<img src="${C.logo}" style="height:200px;border-radius:40px;background:#fff;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.5);transform:scale(${.6 + .4 * ease(p * 4)}) rotate(${(1 - ease(p * 3)) * -8}deg);opacity:${ease(p * 5)}">` : ''}
+      <p class="kicker" style="margin-top:44px;font-size:26px;opacity:${ease(p * 4 - .4)}">LDS Connect · Ligue de la Souveraineté</p>
+      <p style="margin-top:14px;font-size:96px;font-weight:900;opacity:${ease(p * 3 - .3)};transform:translateY(${(1 - ease(p * 3 - .3)) * 40}px)">${intro ? 'Guide de la plateforme' : 'Merci de votre attention'}</p>
+      <p class="aud" style="font-size:24px;margin-top:26px;flex-wrap:wrap;justify-content:center;max-width:1500px;gap:12px">${intro ? chips : '<em>Saison 2026-2027</em><em>Sur téléphone et ordinateur</em>'}</p>
+    </div></div>
+    <div class="progress" style="height:8px"><span style="background:#c8102e"></span><span style="background:#f5c518"></span><span style="background:#1f7a3a"></span></div>`;
+}
+
+function footer(tc) {
+  const caps = C.captions; let k = -1;
+  for (let i = 0; i < caps.length; i++) if (caps[i].t <= tc) k = i;
+  $('steps').innerHTML = caps.map((c, i) => i === k ? `<span class="chip now"><i>${i + 1}</i>${c.caption}</span>` : `<span class="chip ${i < k ? 'done' : ''}">${i < k ? '✓' : i + 1}</span>`).join('');
+  $('fill').style.width = `${clamp(tc / C.end, 0, 1) * 100}%`;
+  return k;
+}
+
+function caption(tc, k) {
+  const card = $('card');
+  if (k < 0) { card.style.opacity = 0; return; }
+  const c = C.captions[k], age = tc - c.t;
+  const a = ease(age / .5);
+  card.style.opacity = a; card.style.transform = `translateX(${(1 - a) * 60}px)`;
+  $('stepn').textContent = k + 1; $('stepl').textContent = `ÉTAPE ${k + 1} / ${C.captions.length}`;
+  $('cap').textContent = c.caption;
+  const words = c.voice.split(/\s+/); const shown = Math.floor(age * 2.6) + 1;
+  $('voice').innerHTML = words.map((w, i) => `<span class="w${i < shown ? ' on' : ''}">${w}</span>`).join(' ');
+}
+
+function camera(i) {
+  const L = C.layout, cam = C.cam[Math.min(i, C.cam.length - 1)];
+  const z = cam[0], cx = cam[1], cy = cam[2];
+  const W = L.w, H = L.h;
+  img.style.width = W + 'px'; img.style.height = H + 'px';
+  img.style.transform = `translate(${W / 2 - cx * W * z}px, ${H / 2 - cy * H * z}px) scale(${z})`;
+  if (C.mobile) {
+    // Téléphone : léger mouvement de flottement, plus marqué au zoom
+    const f = $('frame'); f.style.transform = `perspective(1800px) rotateY(${-7 + 2 * Math.sin(i / C.fps / 3)}deg) rotateX(${1.5 * Math.cos(i / C.fps / 4)}deg) translateY(${4 * Math.sin(i / C.fps / 2)}px)`;
+  }
+}
+
+function frameAt(tc) {
+  const fr = C.frames; let lo = 0, hi = fr.length - 1;
+  if (tc <= fr[0].t) return fr[0].file;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (fr[m].t <= tc) lo = m; else hi = m - 1; }
+  return fr[lo].file;
+}
+
+window.render = async (i) => {
+  const t = i / C.fps;
+  background(t);
+  if (C.mode !== 'chapter') { bookend(t); return; }
+  const tc = t - C.titleDur + .6; // la prise commence pendant le fondu du carton
+  if (t < C.titleDur) cover(t); else $('cover').classList.add('hidden');
+  const k = footer(Math.max(0, tc));
+  caption(Math.max(0, tc), k);
+  const file = frameAt(Math.max(0, tc));
+  if (file !== current) { current = file; img.src = file; await img.decode().catch(() => {}); }
+  camera(Math.max(0, Math.round(tc * C.fps)));
+};
+</script>
+</body>
+</html>
