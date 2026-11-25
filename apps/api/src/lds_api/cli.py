@@ -129,6 +129,21 @@ def cmd_refresh_stats(args: argparse.Namespace) -> None:
     print(f"Statistiques des joueurs recalculées : {n} ligne(s).")
 
 
+def cmd_purge(args: argparse.Namespace) -> None:
+    from lds_api.db.session import SessionLocal
+    from lds_api.services.purge import purge
+
+    with SessionLocal() as db:
+        r = purge(db, dry_run=args.dry_run)
+        if not args.dry_run:
+            db.commit()
+    verb = "à traiter" if args.dry_run else "traités"
+    print(
+        f"Purge ({verb}) : {r.otp_challenges} code(s) de vote, {r.unpaid_orders} commande(s) "
+        f"non payée(s), {r.paid_order_phones} numéro(s) d'acheteur."
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="lds_api.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -162,6 +177,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--password-stdin", action="store_true", help="Lit le mot de passe sur l'entrée standard"
     )
     p.set_defaults(func=cmd_create_user)
+
+    p = sub.add_parser("purge", help="Efface les données arrivées au terme de leur conservation")
+    p.add_argument("--dry-run", action="store_true", help="Compte sans rien effacer")
+    p.set_defaults(func=cmd_purge)
 
     p = sub.add_parser("refresh-stats", help="Recalcule les statistiques des joueurs (saison)")
     p.set_defaults(func=cmd_refresh_stats)

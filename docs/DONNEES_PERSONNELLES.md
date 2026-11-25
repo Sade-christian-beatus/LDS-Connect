@@ -71,8 +71,9 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
   n'est ni publié, ni réutilisé, ni transmis. Mention affichée sous le champ de saisie.
 - Le numéro n'est conservé en clair (chiffré) que dans le défi SMS ; les votes, le journal CSV
   et le procès-verbal n'en contiennent qu'une empreinte.
-- Durée de conservation des défis SMS et des votes : **à fixer par la Ligue** (proposition :
-  suppression des défis 30 jours après la clôture, empreintes conservées pour le contrôle).
+- Durée de conservation des défis SMS : `RETENTION_OTP_DAYS` (30 jours après la clôture par
+  défaut, **à confirmer par la Ligue**) ; la purge planifiée (`make purge`) supprime alors le
+  numéro chiffré ; les votes gardent l'empreinte pour le contrôle.
 
 ## 6. Billetterie
 
@@ -80,7 +81,9 @@ La compétition admet des joueurs dès 16 ans. Mesures appliquées :
   et à l'envoi du lien des billets par SMS. Le lien porte une clé secrète dont seule
   l'empreinte est conservée.
 - Les passages au contrôle (`access_scans`) sont liés au billet, pas à l'acheteur.
-- Durée de conservation des commandes : **à fixer par la Ligue** (obligations comptables).
+- Commandes non payées : nom et numéro effacés après `RETENTION_UNPAID_ORDERS_DAYS` (30 jours
+  par défaut). Commandes payées : numéro effacé après `RETENTION_PAID_ORDER_PHONE_DAYS`
+  (**à fixer par la Ligue** selon ses obligations comptables ; 0 = conservé).
 
 ## 7. Talents (phase 3)
 

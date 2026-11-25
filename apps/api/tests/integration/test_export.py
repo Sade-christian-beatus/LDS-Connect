@@ -14,6 +14,9 @@ def test_export_masks_secrets_by_default(db, seeded, tmp_path):
     assert "password_hash" not in users[0]
     assert (folder / "matches.csv").read_text(encoding="utf-8").startswith("id,")
     assert json.loads((folder / "manifest.json").read_text())["include_sensitive"] is False
+    # État réel des commandes (« expired » se déduit de l'échéance de réservation)
+    header = (folder / "orders.csv").read_text(encoding="utf-8").splitlines()[0]
+    assert header.endswith(",effective_status")
 
 
 def test_export_sensitive_decrypts(db, seeded, tmp_path):

@@ -60,6 +60,11 @@ class Settings(BaseSettings):
     payment_callback_base_url: str = ""
     # Secret partagé avec l'agrégateur : signature HMAC-SHA256 de ses notifications
     payment_webhook_secret: SecretStr = SecretStr("")
+    # Durées de conservation en jours (purge : python -m lds_api.cli purge ; 0 = sans limite)
+    retention_otp_days: int = 30  # après la clôture du scrutin
+    retention_unpaid_orders_days: int = 30
+    retention_paid_order_phone_days: int = 0  # à fixer par la Ligue (obligations comptables)
+
     storage_backend: Literal["local", "s3"] = "local"
     storage_local_path: str = "./var/storage"
     s3_endpoint_url: str | None = None

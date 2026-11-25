@@ -173,6 +173,15 @@ sauvegarde avec le stockage sur disque (avec S3, activer la gestion des versions
 Le fichier `.env` se garde dans le coffre-fort, pas avec les sauvegardes. Les 30 dernières
 sauvegardes de chaque type sont conservées (`KEEP=…` pour changer).
 
+**Purge des données à durée limitée** (codes de vote, commandes non payées, numéros des
+acheteurs ; durées dans `.env`, variables `RETENTION_*`) : à planifier chaque nuit après la
+sauvegarde. `make purge DRY=1` affiche ce qui serait effacé sans rien toucher ; chaque passage
+est inscrit au journal d'audit.
+
+```cron
+0 3 * * * cd /opt/lds-connect && docker compose -f docker-compose.yml exec -T api python -m lds_api.cli purge >> /var/log/lds-purge.log 2>&1
+```
+
 **Restauration** (remplace la base actuelle, confirmation demandée) :
 
 ```bash
