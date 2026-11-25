@@ -31,6 +31,9 @@ class Settings(BaseSettings):
 
     # Base de données et cache
     database_url: str = "postgresql+psycopg://lds:lds@localhost:5432/lds"
+    # Connexions à la base par processus de l'API (pool_size + max_overflow au plus)
+    db_pool_size: int = 10
+    db_max_overflow: int = 20
     redis_url: str = "redis://localhost:6379/0"
 
     # Authentification
