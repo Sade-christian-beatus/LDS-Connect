@@ -152,3 +152,33 @@ def test_minor_photo_requires_guardian_consent(client, db, as_club):
     minor.guardian_consent_on = date.today()
     db.commit()
     assert upload(client, url, PNG, as_club).status_code == 204
+
+
+# --- Import des blasons en lot --------------------------------------------------------------
+def test_import_team_logos_from_zip(db, seeded, storage):
+    import io
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("Blasons/01_Vinnim_du_Kadiogo.png", PNG)
+        zf.writestr("Blasons/12_Dojo_Sport_du_Guiriko.png", JPG)  # orthographe voisine
+        zf.writestr("Blasons/99_Equipe_Inconnue.png", PNG)
+        zf.writestr("Blasons/Apercu_20_blasons.png", PNG)  # planche d'aperçu ignorée
+        zf.writestr("Blasons/LISEZ-MOI.txt", "texte")
+    report = media.import_team_logos(db, None, buf.getvalue(), dry_run=True)
+    assert {r["file"].split("/")[-1] for r in report} == {
+        "01_Vinnim_du_Kadiogo.png",
+        "12_Dojo_Sport_du_Guiriko.png",
+        "99_Equipe_Inconnue.png",
+    }
+    assert db.scalar(select(Team).where(Team.short_name == "Vinnim")).logo_path is None
+
+    report = media.import_team_logos(db, None, buf.getvalue())
+    db.commit()
+    by_file = {r["file"].split("/")[-1]: r for r in report}
+    assert by_file["01_Vinnim_du_Kadiogo.png"]["status"] == "importé"
+    assert by_file["12_Dojo_Sport_du_Guiriko.png"]["team"] == "Dozo Sport du Guiriko"
+    assert by_file["99_Equipe_Inconnue.png"]["status"] == "sans correspondance sûre"
+    vinnim = db.scalar(select(Team).where(Team.short_name == "Vinnim"))
+    assert vinnim.logo_path.startswith(f"teams/{vinnim.id}/logo-")

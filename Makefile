@@ -9,7 +9,7 @@ WEB_DIR = apps/web
 
 .DEFAULT_GOAL := help
 .PHONY: help env keys keys-into-env up dev down logs migrate seed test lint e2e shell-db \
-        install-local dev-local migrate-local seed-local test-local backup restore purge export
+        install-local dev-local migrate-local seed-local test-local backup restore import-logos purge export
 
 help: ## Affiche cette aide
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[32m%-16s\033[0m %s\n", $$1, $$2}'
@@ -88,6 +88,9 @@ backup: ## Sauvegarde PostgreSQL dans ./backups
 
 restore: ## Restaure une sauvegarde : make restore FILE=backups/xxx.dump
 	./infra/scripts/restore.sh $(FILE)
+
+import-logos: ## Importe les blasons des équipes : make import-logos ZIP=blasons.zip (DRY=1 pour vérifier)
+	$(API_EXEC) -T python -m lds_api.cli import-logos --zip - $(if $(DRY),--dry-run,) < $(ZIP)
 
 purge: ## Efface les données arrivées au terme de leur conservation (DRY=1 pour simuler)
 	$(API_EXEC) python -m lds_api.cli purge $(if $(DRY),--dry-run,)

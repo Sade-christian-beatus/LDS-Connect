@@ -158,3 +158,69 @@ def read_person_photo(person: Person) -> tuple[bytes, str]:
     except (FileNotFoundError, KeyError, OSError) as exc:
         raise NotFound("Aucune photo") from exc
     return data, TYPES[key.rsplit(".", 1)[1]]
+
+
+# --- Import en lot des blasons (archive ZIP) ------------------------------------------------
+def _norm(text: str) -> str:
+    import unicodedata
+
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+    plain = re.sub(r"^\d+[_\- ]*", "", plain)  # numéro d'ordre en tête de fichier
+    return " ".join(re.findall(r"[a-z0-9]+", plain))
+
+
+def match_team(filename: str, teams: list[Team]) -> tuple[Team | None, float]:
+    """Équipe correspondant au nom de fichier (« 05_Union_Sportive_des_Koulse_USK.png »)."""
+    from difflib import SequenceMatcher
+
+    stem = _norm(filename.rsplit("/", 1)[-1].rsplit(".", 1)[0])
+    best, score = None, 0.0
+    for t in teams:
+        names = [t.name, t.short_name, t.slug.replace("-", " ")] + (
+            [t.acronym] if t.acronym else []
+        )
+        s = max(SequenceMatcher(None, stem, _norm(n)).ratio() for n in names)
+        # Nom complet contenu dans le fichier (le fichier ajoute souvent le sigle)
+        if _norm(t.name) and _norm(t.name) in stem:
+            s = max(s, 0.95)
+        if s > score:
+            best, score = t, s
+    return best, score
+
+
+def import_team_logos(db: Session, actor, archive: bytes, *, dry_run: bool = False) -> list[dict]:
+    """Associe chaque image de l'archive à une équipe et l'enregistre comme son blason.
+
+    Seules les correspondances sûres (score ≥ 0,75, une image par équipe) sont appliquées ;
+    les autres sont signalées pour un envoi manuel depuis le back-office.
+    """
+    import io
+    import zipfile
+
+    from sqlalchemy import select
+
+    teams = list(db.scalars(select(Team)))
+    report: list[dict] = []
+    used: set = set()
+    with zipfile.ZipFile(io.BytesIO(archive)) as zf:
+        names = sorted(
+            n
+            for n in zf.namelist()
+            if not n.endswith("/")
+            and n.lower().rsplit(".", 1)[-1] in {"png", "jpg", "jpeg", "webp"}
+            and not n.rsplit("/", 1)[-1].lower().startswith(("apercu", "aperçu", "preview", "."))
+        )
+        for name in names:
+            team, score = match_team(name, teams)
+            entry = {"file": name, "team": team.name if team else None, "score": round(score, 2)}
+            if team is None or score < 0.75:
+                entry["status"] = "sans correspondance sûre"
+            elif team.id in used:
+                entry["status"] = "équipe déjà servie par un autre fichier"
+            else:
+                used.add(team.id)
+                if not dry_run:
+                    set_team_logo(db, actor, team.id, zf.read(name))
+                entry["status"] = "à importer" if dry_run else "importé"
+            report.append(entry)
+    return report

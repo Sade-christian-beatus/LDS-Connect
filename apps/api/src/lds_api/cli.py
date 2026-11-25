@@ -160,6 +160,24 @@ def cmd_reset_mfa(args: argparse.Namespace) -> None:
     print(f"Double authentification réinitialisée pour {args.email} : à réactiver à la connexion.")
 
 
+def cmd_import_logos(args: argparse.Namespace) -> None:
+    import sys
+
+    from lds_api.db.session import SessionLocal
+    from lds_api.services import media
+
+    data = sys.stdin.buffer.read() if args.zip == "-" else Path(args.zip).read_bytes()
+    with SessionLocal() as db:
+        report = media.import_team_logos(db, None, data, dry_run=args.dry_run)
+        if not args.dry_run:
+            db.commit()
+    for r in report:
+        team = r["team"] or "?"
+        print(f"{r['status']:<40} {r['file']}  →  {team} ({r['score']:.2f})")
+    done = sum(r["status"] in {"importé", "à importer"} for r in report)
+    print(f"{done} blason(s) sur {len(report)} fichier(s).")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="lds_api.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -193,6 +211,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--password-stdin", action="store_true", help="Lit le mot de passe sur l'entrée standard"
     )
     p.set_defaults(func=cmd_create_user)
+
+    p = sub.add_parser("import-logos", help="Importe les blasons des équipes depuis un ZIP")
+    p.add_argument("--zip", required=True, help="Archive ZIP (« - » : entrée standard)")
+    p.add_argument(
+        "--dry-run", action="store_true", help="Affiche les correspondances sans rien importer"
+    )
+    p.set_defaults(func=cmd_import_logos)
 
     p = sub.add_parser("reset-mfa", help="Réinitialise la double authentification d'un compte")
     p.add_argument("--email", required=True)
