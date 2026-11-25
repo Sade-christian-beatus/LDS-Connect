@@ -40,6 +40,13 @@ Puis éditer `.env` :
 | `TICKET_ALLOWED_COUNTRY_CODES` | `226` : indicatifs acceptés pour l'achat de billets |
 | `PAYMENT_CALLBACK_BASE_URL` | adresse publique de l'API vue par l'agrégateur (vide = `API_BASE_URL`) |
 
+> **Double authentification** : obligatoire en production pour le super administrateur et
+> l'administration de la Ligue (`MFA_REQUIRED_ROLES` pour changer la liste). À la première
+> connexion, ces comptes n'ont accès qu'à « Mon compte » tant qu'ils ne l'ont pas activée
+> (application Google Authenticator, Microsoft Authenticator, FreeOTP…). Téléphone perdu : le
+> super administrateur la réinitialise depuis « Comptes » ; pour son propre compte, sur le
+> serveur : `docker compose exec api python -m lds_api.cli reset-mfa --email …`.
+
 > **Contrôle au démarrage** : avec `ENVIRONMENT=production`, l'API **refuse de démarrer** et
 > liste les réglages à corriger si l'un de ces points n'est pas respecté : `JWT_SECRET` d'au
 > moins 32 caractères, clés de chiffrement et de signature renseignées,
@@ -107,8 +114,11 @@ accède.
 Un exemple Caddy (certificats Let's Encrypt automatiques) est fourni :
 `infra/caddy/Caddyfile.example`. Routage attendu :
 
-- `/api/*` → `api:8000`, **sans mise en tampon** (flux temps réel SSE) ;
-- tout le reste → `web:3000`.
+- `/api/*` → `127.0.0.1:8000`, **sans mise en tampon** (flux temps réel SSE) ;
+- tout le reste → `127.0.0.1:3000`.
+
+Le proxy tourne sur le serveur (hors Docker) : `sudo apt install caddy`, copier l'exemple dans
+`/etc/caddy/Caddyfile` en remplaçant le nom de domaine, puis `sudo systemctl reload caddy`.
 
 Avec Nginx, l'équivalent pour le flux en direct :
 
@@ -158,7 +168,7 @@ sécurisé ne fonctionnent qu'en contexte sécurisé.
 ## 4. Sauvegardes
 
 ```bash
-make backup                 # écrit backups/lds-AAAAMMJJ-HHMMSS.dump (30 dernières conservées)
+make backup   # base : backups/lds-AAAAMMJJ-HHMMSS.dump ; fichiers : backups/lds-files-….tar.gz
 ```
 
 À planifier chaque nuit (crontab de l'utilisateur `lds`) et **copier hors du serveur** :
@@ -168,13 +178,24 @@ make backup                 # écrit backups/lds-AAAAMMJJ-HHMMSS.dump (30 derni�
 ```
 
 Pendant les journées de match, une sauvegarde supplémentaire après la dernière rencontre est
-recommandée. Sauvegarder aussi le volume `storage` (fichiers téléversés) et le fichier `.env`
-(dans le coffre-fort, pas avec les sauvegardes de la base).
+recommandée. Les fichiers téléversés (logos, photos de licence) sont archivés à chaque
+sauvegarde avec le stockage sur disque (avec S3, activer la gestion des versions du bucket).
+Le fichier `.env` se garde dans le coffre-fort, pas avec les sauvegardes. Les 30 dernières
+sauvegardes de chaque type sont conservées (`KEEP=…` pour changer).
+
+**Purge des données à durée limitée** (codes de vote, commandes non payées, numéros des
+acheteurs ; durées dans `.env`, variables `RETENTION_*`) : à planifier chaque nuit après la
+sauvegarde. `make purge DRY=1` affiche ce qui serait effacé sans rien toucher ; chaque passage
+est inscrit au journal d'audit.
+
+```cron
+0 3 * * * cd /opt/lds-connect && docker compose -f docker-compose.yml exec -T api python -m lds_api.cli purge >> /var/log/lds-purge.log 2>&1
+```
 
 **Restauration** (remplace la base actuelle, confirmation demandée) :
 
 ```bash
-make restore FILE=backups/lds-20270110-023000.dump
+make restore FILE=backups/lds-20270110-023000.dump   # + lds-files-20270110-023000.tar.gz s'il existe
 ```
 
 Tester une restauration au moins une fois avant le coup d'envoi, sur un serveur de test.

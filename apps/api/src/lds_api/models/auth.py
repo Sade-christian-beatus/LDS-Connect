@@ -3,11 +3,12 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Table
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, String, Table
 from sqlalchemy import false as sa_false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lds_api.db.base import Base, Timestamps, UUIDPk
+from lds_api.db.types import EncryptedString
 from lds_api.models.enums import RoleCode, str_enum
 
 user_roles = Table(
@@ -39,6 +40,12 @@ class User(UUIDPk, Timestamps, Base):
     must_change_password: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default=sa_false(), nullable=False
     )
+
+    # Double authentification (TOTP) : secret chiffré, activée quand la date est renseignée.
+    # Le dernier pas de temps accepté empêche de rejouer un code.
+    totp_secret: Mapped[str | None] = mapped_column(EncryptedString)
+    totp_enabled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    totp_last_step: Mapped[int | None] = mapped_column(BigInteger)
 
     roles: Mapped[list[Role]] = relationship(secondary=user_roles, lazy="selectin")
 

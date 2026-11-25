@@ -26,7 +26,11 @@ export class NetworkError extends Error {}
 type AuthState = {
   user: User | null;
   ready: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  /** Utilisateur connecté, ou jeton intermédiaire si un code de double authentification est attendu. */
+  login: (email: string, password: string) => Promise<User | { mfaToken: string }>;
+  loginMfa: (mfaToken: string, code: string) => Promise<User>;
+  /** Profil mis à jour par une action de « Mon compte » (double authentification…). */
+  updateUser: (user: User) => void;
   logout: () => Promise<void>;
   api: <T>(path: string, init?: RequestInit) => Promise<T>;
   /** Réponse brute (fichiers : QR en SVG, exports…). */
@@ -151,11 +155,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new NetworkError("Connexion impossible : vérifiez le réseau");
     }
     if (!res.ok) throw await parseError(res);
+    const data: TokenOut | { mfa_required: true; mfa_token: string } = await res.json();
+    if ("mfa_required" in data) return { mfaToken: data.mfa_token };
+    token.current = data.access_token;
+    setUser(data.user);
+    await rememberUser(data.user);
+    return data.user;
+  }, []);
+
+  const loginMfa = useCallback(async (mfaToken: string, code: string) => {
+    let res: Response;
+    try {
+      res = await fetch("/api/v1/auth/login/mfa", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mfa_token: mfaToken, code }),
+      });
+    } catch {
+      throw new NetworkError("Connexion impossible : vérifiez le réseau");
+    }
+    if (!res.ok) throw await parseError(res);
     const data: TokenOut = await res.json();
     token.current = data.access_token;
     setUser(data.user);
     await rememberUser(data.user);
     return data.user;
+  }, []);
+
+  const updateUser = useCallback((u: User) => {
+    setUser(u);
+    rememberUser(u);
   }, []);
 
   const logout = useCallback(async () => {
@@ -171,8 +201,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, ready, login, logout, api, raw }),
-    [user, ready, login, logout, api, raw],
+    () => ({ user, ready, login, loginMfa, updateUser, logout, api, raw }),
+    [user, ready, login, loginMfa, updateUser, logout, api, raw],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

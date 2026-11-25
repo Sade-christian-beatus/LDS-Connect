@@ -110,4 +110,7 @@ class AccessScan(UUIDPk, Timestamps, Base):
     scanned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     offline: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     device: Mapped[str | None] = mapped_column(String(80))
+    # Zone gardée par l'appareil (tribune, terrain, presse…) : une accréditation sans cette
+    # zone est refusée. Vide : contrôle sans zone (billets du public).
+    zone: Mapped[str | None] = mapped_column(String(40))
     scanned_by_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))

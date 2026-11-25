@@ -27,6 +27,8 @@ class VenueOut(BaseModel):
     name: str
     city: str
     is_confirmed: bool
+    capacity: int | None = None
+    address: str | None = None
 
 
 class MatchOut(BaseModel):

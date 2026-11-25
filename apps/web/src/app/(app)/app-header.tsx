@@ -16,6 +16,7 @@ const GROUPS = ["Compétition", "Au stade", "Public", "Administration"];
 export function menuFor(user: User): Item[] {
   const p = new Set(user.permissions);
   const items: Item[] = [];
+  if (p.has("audit:read")) items.push({ href: "/admin/tableau-de-bord", label: "Tableau de bord", group: "Compétition" });
   if (p.has("squad:read")) {
     items.push({
       href: user.team_id && !p.has("team:manage") ? `/admin/equipes/${user.team_id}` : "/admin/equipes",
@@ -24,6 +25,7 @@ export function menuFor(user: User): Item[] {
     });
   }
   if (p.has("fixture:manage")) items.push({ href: "/admin/calendrier", label: "Calendrier", group: "Compétition" });
+  if (p.has("rules:manage")) items.push({ href: "/admin/saison", label: "Saison et règles", group: "Compétition" });
   if (p.has("sheet:edit")) items.push({ href: "/delegue", label: "Feuilles de match", group: "Compétition" });
   if (p.has("stats:read")) items.push({ href: "/admin/talents", label: "Talents", group: "Compétition" });
   if (p.has("licence:verify")) items.push({ href: "/controle", label: "Licences", group: "Au stade" });
@@ -39,8 +41,9 @@ export function menuFor(user: User): Item[] {
 
 /** Écran d'arrivée après connexion : l'outil principal du rôle. */
 export function landingFor(user: User): string {
-  if (user.must_change_password) return "/compte";
+  if (user.must_change_password || user.mfa_setup_required) return "/compte";
   const p = new Set(user.permissions);
+  if (p.has("audit:read")) return "/admin/tableau-de-bord";
   if (p.has("team:manage")) return "/admin/equipes";
   if (p.has("squad:write") && user.team_id) return `/admin/equipes/${user.team_id}`;
   if (p.has("sheet:edit")) return "/delegue";
@@ -60,7 +63,7 @@ export function AppHeader() {
   const pathname = usePathname();
   const logo = useBrandLogo();
   // Mot de passe provisoire : aucun menu tant qu'il n'est pas changé
-  const menu = user && !user.must_change_password ? menuFor(user) : [];
+  const menu = user && !user.must_change_password && !user.mfa_setup_required ? menuFor(user) : [];
   const sidebar = menu.length >= SIDEBAR_MIN;
   const active = (href: string) => pathname.startsWith(href);
 

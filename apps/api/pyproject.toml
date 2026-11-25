@@ -53,3 +53,6 @@ ignore = ["S101", "B008"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+# TestClient de Starlette annonce le passage à « httpx2 » : sans effet sur les tests, la
+# dépendance sera changée quand FastAPI la proposera par défaut.
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]

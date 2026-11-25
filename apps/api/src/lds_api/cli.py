@@ -129,6 +129,55 @@ def cmd_refresh_stats(args: argparse.Namespace) -> None:
     print(f"Statistiques des joueurs recalculées : {n} ligne(s).")
 
 
+def cmd_purge(args: argparse.Namespace) -> None:
+    from lds_api.db.session import SessionLocal
+    from lds_api.services.purge import purge
+
+    with SessionLocal() as db:
+        r = purge(db, dry_run=args.dry_run)
+        if not args.dry_run:
+            db.commit()
+    verb = "à traiter" if args.dry_run else "traités"
+    print(
+        f"Purge ({verb}) : {r.otp_challenges} code(s) de vote, {r.unpaid_orders} commande(s) "
+        f"non payée(s), {r.paid_order_phones} numéro(s) d'acheteur."
+    )
+
+
+def cmd_reset_mfa(args: argparse.Namespace) -> None:
+    from sqlalchemy import select
+
+    from lds_api.db.session import SessionLocal
+    from lds_api.models import User
+    from lds_api.services import mfa
+
+    with SessionLocal() as db:
+        user = db.scalar(select(User).where(User.email == args.email.strip().lower()))
+        if user is None:
+            raise SystemExit(f"Aucun compte {args.email}")
+        mfa.reset(db, None, user)
+        db.commit()
+    print(f"Double authentification réinitialisée pour {args.email} : à réactiver à la connexion.")
+
+
+def cmd_import_logos(args: argparse.Namespace) -> None:
+    import sys
+
+    from lds_api.db.session import SessionLocal
+    from lds_api.services import media
+
+    data = sys.stdin.buffer.read() if args.zip == "-" else Path(args.zip).read_bytes()
+    with SessionLocal() as db:
+        report = media.import_team_logos(db, None, data, dry_run=args.dry_run)
+        if not args.dry_run:
+            db.commit()
+    for r in report:
+        team = r["team"] or "?"
+        print(f"{r['status']:<40} {r['file']}  →  {team} ({r['score']:.2f})")
+    done = sum(r["status"] in {"importé", "à importer"} for r in report)
+    print(f"{done} blason(s) sur {len(report)} fichier(s).")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="lds_api.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -162,6 +211,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--password-stdin", action="store_true", help="Lit le mot de passe sur l'entrée standard"
     )
     p.set_defaults(func=cmd_create_user)
+
+    p = sub.add_parser("import-logos", help="Importe les blasons des équipes depuis un ZIP")
+    p.add_argument("--zip", required=True, help="Archive ZIP (« - » : entrée standard)")
+    p.add_argument(
+        "--dry-run", action="store_true", help="Affiche les correspondances sans rien importer"
+    )
+    p.set_defaults(func=cmd_import_logos)
+
+    p = sub.add_parser("reset-mfa", help="Réinitialise la double authentification d'un compte")
+    p.add_argument("--email", required=True)
+    p.set_defaults(func=cmd_reset_mfa)
+
+    p = sub.add_parser("purge", help="Efface les données arrivées au terme de leur conservation")
+    p.add_argument("--dry-run", action="store_true", help="Compte sans rien effacer")
+    p.set_defaults(func=cmd_purge)
 
     p = sub.add_parser("refresh-stats", help="Recalcule les statistiques des joueurs (saison)")
     p.set_defaults(func=cmd_refresh_stats)

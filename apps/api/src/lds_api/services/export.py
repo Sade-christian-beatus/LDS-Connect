@@ -25,6 +25,18 @@ EXCLUDED_TABLES = {"refresh_tokens"}
 EXCLUDED_COLUMNS = {("users", "password_hash"), ("otp_challenges", "code_hash")}
 
 
+def _order_state(row, now: datetime) -> str:
+    """État affiché d'une commande : « expired » n'est pas stocké, il se déduit de l'échéance."""
+    status = _plain(row["status"])
+    if status == "pending" and row["expires_at"] is not None and row["expires_at"] < now:
+        return "expired"
+    return status
+
+
+# Colonnes calculées ajoutées à l'export (lisibilité des fichiers hors de la plateforme)
+DERIVED = {"orders": {"effective_status": _order_state}}
+
+
 def _plain(value):
     if isinstance(value, UUID | Decimal):
         return str(value)
@@ -42,6 +54,7 @@ def export_all(db: Session, out_dir: Path, *, include_sensitive: bool = False) -
     target = out_dir / f"export-{stamp}"
     target.mkdir(parents=True, exist_ok=False)
     counts: dict[str, int] = {}
+    now = datetime.now(UTC)
     for table in Base.metadata.sorted_tables:
         if table.name in EXCLUDED_TABLES:
             continue
@@ -55,13 +68,16 @@ def export_all(db: Session, out_dir: Path, *, include_sensitive: bool = False) -
                     item[c.name] = "***" if row[c.name] is not None else None
                 else:
                     item[c.name] = _plain(row[c.name])
+            for name, fn in DERIVED.get(table.name, {}).items():
+                item[name] = fn(row, now)
             rows.append(item)
         counts[table.name] = len(rows)
         (target / f"{table.name}.json").write_text(
             json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8"
         )
         with (target / f"{table.name}.csv").open("w", newline="", encoding="utf-8") as fh:
-            writer = csv.DictWriter(fh, fieldnames=[c.name for c in cols])
+            fields = [c.name for c in cols] + list(DERIVED.get(table.name, {}))
+            writer = csv.DictWriter(fh, fieldnames=fields)
             writer.writeheader()
             for r in rows:
                 writer.writerow(

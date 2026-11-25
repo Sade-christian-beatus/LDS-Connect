@@ -65,3 +65,28 @@ def decode_access_token(token: str) -> dict[str, Any]:
 def new_refresh_token_value() -> str:
     """Valeur opaque du jeton de rafraîchissement (stockée en base par son jti)."""
     return secrets.token_urlsafe(48)
+
+
+MFA_TOKEN_TYPE = "mfa"  # noqa: S105 — type de jeton, pas un secret
+MFA_TOKEN_MINUTES = 5
+
+
+def create_mfa_token(user_id: uuid.UUID) -> str:
+    """Jeton intermédiaire : mot de passe vérifié, code de double authentification attendu."""
+    now = datetime.now(UTC)
+    payload = {
+        "sub": str(user_id),
+        "type": MFA_TOKEN_TYPE,
+        "iat": now,
+        "exp": now + timedelta(minutes=MFA_TOKEN_MINUTES),
+    }
+    return jwt.encode(payload, _secret(), algorithm=JWT_ALGORITHM)
+
+
+def decode_mfa_token(token: str) -> uuid.UUID:
+    payload = jwt.decode(
+        token, _secret(), algorithms=[JWT_ALGORITHM], options={"require": ["exp", "sub"]}
+    )
+    if payload.get("type") != MFA_TOKEN_TYPE:
+        raise jwt.InvalidTokenError("Type de jeton inattendu")
+    return uuid.UUID(payload["sub"])

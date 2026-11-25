@@ -26,6 +26,17 @@ export function RequireAuth({ permission, children }: { permission: string; chil
       </p>
     );
   }
+  if (user.mfa_setup_required) {
+    return (
+      <p className="rounded bg-amber-50 p-3 text-amber-900">
+        La double authentification est obligatoire pour votre rôle.{" "}
+        <Link href="/compte" className="font-semibold underline">
+          Activez-la dans « Mon compte »
+        </Link>{" "}
+        pour accéder à cet écran.
+      </p>
+    );
+  }
   if (!user.permissions.includes(permission)) {
     return <p className="text-lds-red">Votre rôle ne permet pas d&apos;accéder à cet écran.</p>;
   }

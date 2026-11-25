@@ -5,12 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from lds_api.api.v1 import (
     auth,
+    dashboard,
     fixtures,
     licences,
     live,
     media,
     public,
     registry,
+    seasons,
     sheets,
     talents,
     ticketing,
@@ -26,12 +28,16 @@ API_PREFIX = "/api/v1"
 def create_app() -> FastAPI:
     settings = get_settings()
     enforce_production_settings(settings)
+    docs = settings.api_docs_public
+    if docs is None:
+        docs = settings.environment != "production"
     app = FastAPI(
         title="LDS Connect API",
         description="API de la plateforme numérique de la Ligue de la Souveraineté",
         version="0.1.0",
-        docs_url=f"{API_PREFIX}/docs",
-        openapi_url=f"{API_PREFIX}/openapi.json",
+        docs_url=f"{API_PREFIX}/docs" if docs else None,
+        redoc_url=None,
+        openapi_url=f"{API_PREFIX}/openapi.json" if docs else None,
     )
     app.add_middleware(
         CORSMiddleware,
@@ -56,6 +62,8 @@ def create_app() -> FastAPI:
         ticketing,
         talents,
         media,
+        seasons,
+        dashboard,
     )
     for module in modules:
         v1.include_router(module.router)

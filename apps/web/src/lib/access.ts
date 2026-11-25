@@ -21,6 +21,18 @@ type AccreditationPayload = {
   org?: string;
 };
 
+// Zones réservées du stade. Une porte sans zone est une entrée du public (tribunes).
+export const ZONES = ["Pelouse", "Vestiaires", "Tribune de presse", "Zone mixte", "Tribune d'honneur"];
+export const ALL_ZONES = "Toutes zones";
+
+/** Même règle que le serveur (domain/ticketing.py, zone_refusal). */
+export function zoneRefusal(kind: "ticket" | "accreditation", gateZone: string | undefined, zones: string[] = []): string | null {
+  if (!gateZone) return null;
+  if (kind === "ticket") return `Billet du public : pas d'accès à la zone « ${gateZone} »`;
+  if (zones.includes(ALL_ZONES) || zones.includes(gateZone)) return null;
+  return `Zone « ${gateZone} » non autorisée pour cette accréditation`;
+}
+
 export const ACCREDITATION_LABEL: Record<string, string> = {
   press: "Presse",
   official: "Officiel",
@@ -42,7 +54,7 @@ function hhmm(iso: string) {
 /** Décision locale, sans réseau. */
 export async function decide(
   token: string,
-  ctx: { matchId: string; keys: KeySet["keys"]; manifest: AccessManifest | null; now?: Date },
+  ctx: { matchId: string; keys: KeySet["keys"]; manifest: AccessManifest | null; now?: Date; zone?: string },
 ): Promise<Decision> {
   const now = ctx.now ?? new Date();
   const decoded = await verifyToken<TicketPayload | AccreditationPayload>(
@@ -58,6 +70,8 @@ export async function decide(
     if (ctx.manifest?.revoked_accreditations.includes(a.c)) return { ...base, result: "invalid", detail: "Accréditation révoquée" };
     const today = now.toISOString().slice(0, 10);
     if (today < a.vf || today > a.vu) return { ...base, result: "invalid", detail: "Accréditation hors de sa période de validité" };
+    const zoneIssue = zoneRefusal("accreditation", ctx.zone, a.z);
+    if (zoneIssue) return { ...base, result: "invalid", detail: zoneIssue };
     const org = a.org ? ` · ${a.org}` : "";
     return { ...base, result: "admitted", detail: `${ACCREDITATION_LABEL[a.cat] ?? a.cat}${org}` };
   }
@@ -67,6 +81,8 @@ export async function decide(
   if (t.m !== ctx.matchId) {
     return { ...base, result: "wrong_match", detail: `Billet valable pour un autre match${t.mt ? ` (${t.mt})` : ""}` };
   }
+  const ticketZone = zoneRefusal("ticket", ctx.zone);
+  if (ticketZone) return { ...base, result: "invalid", detail: ticketZone };
   const entry = ctx.manifest?.tickets.find((x) => x.c === t.c);
   if (entry?.s === "cancelled") return { ...base, result: "invalid", detail: "Billet annulé" };
   const local = await db.scans
@@ -83,7 +99,7 @@ export async function decide(
   return { ...base, result: "admitted", detail: "Entrée autorisée" };
 }
 
-export async function recordScan(token: string, d: Decision, ctx: { matchId: string; device: string; offline: boolean }) {
+export async function recordScan(token: string, d: Decision, ctx: { matchId: string; device: string; offline: boolean; zone?: string }) {
   const scan: LocalScan = {
     clientId: crypto.randomUUID(),
     matchId: ctx.matchId,
@@ -95,6 +111,7 @@ export async function recordScan(token: string, d: Decision, ctx: { matchId: str
     detail: d.detail,
     scannedAt: new Date().toISOString(),
     device: ctx.device,
+    zone: ctx.zone || undefined,
     offline: ctx.offline,
     synced: 0,
   };
@@ -118,6 +135,7 @@ export async function syncScans(api: Api): Promise<number> {
         scanned_at: s.scannedAt,
         offline: s.offline,
         device: s.device,
+        zone: s.zone ?? null,
       })),
     }),
   });

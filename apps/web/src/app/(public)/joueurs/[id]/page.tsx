@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SeasonName } from "@/components/SeasonFacts";
 import { Suspense } from "react";
 import { MatchLogList, StatTiles } from "@/components/PlayerStats";
 import { TeamBadge } from "@/components/TeamBadge";
@@ -51,7 +52,9 @@ async function Player({ params }: { params: PageProps<"/joueurs/[id]">["params"]
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-black tracking-tight text-heading">Saison 2027</h2>
+        <h2 className="text-xl font-black tracking-tight text-heading">
+          <SeasonName />
+        </h2>
         <StatTiles stats={p.stats} goalkeeper={p.position === "GK"} />
       </section>
 

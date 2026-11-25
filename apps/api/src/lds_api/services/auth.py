@@ -5,12 +5,15 @@ import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
+import jwt
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from lds_api.core.config import get_settings
 from lds_api.core.security import (
     create_access_token,
+    create_mfa_token,
+    decode_mfa_token,
     hash_password,
     needs_rehash,
     new_refresh_token_value,
@@ -67,8 +70,44 @@ def _issue(db: Session, user: User, family_id: str, user_agent: str | None) -> T
     return TokenPair(access, value, user)
 
 
-def login(db: Session, email: str, password: str, *, ip: str | None, user_agent: str | None):
+@dataclass
+class MfaChallenge:
+    """Mot de passe correct, code de double authentification attendu."""
+
+    mfa_token: str
+
+
+def login(
+    db: Session, email: str, password: str, *, ip: str | None, user_agent: str | None
+) -> "TokenPair | MfaChallenge":
+    from lds_api.services import mfa
+
     user = authenticate(db, email, password)
+    if mfa.enabled(user):
+        db.commit()  # rehachage éventuel du mot de passe
+        return MfaChallenge(create_mfa_token(user.id))
+    return _open_session(db, user, ip=ip, user_agent=user_agent)
+
+
+def login_mfa(
+    db: Session, mfa_token: str, code: str, *, ip: str | None, user_agent: str | None
+) -> TokenPair:
+    from lds_api.services import mfa
+
+    try:
+        user = db.get(User, decode_mfa_token(mfa_token))
+    except (jwt.InvalidTokenError, ValueError):
+        raise AuthError from None
+    if user is None or not user.is_active or not mfa.enabled(user):
+        raise AuthError
+    if not mfa.check_code(user, code):
+        audit.record(db, _ActorStub(user, ip), "mfa_failed", "user", user.id)
+        db.commit()
+        raise AuthError
+    return _open_session(db, user, ip=ip, user_agent=user_agent)
+
+
+def _open_session(db: Session, user: User, *, ip: str | None, user_agent: str | None) -> TokenPair:
     user.last_login_at = datetime.now(UTC)
     pair = _issue(db, user, secrets.token_hex(16), user_agent)
     audit.record(db, _ActorStub(user, ip), "login", "user", user.id)

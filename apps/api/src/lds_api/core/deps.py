@@ -124,6 +124,14 @@ def require(*perms: Perm) -> Callable[[Actor], Actor]:
                 detail="Changez votre mot de passe provisoire avant de continuer",
                 headers={"X-LDS-Reason": "password_change_required"},
             )
+        from lds_api.services import mfa
+
+        if mfa.setup_pending(actor.user):
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN,
+                detail="Activez la double authentification (Mon compte) avant de continuer",
+                headers={"X-LDS-Reason": "mfa_setup_required"},
+            )
         missing = [p for p in perms if not actor.can(p)]
         if missing:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "Action non autorisée pour votre rôle")

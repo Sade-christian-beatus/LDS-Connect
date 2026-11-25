@@ -74,3 +74,7 @@ export type PublicPlayerProfile = S["PublicPlayerProfile"];
 export type MatchLog = S["MatchLog"];
 export type StatValues = S["StatValues"];
 export type TalentNote = S["NoteOut"];
+export type RulesAdmin = S["RulesAdminOut"];
+export type RulesUpdate = S["RulesUpdate"];
+export type SeasonAdmin = S["SeasonAdminOut"];
+export type Dashboard = S["DashboardOut"];

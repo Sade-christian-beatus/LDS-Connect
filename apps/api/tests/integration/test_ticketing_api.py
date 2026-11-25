@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 from sqlalchemy import select
 
-from lds_api.models import Match, Order
+from lds_api.models import AuditLog, Match, Order
 from lds_api.models.enums import MatchStatus
 from lds_api.providers.payment import PaymentSession, SimulatorPaymentProvider, sign
 from lds_api.providers.sms import SmsResult
@@ -134,7 +134,7 @@ def buy(client, pay, tt, quantity=2, phone="70 11 22 33") -> dict:
     return view(client, created).json()
 
 
-def scan(client, headers, token, match=None, at=None, device="Porte A", client_id=None):
+def scan(client, headers, token, match=None, at=None, device="Porte A", client_id=None, zone=None):
     body = {
         "scans": [
             {
@@ -143,6 +143,7 @@ def scan(client, headers, token, match=None, at=None, device="Porte A", client_i
                 "match_id": str(match.id) if match else None,
                 "scanned_at": (at or datetime.now(UTC)).isoformat(),
                 "device": device,
+                "zone": zone,
             }
         ]
     }
@@ -349,6 +350,16 @@ def test_offline_scans_from_two_devices(client, as_admin, as_controller, pay, sm
     assert stats["admitted"] == 1 and stats["duplicates"] == 1
 
 
+def test_public_ticket_refused_at_reserved_zone(client, as_admin, as_controller, pay, sms, match):
+    tt = make_type(client, as_admin, match)
+    ticket = buy(client, pay, tt, quantity=1)["tickets"][0]
+    res = scan(client, as_controller, ticket["token"], match, device="Tunnel", zone="Pelouse")
+    assert res["result"] == "invalid" and "public" in res["detail"]
+    # Le billet n'est pas consommé : il reste valable à l'entrée des tribunes
+    res = scan(client, as_controller, ticket["token"], match, device="Porte A")
+    assert res["result"] == "admitted"
+
+
 def test_cancelled_ticket_is_refused(client, as_admin, as_controller, pay, sms, match):
     tt = make_type(client, as_admin, match)
     t = buy(client, pay, tt, quantity=1)["tickets"][0]
@@ -386,6 +397,14 @@ def test_accreditation_lifecycle(client, as_admin, as_controller, match):
         res = scan(client, as_controller, acc["token"], match)
         assert res["result"] == "admitted" and res["label"] == "Mariam Kaboré"
 
+    # Zones (M10) : admise à la tribune de presse, refusée sur la pelouse
+    res = scan(
+        client, as_controller, acc["token"], match, device="Presse", zone="Tribune de presse"
+    )
+    assert res["result"] == "admitted"
+    res = scan(client, as_controller, acc["token"], match, device="Tunnel", zone="Pelouse")
+    assert res["result"] == "invalid" and "Pelouse" in res["detail"]
+
     r = client.post(
         f"/api/v1/admin/accreditations/{acc['id']}/revoke",
         json={"reason": "Carte perdue"},
@@ -411,3 +430,36 @@ def test_payment_disabled_is_explicit(client, as_admin, match, monkeypatch):
         assert r.status_code == 503 and "pas encore disponible" in r.json()["detail"]
     finally:
         get_settings.cache_clear()
+
+
+def test_refund_tracking(client, db, as_admin, pay, sms, match):
+    tt = make_type(client, as_admin, match)
+    bought = buy(client, pay, tt, quantity=2)
+    ref = bought["reference"]
+    url = f"/api/v1/admin/orders/{ref}/refund"
+    body = {"reason": "Match annulé", "transaction": "OM-778899"}
+    # Billets encore valables : rien à rembourser
+    assert client.post(url, json=body, headers=as_admin).status_code == 422
+
+    for t in bought["tickets"]:
+        r = client.post(
+            f"/api/v1/admin/tickets/{t['code']}/cancel",
+            json={"reason": "Match annulé"},
+            headers=as_admin,
+        )
+        assert r.status_code == 204
+    orders = client.get(
+        "/api/v1/admin/orders", params={"match_id": str(match.id)}, headers=as_admin
+    ).json()
+    row = next(o for o in orders if o["reference"] == ref)
+    assert row["cancelled_tickets"] == 2 and row["refund_due_fcfa"] == row["amount_fcfa"]
+
+    assert client.post(url, json=body, headers=as_admin).status_code == 204
+    orders = client.get(
+        "/api/v1/admin/orders", params={"match_id": str(match.id)}, headers=as_admin
+    ).json()
+    row = next(o for o in orders if o["reference"] == ref)
+    assert row["state"] == "refunded" and row["refund_due_fcfa"] == 0
+    assert client.post(url, json=body, headers=as_admin).status_code == 422
+    log = db.scalars(select(AuditLog).where(AuditLog.action == "refund")).all()[-1]
+    assert log.changes["transaction"] == "OM-778899"

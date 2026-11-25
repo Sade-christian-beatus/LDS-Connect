@@ -383,9 +383,7 @@ function VenuesPanel({ venues, onDone, onError }: { venues: Venue[]; onDone: (t:
       <summary className="cursor-pointer font-semibold">Stades ({venues.length})</summary>
       <ul className="mt-2 space-y-1 text-sm">
         {venues.map((v) => (
-          <li key={v.id}>
-            {v.name} — {v.city} {v.is_confirmed ? <Badge tone="green">Confirmé</Badge> : <Badge tone="amber">À confirmer</Badge>}
-          </li>
+          <VenueRow key={v.id} venue={v} onDone={onDone} onError={onError} />
         ))}
       </ul>
       <form
@@ -422,5 +420,65 @@ function VenuesPanel({ venues, onDone, onError }: { venues: Venue[]; onDone: (t:
         </div>
       </form>
     </details>
+  );
+}
+
+function VenueRow({ venue, onDone, onError }: { venue: Venue; onDone: (t: string) => void; onError: (e: unknown) => void }) {
+  const { api } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [f, setF] = useState({ name: venue.name, city: venue.city, capacity: venue.capacity?.toString() ?? "", is_confirmed: venue.is_confirmed });
+  if (!editing) {
+    return (
+      <li className="flex flex-wrap items-center gap-2">
+        <span>
+          {venue.name} — {venue.city}
+          {venue.capacity ? ` · ${venue.capacity.toLocaleString("fr-FR")} places` : ""}
+        </span>
+        {venue.is_confirmed ? <Badge tone="green">Confirmé</Badge> : <Badge tone="amber">À confirmer</Badge>}
+        <Button variant="link" onClick={() => setEditing(true)} aria-label={`Modifier ${venue.name}`}>
+          Modifier
+        </Button>
+      </li>
+    );
+  }
+  return (
+    <li>
+      <form
+        className="grid gap-2 rounded-lg bg-stone-50 p-2 sm:grid-cols-5"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          try {
+            await api(`/admin/venues/${venue.id}`, {
+              method: "PATCH",
+              body: JSON.stringify({ ...f, capacity: f.capacity === "" ? null : Number(f.capacity) }),
+            });
+            setEditing(false);
+            onDone(`Stade « ${f.name} » modifié`);
+          } catch (err) {
+            onError(err);
+          }
+        }}
+      >
+        <Field label="Nom du stade">
+          <input required minLength={2} className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+        </Field>
+        <Field label="Ville">
+          <input required className={inputClass} value={f.city} onChange={(e) => setF({ ...f, city: e.target.value })} />
+        </Field>
+        <Field label="Capacité">
+          <input type="number" min={0} className={inputClass} value={f.capacity} onChange={(e) => setF({ ...f, capacity: e.target.value })} />
+        </Field>
+        <label className="flex items-end gap-2 pb-2 text-sm">
+          <input type="checkbox" checked={f.is_confirmed} onChange={(e) => setF({ ...f, is_confirmed: e.target.checked })} />
+          Confirmé par la Ligue
+        </label>
+        <div className="flex items-end gap-2">
+          <Button type="submit">Enregistrer</Button>
+          <Button variant="secondary" onClick={() => setEditing(false)}>
+            Annuler
+          </Button>
+        </div>
+      </form>
+    </li>
   );
 }

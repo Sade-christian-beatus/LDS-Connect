@@ -65,6 +65,9 @@ def _scan_ticket(db: Session, actor, scan: ts.ScanIn, payload: dict, token: str)
     if t is None or t.token != token.strip():
         return None, rules.Decision(ScanResult.INVALID, "Billet inconnu ou remplacé")
     label = db.scalar(select(TicketType.name).where(TicketType.id == t.ticket_type_id))
+    refusal = rules.zone_refusal(kind="ticket", gate_zone=scan.zone)
+    if refusal:
+        return (t, label), rules.Decision(ScanResult.INVALID, refusal)
     first = db.scalar(
         select(AccessScan)
         .where(AccessScan.ticket_id == t.id, AccessScan.result == ScanResult.ADMITTED)
@@ -99,6 +102,9 @@ def _scan_accreditation(db: Session, scan: ts.ScanIn, payload: dict, token: str)
         return a, rules.Decision(ScanResult.INVALID, "Accréditation révoquée")
     if not (a.valid_from <= day <= a.valid_until):
         return a, rules.Decision(ScanResult.INVALID, "Accréditation hors de sa période de validité")
+    refusal = rules.zone_refusal(kind="accreditation", gate_zone=scan.zone, zones=a.zones)
+    if refusal:
+        return a, rules.Decision(ScanResult.INVALID, refusal)
     # Une accréditation permet plusieurs entrées et sorties
     return a, rules.Decision(ScanResult.ADMITTED, f"Accréditation {a.category.value} valide")
 
@@ -117,6 +123,7 @@ def record(db: Session, actor, scans: list[ts.ScanIn]) -> list[ts.ScanOut]:
             scanned_at=scan.scanned_at,
             offline=scan.offline,
             device=scan.device,
+            zone=scan.zone or None,
             scanned_by_id=getattr(actor, "id", None),
         )
         label = None

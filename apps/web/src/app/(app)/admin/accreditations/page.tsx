@@ -1,6 +1,7 @@
 "use client";
 // Accréditations : presse, officiels, équipes, sécurité, bénévoles, partenaires.
 import { useBrandLogo } from "@/lib/brand";
+import { ALL_ZONES, ZONES as GATE_ZONES } from "@/lib/access";
 import { BrandLogo } from "@/components/BrandLogo";
 import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Dialog, Field, inputClass, Notice } from "@/components/admin/ui";
@@ -19,7 +20,8 @@ export default function AccreditationsPage() {
   );
 }
 
-const ZONES = ["Pelouse", "Vestiaires", "Tribune de presse", "Zone mixte", "Tribune d'honneur", "Toutes zones"];
+// Zones réservées (communes avec l'écran de contrôle) ; sans zone cochée, seule l'entrée du public
+const ZONES = [...GATE_ZONES, ALL_ZONES];
 const today = () => new Date().toISOString().slice(0, 10);
 
 function Accreditations() {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SeasonName } from "@/components/SeasonFacts";
 import { Suspense } from "react";
 import { MatchCard } from "@/components/MatchCard";
 import { PageHeader, Pills } from "@/components/PageHeader";
@@ -17,7 +18,7 @@ const TABS = [
 export default function ResultatsPage({ searchParams }: PageProps<"/resultats">) {
   return (
     <>
-      <PageHeader kicker="Saison 2027" title="Résultats">
+      <PageHeader kicker={<SeasonName />} title="Résultats">
         Scores officiels, validés à partir des feuilles de match.
       </PageHeader>
       <Suspense fallback={<p className="text-subtle">Chargement des résultats…</p>}>

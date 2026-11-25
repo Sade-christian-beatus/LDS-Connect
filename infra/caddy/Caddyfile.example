@@ -1,20 +1,24 @@
 # Exemple de reverse proxy Caddy (TLS automatique via Let's Encrypt).
 # Remplacer lds.exemple.bf par le nom de domaine retenu par la Ligue.
 # Nginx ou Traefik conviennent aussi : voir docs/DEPLOIEMENT.md.
+#
+# Caddy tourne sur le serveur lui-même (paquet Debian/Ubuntu « caddy »), devant les ports que
+# docker-compose.yml publie sur 127.0.0.1 (API_PORT=8000, WEB_PORT=3000). Copier ce fichier en
+# /etc/caddy/Caddyfile puis : systemctl reload caddy.
 
 lds.exemple.bf {
 	encode gzip zstd
 
 	# API (y compris le flux temps réel SSE : pas de mise en tampon)
 	handle /api/* {
-		reverse_proxy api:8000 {
+		reverse_proxy 127.0.0.1:8000 {
 			flush_interval -1
 		}
 	}
 
 	# Site public et PWA
 	handle {
-		reverse_proxy web:3000
+		reverse_proxy 127.0.0.1:3000
 	}
 
 	header {

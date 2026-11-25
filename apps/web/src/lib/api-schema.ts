@@ -21,6 +21,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/login/mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login Mfa */
+        post: operations["login_mfa_api_v1_auth_login_mfa_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mfa Setup */
+        post: operations["mfa_setup_api_v1_auth_mfa_setup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mfa Enable */
+        post: operations["mfa_enable_api_v1_auth_mfa_enable_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mfa Disable */
+        post: operations["mfa_disable_api_v1_auth_mfa_disable_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/refresh": {
         parameters: {
             query?: never;
@@ -886,6 +954,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users/{user_id}/reset-mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset Mfa
+         * @description Téléphone perdu : la double authentification est à réactiver à la prochaine connexion.
+         */
+        post: operations["reset_mfa_api_v1_admin_users__user_id__reset_mfa_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/password": {
         parameters: {
             query?: never;
@@ -1379,6 +1467,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/orders/{reference}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refund Order */
+        post: operations["refund_order_api_v1_admin_orders__reference__refund_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/tickets/{code}/cancel": {
         parameters: {
             query?: never;
@@ -1756,6 +1861,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current Rules */
+        get: operations["current_rules_api_v1_admin_rules_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Rules */
+        patch: operations["update_rules_api_v1_admin_rules_patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Seasons */
+        get: operations["list_seasons_api_v1_admin_seasons_get"];
+        put?: never;
+        /** Create Season */
+        post: operations["create_season_api_v1_admin_seasons_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/seasons/{season_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate Season */
+        post: operations["activate_season_api_v1_admin_seasons__season_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/venues/{venue_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Venue */
+        patch: operations["update_venue_api_v1_admin_venues__venue_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dashboard */
+        get: operations["dashboard_api_v1_admin_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -2121,6 +2313,31 @@ export interface components {
             /** Phone Hint */
             phone_hint: string;
         };
+        /** Counts */
+        Counts: {
+            /** Licences Active */
+            licences_active: number;
+            /** Licences Blocked */
+            licences_blocked: number;
+            /** Sheets To Validate */
+            sheets_to_validate: number;
+            /** Matches Played */
+            matches_played: number;
+            /** Matches Total */
+            matches_total: number;
+            /** Tickets Sold */
+            tickets_sold: number;
+            /** Revenue Fcfa */
+            revenue_fcfa: number;
+            /** Refunds Due */
+            refunds_due: number;
+            /** Ballots Open */
+            ballots_open: number;
+            /** Votes Valid */
+            votes_valid: number;
+            /** Votes Flagged */
+            votes_flagged: number;
+        };
         /**
          * CredentialsOut
          * @description Mot de passe provisoire : affiché une seule fois, jamais stocké en clair.
@@ -2140,6 +2357,16 @@ export interface components {
             match_duration_minutes: number;
             /** Rows */
             rows: components["schemas"]["DashboardRow"][];
+        };
+        /** DashboardOut */
+        DashboardOut: {
+            /** Season */
+            season: string;
+            /** Live */
+            live: components["schemas"]["MatchOut"][];
+            /** Upcoming */
+            upcoming: components["schemas"]["MatchOut"][];
+            counts: components["schemas"]["Counts"];
         };
         /** DashboardRow */
         DashboardRow: {
@@ -2554,6 +2781,40 @@ export interface components {
          * @enum {string}
          */
         MembershipStatus: "active" | "released";
+        /** MfaCodeIn */
+        MfaCodeIn: {
+            /** Code */
+            code: string;
+        };
+        /** MfaLoginIn */
+        MfaLoginIn: {
+            /** Mfa Token */
+            mfa_token: string;
+            /** Code */
+            code: string;
+        };
+        /**
+         * MfaRequiredOut
+         * @description Mot de passe correct : saisir le code de l'application d'authentification.
+         */
+        MfaRequiredOut: {
+            /**
+             * Mfa Required
+             * @default true
+             */
+            mfa_required: boolean;
+            /** Mfa Token */
+            mfa_token: string;
+        };
+        /** MfaSetupOut */
+        MfaSetupOut: {
+            /** Secret */
+            secret: string;
+            /** Otpauth Uri */
+            otpauth_uri: string;
+            /** Qr Svg */
+            qr_svg: string;
+        };
         /** NoteDelete */
         NoteDelete: {
             /** Reason */
@@ -2664,6 +2925,16 @@ export interface components {
             provider: string;
             /** Tickets */
             tickets: string[];
+            /**
+             * Cancelled Tickets
+             * @default 0
+             */
+            cancelled_tickets: number;
+            /**
+             * Refund Due Fcfa
+             * @default 0
+             */
+            refund_due_fcfa: number;
         };
         /** OrderCreated */
         OrderCreated: {
@@ -2944,6 +3215,13 @@ export interface components {
             /** Staff */
             staff: components["schemas"]["PublicStaff"][];
         };
+        /** RefundIn */
+        RefundIn: {
+            /** Reason */
+            reason: string;
+            /** Transaction */
+            transaction?: string | null;
+        };
         /** RegionOut */
         RegionOut: {
             /**
@@ -3015,6 +3293,70 @@ export interface components {
             /** Detail */
             detail: string;
         };
+        /** RulesAdminOut */
+        RulesAdminOut: {
+            /** Points Win */
+            points_win: number;
+            /** Points Draw */
+            points_draw: number;
+            /** Points Loss */
+            points_loss: number;
+            /** Tiebreakers */
+            tiebreakers: string[];
+            /** Max Squad Players */
+            max_squad_players: number;
+            /** Max Staff */
+            max_staff: number;
+            /** Min Age */
+            min_age: number;
+            /** Youth Age Limit */
+            youth_age_limit: number;
+            /** Min Youth Players */
+            min_youth_players: number;
+            /** Age Reference Date */
+            age_reference_date?: string | null;
+            /** Min Local Starters Ratio */
+            min_local_starters_ratio: string;
+            /** Residence Min Months */
+            residence_min_months: number;
+            /** Starters Count */
+            starters_count: number;
+            /** Max Substitutes On Sheet */
+            max_substitutes_on_sheet: number;
+            /** Max Substitutions */
+            max_substitutions: number;
+            /** Match Duration Minutes */
+            match_duration_minutes: number;
+            /** Yellow Cards Threshold */
+            yellow_cards_threshold: number;
+            /** Yellow Accumulation Ban Matches */
+            yellow_accumulation_ban_matches: number;
+            /** Red Card Ban Matches */
+            red_card_ban_matches: number;
+            /** Second Yellow Ban Matches */
+            second_yellow_ban_matches: number;
+            /** Reset Yellows After Group Stage */
+            reset_yellows_after_group_stage: boolean;
+            /** Qualifiers Per Pool */
+            qualifiers_per_pool: number;
+            /** Third Place Match */
+            third_place_match: boolean;
+            /** Knockout Pairings */
+            knockout_pairings: string[][];
+            /** Prize Money */
+            prize_money: {
+                [key: string]: number;
+            };
+            /**
+             * Season Id
+             * Format: uuid
+             */
+            season_id: string;
+            /** Locked Fields */
+            locked_fields: string[];
+            /** Season Started */
+            season_started: boolean;
+        };
         /**
          * RulesOut
          * @description Règles sportives de la saison (information publique).
@@ -3067,6 +3409,66 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /**
+         * RulesUpdate
+         * @description Modification partielle : seuls les champs envoyés changent.
+         */
+        RulesUpdate: {
+            /** Points Win */
+            points_win?: number | null;
+            /** Points Draw */
+            points_draw?: number | null;
+            /** Points Loss */
+            points_loss?: number | null;
+            /** Tiebreakers */
+            tiebreakers?: string[] | null;
+            /** Max Squad Players */
+            max_squad_players?: number | null;
+            /** Max Staff */
+            max_staff?: number | null;
+            /** Min Age */
+            min_age?: number | null;
+            /** Youth Age Limit */
+            youth_age_limit?: number | null;
+            /** Min Youth Players */
+            min_youth_players?: number | null;
+            /** Age Reference Date */
+            age_reference_date?: string | null;
+            /** Min Local Starters Ratio */
+            min_local_starters_ratio?: number | string | null;
+            /** Residence Min Months */
+            residence_min_months?: number | null;
+            /** Starters Count */
+            starters_count?: number | null;
+            /** Max Substitutes On Sheet */
+            max_substitutes_on_sheet?: number | null;
+            /** Max Substitutions */
+            max_substitutions?: number | null;
+            /** Match Duration Minutes */
+            match_duration_minutes?: number | null;
+            /** Yellow Cards Threshold */
+            yellow_cards_threshold?: number | null;
+            /** Yellow Accumulation Ban Matches */
+            yellow_accumulation_ban_matches?: number | null;
+            /** Red Card Ban Matches */
+            red_card_ban_matches?: number | null;
+            /** Second Yellow Ban Matches */
+            second_yellow_ban_matches?: number | null;
+            /** Reset Yellows After Group Stage */
+            reset_yellows_after_group_stage?: boolean | null;
+            /** Qualifiers Per Pool */
+            qualifiers_per_pool?: number | null;
+            /** Third Place Match */
+            third_place_match?: boolean | null;
+            /** Knockout Pairings */
+            knockout_pairings?: string[][] | null;
+            /** Prize Money */
+            prize_money?: {
+                [key: string]: number;
+            } | null;
+            /** Reason */
+            reason: string;
+        };
         /** ScanBatch */
         ScanBatch: {
             /** Scans */
@@ -3095,6 +3497,8 @@ export interface components {
             offline: boolean;
             /** Device */
             device?: string | null;
+            /** Zone */
+            zone?: string | null;
         };
         /** ScanOut */
         ScanOut: {
@@ -3122,6 +3526,63 @@ export interface components {
          * @enum {string}
          */
         ScanResult: "admitted" | "duplicate" | "invalid" | "wrong_match";
+        /** SeasonAdminOut */
+        SeasonAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Year */
+            year: number;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            status: components["schemas"]["SeasonStatus"];
+            /** Is Current */
+            is_current: boolean;
+            /**
+             * Teams
+             * @default 0
+             */
+            teams: number;
+            /**
+             * Matches
+             * @default 0
+             */
+            matches: number;
+        };
+        /** SeasonCreate */
+        SeasonCreate: {
+            /** Year */
+            year: number;
+            /** Name */
+            name: string;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /**
+             * Copy From Current
+             * @default true
+             */
+            copy_from_current: boolean;
+        };
         /** SeasonOut */
         SeasonOut: {
             /**
@@ -3153,6 +3614,11 @@ export interface components {
             /** Assists */
             assists: components["schemas"]["StatRow"][];
         };
+        /**
+         * SeasonStatus
+         * @enum {string}
+         */
+        SeasonStatus: "draft" | "active" | "closed";
         /** SensitiveData */
         SensitiveData: {
             /**
@@ -3731,6 +4197,16 @@ export interface components {
             is_active: boolean;
             /** Must Change Password */
             must_change_password: boolean;
+            /**
+             * Mfa Enabled
+             * @default false
+             */
+            mfa_enabled: boolean;
+            /**
+             * Mfa Required
+             * @default false
+             */
+            mfa_required: boolean;
             /** Last Login At */
             last_login_at: string | null;
             /**
@@ -3768,6 +4244,21 @@ export interface components {
             team_id: string | null;
             /** Must Change Password */
             must_change_password: boolean;
+            /**
+             * Mfa Enabled
+             * @default false
+             */
+            mfa_enabled: boolean;
+            /**
+             * Mfa Required
+             * @default false
+             */
+            mfa_required: boolean;
+            /**
+             * Mfa Setup Required
+             * @default false
+             */
+            mfa_setup_required: boolean;
         };
         /** UserUpdateIn */
         UserUpdateIn: {
@@ -3821,6 +4312,23 @@ export interface components {
             city: string;
             /** Is Confirmed */
             is_confirmed: boolean;
+            /** Capacity */
+            capacity?: number | null;
+            /** Address */
+            address?: string | null;
+        };
+        /** VenueUpdate */
+        VenueUpdate: {
+            /** Name */
+            name?: string | null;
+            /** City */
+            city?: string | null;
+            /** Capacity */
+            capacity?: number | null;
+            /** Address */
+            address?: string | null;
+            /** Is Confirmed */
+            is_confirmed?: boolean | null;
         };
         /** VerifyIn */
         VerifyIn: {
@@ -3918,7 +4426,126 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": components["schemas"]["TokenOut"] | components["schemas"]["MfaRequiredOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    login_mfa_api_v1_auth_login_mfa_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaLoginIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "application/json": components["schemas"]["TokenOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mfa_setup_api_v1_auth_mfa_setup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaSetupOut"];
+                };
+            };
+        };
+    };
+    mfa_enable_api_v1_auth_mfa_enable_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mfa_disable_api_v1_auth_mfa_disable_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
                 };
             };
             /** @description Validation Error */
@@ -5429,6 +6056,37 @@ export interface operations {
             };
         };
     };
+    reset_mfa_api_v1_admin_users__user_id__reset_mfa_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     change_password_api_v1_auth_password_post: {
         parameters: {
             query?: never;
@@ -6322,6 +6980,39 @@ export interface operations {
             };
         };
     };
+    refund_order_api_v1_admin_orders__reference__refund_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reference: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefundIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     cancel_ticket_api_v1_admin_tickets__code__cancel_post: {
         parameters: {
             query?: never;
@@ -7130,6 +7821,198 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    current_rules_api_v1_admin_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesAdminOut"];
+                };
+            };
+        };
+    };
+    update_rules_api_v1_admin_rules_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RulesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_seasons_api_v1_admin_seasons_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonAdminOut"][];
+                };
+            };
+        };
+    };
+    create_season_api_v1_admin_seasons_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeasonCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_season_api_v1_admin_seasons__season_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                season_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_venue_api_v1_admin_venues__venue_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VenueUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dashboard_api_v1_admin_dashboard_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardOut"];
                 };
             };
         };

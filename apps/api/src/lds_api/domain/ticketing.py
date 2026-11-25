@@ -100,3 +100,21 @@ def decide_ticket(
         where = f" ({first_entry.device})" if first_entry.device else ""
         return Decision("duplicate", f"Déjà entré à {at}{where}")
     return Decision("admitted", "Entrée autorisée")
+
+
+# --- Zones du stade (audit M10) --------------------------------------------------------------
+# Une porte sans zone est une entrée du public (tribunes) : billets et accréditations y passent.
+# Une porte attachée à une zone réservée (pelouse, vestiaires, presse…) n'admet que les
+# accréditations qui portent cette zone, ou « Toutes zones ».
+ALL_ZONES = "Toutes zones"
+
+
+def zone_refusal(*, kind: str, gate_zone: str | None, zones: list[str] | None = None) -> str | None:
+    """Motif de refus lié à la zone, ou None si le passage est permis à cette porte."""
+    if not gate_zone:
+        return None
+    if kind == "ticket":
+        return f"Billet du public : pas d'accès à la zone « {gate_zone} »"
+    if ALL_ZONES in (zones or []) or gate_zone in (zones or []):
+        return None
+    return f"Zone « {gate_zone} » non autorisée pour cette accréditation"

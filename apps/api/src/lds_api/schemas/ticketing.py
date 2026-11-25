@@ -112,6 +112,15 @@ class OrderAdminOut(BaseModel):
     paid_at: datetime | None
     provider: str
     tickets: list[str]
+    cancelled_tickets: int = 0
+    # Montant payé à rembourser (commande annulée après paiement, ou tous ses billets annulés)
+    refund_due_fcfa: int = 0
+
+
+class RefundIn(BaseModel):
+    reason: str = Field(min_length=3, max_length=255)
+    # Référence du remboursement (transaction mobile money, reçu…), pour le rapprochement
+    transaction: str | None = Field(default=None, max_length=120)
 
 
 class CancelIn(BaseModel):
@@ -142,6 +151,8 @@ class ScanIn(BaseModel):
     scanned_at: datetime
     offline: bool = False
     device: str | None = Field(default=None, max_length=80)
+    # Zone gardée par l'appareil (vide : entrée du public)
+    zone: str | None = Field(default=None, max_length=40)
 
 
 class ScanBatch(BaseModel):

@@ -492,18 +492,31 @@ def admin_orders(
     types = {t.id: t for t in _types(db, match_id, active_only=False)}
     if not types:
         return []
-    orders = db.scalars(
-        select(Order)
-        .where(Order.ticket_type_id.in_(types))
-        .order_by(Order.created_at.desc())
-        .limit(500)
-    )
+    orders = [
+        o
+        for o in db.scalars(
+            select(Order)
+            .where(Order.ticket_type_id.in_(types))
+            .order_by(Order.created_at.desc())
+            .limit(500)
+        )
+        if not state or _state(o, at) == state
+    ]
+    # Codes des billets en une seule requête (et non une par commande)
+    codes: dict[uuid.UUID, list[str]] = {o.id: [] for o in orders}
+    cancelled: dict[uuid.UUID, int] = dict.fromkeys(codes, 0)
+    if orders:
+        rows = db.execute(
+            select(Ticket.order_id, Ticket.code, Ticket.status)
+            .where(Ticket.order_id.in_(list(codes)))
+            .order_by(Ticket.code)
+        )
+        for order_id, code, status_ in rows:
+            codes[order_id].append(code)
+            cancelled[order_id] += status_ == TicketStatus.CANCELLED
     out = []
     for o in orders:
         st = _state(o, at)
-        if state and st != state:
-            continue
-        codes = db.scalars(select(Ticket.code).where(Ticket.order_id == o.id).order_by(Ticket.code))
         out.append(
             ts.OrderAdminOut(
                 reference=o.reference,
@@ -516,10 +529,54 @@ def admin_orders(
                 created_at=o.created_at,
                 paid_at=o.paid_at,
                 provider=o.provider,
-                tickets=list(codes),
+                tickets=codes[o.id],
+                cancelled_tickets=cancelled[o.id],
+                refund_due_fcfa=o.amount_fcfa
+                if _refund_due(o, len(codes[o.id]), cancelled[o.id])
+                else 0,
             )
         )
     return out
+
+
+def _refund_due(order: Order, tickets: int, cancelled: int) -> bool:
+    """Argent encaissé sans billet utilisable : commande annulée après paiement, ou payée
+    dont tous les billets ont été annulés (match annulé, erreur…)."""
+    if order.paid_at is None:
+        return False
+    if order.status == OrderStatus.CANCELLED:
+        return True
+    return order.status == OrderStatus.PAID and tickets > 0 and cancelled == tickets
+
+
+def mark_refunded(db: Session, actor, reference: str, reason: str, transaction: str | None):
+    """Le remboursement se fait hors plateforme (mobile money) ; il est consigné ici."""
+    o = db.scalar(select(Order).where(Order.reference == reference).with_for_update())
+    if o is None:
+        raise NotFound("Commande introuvable")
+    if o.status == OrderStatus.REFUNDED:
+        raise BusinessError("Commande déjà remboursée")
+    tickets = list(db.scalars(select(Ticket).where(Ticket.order_id == o.id)))
+    cancelled = sum(t.status == TicketStatus.CANCELLED for t in tickets)
+    if not _refund_due(o, len(tickets), cancelled):
+        raise BusinessError(
+            "Rien à rembourser : la commande n'a pas été payée ou garde des billets valables "
+            "(annulez d'abord les billets concernés)"
+        )
+    o.status = OrderStatus.REFUNDED
+    audit.record(
+        db,
+        actor,
+        "refund",
+        "order",
+        o.id,
+        {
+            "reference": o.reference,
+            "amount_fcfa": o.amount_fcfa,
+            "reason": reason,
+            "transaction": transaction,
+        },
+    )
 
 
 def cancel_ticket(db: Session, actor, code: str, reason: str) -> None:

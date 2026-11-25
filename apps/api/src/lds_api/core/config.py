@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # Proxys de confiance (reverse proxy, réseau Docker) : seuls eux peuvent indiquer
     # l'adresse réelle du visiteur par X-Forwarded-For. Adresses ou réseaux, séparés par
     # des virgules. Sans cela, derrière un proxy, tous les visiteurs auraient la même IP.
+    # Documentation interactive de l'API (/api/v1/docs) : ouverte en développement, fermée en
+    # production sauf API_DOCS_PUBLIC=true (elle décrit toutes les routes d'administration)
+    api_docs_public: bool | None = None
     trusted_proxies: str = "127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
     # Base de données et cache
@@ -35,6 +38,10 @@ class Settings(BaseSettings):
     jwt_access_ttl_minutes: int = 15
     jwt_refresh_ttl_days: int = 14
     refresh_cookie_secure: bool = False
+    # Rôles tenus d'activer la double authentification (codes séparés par des virgules).
+    # Non renseigné : super administrateur et administration en production, aucun ailleurs
+    # (démonstration et tests sans application d'authentification).
+    mfa_required_roles: str | None = None
 
     # Chiffrement des données personnelles (AES-256-GCM) — clé base64 de 32 octets
     field_encryption_key: SecretStr = SecretStr("")
@@ -60,6 +67,11 @@ class Settings(BaseSettings):
     payment_callback_base_url: str = ""
     # Secret partagé avec l'agrégateur : signature HMAC-SHA256 de ses notifications
     payment_webhook_secret: SecretStr = SecretStr("")
+    # Durées de conservation en jours (purge : python -m lds_api.cli purge ; 0 = sans limite)
+    retention_otp_days: int = 30  # après la clôture du scrutin
+    retention_unpaid_orders_days: int = 30
+    retention_paid_order_phone_days: int = 0  # à fixer par la Ligue (obligations comptables)
+
     storage_backend: Literal["local", "s3"] = "local"
     storage_local_path: str = "./var/storage"
     s3_endpoint_url: str | None = None
@@ -77,6 +89,14 @@ class Settings(BaseSettings):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
 
+    @property
+    def mfa_roles(self) -> set[str]:
+        if self.mfa_required_roles is None:
+            if self.environment == "production":
+                return {"super_admin", "admin_competition"}
+            return set()
+        return {r.strip() for r in self.mfa_required_roles.split(",") if r.strip()}
+
     def production_problems(self) -> list[str]:
         """Réglages incompatibles avec une mise en service (vérifiés au démarrage en production)."""
         problems: list[str] = []
@@ -85,6 +105,8 @@ class Settings(BaseSettings):
         for name in ("field_encryption_key", "blind_index_key", "licence_signing_key"):
             if not getattr(self, name).get_secret_value():
                 problems.append(f"{name.upper()} est vide (make keys)")
+        if "super_admin" not in self.mfa_roles:
+            problems.append("MFA_REQUIRED_ROLES doit inclure super_admin (double authentification)")
         if not self.refresh_cookie_secure:
             problems.append("REFRESH_COOKIE_SECURE doit valoir true (HTTPS)")
         if self.payment_provider == "simulator":

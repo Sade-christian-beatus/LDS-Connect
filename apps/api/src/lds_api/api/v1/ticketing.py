@@ -122,6 +122,12 @@ def list_orders(
     return svc.admin_orders(db, match_id, state)
 
 
+@router.post("/admin/orders/{reference}/refund", status_code=status.HTTP_204_NO_CONTENT)
+def refund_order(reference: str, body: ts.RefundIn, db: DbSession, actor: TicketManager):
+    svc.mark_refunded(db, actor, reference, body.reason, body.transaction)
+    db.commit()
+
+
 @router.post("/admin/tickets/{code}/cancel", status_code=status.HTTP_204_NO_CONTENT)
 def cancel_ticket(code: str, body: ts.CancelIn, db: DbSession, actor: TicketManager):
     svc.cancel_ticket(db, actor, code, body.reason)

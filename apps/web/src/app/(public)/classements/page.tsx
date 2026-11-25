@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BracketTree } from "@/components/BracketTree";
 import { PageHeader } from "@/components/PageHeader";
+import { SeasonName } from "@/components/SeasonFacts";
 import { StandingsTable } from "@/components/StandingsTable";
 import { apiGet } from "@/lib/server-api";
 import type { Match, PoolStandings } from "@/lib/types";
@@ -12,7 +13,7 @@ export const metadata: Metadata = { title: "Classements" };
 export default function ClassementsPage() {
   return (
     <>
-      <PageHeader kicker="Saison 2027" title="Classements">
+      <PageHeader kicker={<SeasonName />} title="Classements">
         Les quatre premiers de chaque poule se qualifient pour les quarts de finale.
       </PageHeader>
       <Suspense fallback={<p className="text-subtle">Chargement des classements…</p>}>
