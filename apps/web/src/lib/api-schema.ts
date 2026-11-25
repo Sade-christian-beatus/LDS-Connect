@@ -1756,6 +1756,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current Rules */
+        get: operations["current_rules_api_v1_admin_rules_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Rules */
+        patch: operations["update_rules_api_v1_admin_rules_patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Seasons */
+        get: operations["list_seasons_api_v1_admin_seasons_get"];
+        put?: never;
+        /** Create Season */
+        post: operations["create_season_api_v1_admin_seasons_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/seasons/{season_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate Season */
+        post: operations["activate_season_api_v1_admin_seasons__season_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/venues/{venue_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Venue */
+        patch: operations["update_venue_api_v1_admin_venues__venue_id__patch"];
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -3015,6 +3085,70 @@ export interface components {
             /** Detail */
             detail: string;
         };
+        /** RulesAdminOut */
+        RulesAdminOut: {
+            /** Points Win */
+            points_win: number;
+            /** Points Draw */
+            points_draw: number;
+            /** Points Loss */
+            points_loss: number;
+            /** Tiebreakers */
+            tiebreakers: string[];
+            /** Max Squad Players */
+            max_squad_players: number;
+            /** Max Staff */
+            max_staff: number;
+            /** Min Age */
+            min_age: number;
+            /** Youth Age Limit */
+            youth_age_limit: number;
+            /** Min Youth Players */
+            min_youth_players: number;
+            /** Age Reference Date */
+            age_reference_date?: string | null;
+            /** Min Local Starters Ratio */
+            min_local_starters_ratio: string;
+            /** Residence Min Months */
+            residence_min_months: number;
+            /** Starters Count */
+            starters_count: number;
+            /** Max Substitutes On Sheet */
+            max_substitutes_on_sheet: number;
+            /** Max Substitutions */
+            max_substitutions: number;
+            /** Match Duration Minutes */
+            match_duration_minutes: number;
+            /** Yellow Cards Threshold */
+            yellow_cards_threshold: number;
+            /** Yellow Accumulation Ban Matches */
+            yellow_accumulation_ban_matches: number;
+            /** Red Card Ban Matches */
+            red_card_ban_matches: number;
+            /** Second Yellow Ban Matches */
+            second_yellow_ban_matches: number;
+            /** Reset Yellows After Group Stage */
+            reset_yellows_after_group_stage: boolean;
+            /** Qualifiers Per Pool */
+            qualifiers_per_pool: number;
+            /** Third Place Match */
+            third_place_match: boolean;
+            /** Knockout Pairings */
+            knockout_pairings: string[][];
+            /** Prize Money */
+            prize_money: {
+                [key: string]: number;
+            };
+            /**
+             * Season Id
+             * Format: uuid
+             */
+            season_id: string;
+            /** Locked Fields */
+            locked_fields: string[];
+            /** Season Started */
+            season_started: boolean;
+        };
         /**
          * RulesOut
          * @description Règles sportives de la saison (information publique).
@@ -3066,6 +3200,66 @@ export interface components {
             prize_money: {
                 [key: string]: number;
             };
+        };
+        /**
+         * RulesUpdate
+         * @description Modification partielle : seuls les champs envoyés changent.
+         */
+        RulesUpdate: {
+            /** Points Win */
+            points_win?: number | null;
+            /** Points Draw */
+            points_draw?: number | null;
+            /** Points Loss */
+            points_loss?: number | null;
+            /** Tiebreakers */
+            tiebreakers?: string[] | null;
+            /** Max Squad Players */
+            max_squad_players?: number | null;
+            /** Max Staff */
+            max_staff?: number | null;
+            /** Min Age */
+            min_age?: number | null;
+            /** Youth Age Limit */
+            youth_age_limit?: number | null;
+            /** Min Youth Players */
+            min_youth_players?: number | null;
+            /** Age Reference Date */
+            age_reference_date?: string | null;
+            /** Min Local Starters Ratio */
+            min_local_starters_ratio?: number | string | null;
+            /** Residence Min Months */
+            residence_min_months?: number | null;
+            /** Starters Count */
+            starters_count?: number | null;
+            /** Max Substitutes On Sheet */
+            max_substitutes_on_sheet?: number | null;
+            /** Max Substitutions */
+            max_substitutions?: number | null;
+            /** Match Duration Minutes */
+            match_duration_minutes?: number | null;
+            /** Yellow Cards Threshold */
+            yellow_cards_threshold?: number | null;
+            /** Yellow Accumulation Ban Matches */
+            yellow_accumulation_ban_matches?: number | null;
+            /** Red Card Ban Matches */
+            red_card_ban_matches?: number | null;
+            /** Second Yellow Ban Matches */
+            second_yellow_ban_matches?: number | null;
+            /** Reset Yellows After Group Stage */
+            reset_yellows_after_group_stage?: boolean | null;
+            /** Qualifiers Per Pool */
+            qualifiers_per_pool?: number | null;
+            /** Third Place Match */
+            third_place_match?: boolean | null;
+            /** Knockout Pairings */
+            knockout_pairings?: string[][] | null;
+            /** Prize Money */
+            prize_money?: {
+                [key: string]: number;
+            } | null;
+            /** Reason */
+            reason: string;
         };
         /** ScanBatch */
         ScanBatch: {
@@ -3122,6 +3316,63 @@ export interface components {
          * @enum {string}
          */
         ScanResult: "admitted" | "duplicate" | "invalid" | "wrong_match";
+        /** SeasonAdminOut */
+        SeasonAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Year */
+            year: number;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            status: components["schemas"]["SeasonStatus"];
+            /** Is Current */
+            is_current: boolean;
+            /**
+             * Teams
+             * @default 0
+             */
+            teams: number;
+            /**
+             * Matches
+             * @default 0
+             */
+            matches: number;
+        };
+        /** SeasonCreate */
+        SeasonCreate: {
+            /** Year */
+            year: number;
+            /** Name */
+            name: string;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /**
+             * Copy From Current
+             * @default true
+             */
+            copy_from_current: boolean;
+        };
         /** SeasonOut */
         SeasonOut: {
             /**
@@ -3153,6 +3404,11 @@ export interface components {
             /** Assists */
             assists: components["schemas"]["StatRow"][];
         };
+        /**
+         * SeasonStatus
+         * @enum {string}
+         */
+        SeasonStatus: "draft" | "active" | "closed";
         /** SensitiveData */
         SensitiveData: {
             /**
@@ -3821,6 +4077,23 @@ export interface components {
             city: string;
             /** Is Confirmed */
             is_confirmed: boolean;
+            /** Capacity */
+            capacity?: number | null;
+            /** Address */
+            address?: string | null;
+        };
+        /** VenueUpdate */
+        VenueUpdate: {
+            /** Name */
+            name?: string | null;
+            /** City */
+            city?: string | null;
+            /** Capacity */
+            capacity?: number | null;
+            /** Address */
+            address?: string | null;
+            /** Is Confirmed */
+            is_confirmed?: boolean | null;
         };
         /** VerifyIn */
         VerifyIn: {
@@ -7121,6 +7394,178 @@ export interface operations {
                     "image/png": unknown;
                     "image/jpeg": unknown;
                     "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    current_rules_api_v1_admin_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesAdminOut"];
+                };
+            };
+        };
+    };
+    update_rules_api_v1_admin_rules_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RulesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_seasons_api_v1_admin_seasons_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonAdminOut"][];
+                };
+            };
+        };
+    };
+    create_season_api_v1_admin_seasons_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeasonCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_season_api_v1_admin_seasons__season_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                season_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_venue_api_v1_admin_venues__venue_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VenueUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueOut"];
                 };
             };
             /** @description Validation Error */

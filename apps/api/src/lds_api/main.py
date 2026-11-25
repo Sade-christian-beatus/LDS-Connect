@@ -11,6 +11,7 @@ from lds_api.api.v1 import (
     media,
     public,
     registry,
+    seasons,
     sheets,
     talents,
     ticketing,
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
         ticketing,
         talents,
         media,
+        seasons,
     )
     for module in modules:
         v1.include_router(module.router)

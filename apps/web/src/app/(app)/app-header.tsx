@@ -24,6 +24,7 @@ export function menuFor(user: User): Item[] {
     });
   }
   if (p.has("fixture:manage")) items.push({ href: "/admin/calendrier", label: "Calendrier", group: "Compétition" });
+  if (p.has("rules:manage")) items.push({ href: "/admin/saison", label: "Saison et règles", group: "Compétition" });
   if (p.has("sheet:edit")) items.push({ href: "/delegue", label: "Feuilles de match", group: "Compétition" });
   if (p.has("stats:read")) items.push({ href: "/admin/talents", label: "Talents", group: "Compétition" });
   if (p.has("licence:verify")) items.push({ href: "/controle", label: "Licences", group: "Au stade" });
