@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 from sqlalchemy import select
 
-from lds_api.models import Match, Order
+from lds_api.models import AuditLog, Match, Order
 from lds_api.models.enums import MatchStatus
 from lds_api.providers.payment import PaymentSession, SimulatorPaymentProvider, sign
 from lds_api.providers.sms import SmsResult
@@ -430,3 +430,36 @@ def test_payment_disabled_is_explicit(client, as_admin, match, monkeypatch):
         assert r.status_code == 503 and "pas encore disponible" in r.json()["detail"]
     finally:
         get_settings.cache_clear()
+
+
+def test_refund_tracking(client, db, as_admin, pay, sms, match):
+    tt = make_type(client, as_admin, match)
+    bought = buy(client, pay, tt, quantity=2)
+    ref = bought["reference"]
+    url = f"/api/v1/admin/orders/{ref}/refund"
+    body = {"reason": "Match annulé", "transaction": "OM-778899"}
+    # Billets encore valables : rien à rembourser
+    assert client.post(url, json=body, headers=as_admin).status_code == 422
+
+    for t in bought["tickets"]:
+        r = client.post(
+            f"/api/v1/admin/tickets/{t['code']}/cancel",
+            json={"reason": "Match annulé"},
+            headers=as_admin,
+        )
+        assert r.status_code == 204
+    orders = client.get(
+        "/api/v1/admin/orders", params={"match_id": str(match.id)}, headers=as_admin
+    ).json()
+    row = next(o for o in orders if o["reference"] == ref)
+    assert row["cancelled_tickets"] == 2 and row["refund_due_fcfa"] == row["amount_fcfa"]
+
+    assert client.post(url, json=body, headers=as_admin).status_code == 204
+    orders = client.get(
+        "/api/v1/admin/orders", params={"match_id": str(match.id)}, headers=as_admin
+    ).json()
+    row = next(o for o in orders if o["reference"] == ref)
+    assert row["state"] == "refunded" and row["refund_due_fcfa"] == 0
+    assert client.post(url, json=body, headers=as_admin).status_code == 422
+    log = db.scalars(select(AuditLog).where(AuditLog.action == "refund")).all()[-1]
+    assert log.changes["transaction"] == "OM-778899"

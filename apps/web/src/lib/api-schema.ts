@@ -1467,6 +1467,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/orders/{reference}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refund Order */
+        post: operations["refund_order_api_v1_admin_orders__reference__refund_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/tickets/{code}/cancel": {
         parameters: {
             query?: never;
@@ -2856,6 +2873,16 @@ export interface components {
             provider: string;
             /** Tickets */
             tickets: string[];
+            /**
+             * Cancelled Tickets
+             * @default 0
+             */
+            cancelled_tickets: number;
+            /**
+             * Refund Due Fcfa
+             * @default 0
+             */
+            refund_due_fcfa: number;
         };
         /** OrderCreated */
         OrderCreated: {
@@ -3136,6 +3163,13 @@ export interface components {
             /** Staff */
             staff: components["schemas"]["PublicStaff"][];
         };
+        /** RefundIn */
+        RefundIn: {
+            /** Reason */
+            reason: string;
+            /** Transaction */
+            transaction?: string | null;
+        };
         /** RegionOut */
         RegionOut: {
             /**
@@ -3411,6 +3445,8 @@ export interface components {
             offline: boolean;
             /** Device */
             device?: string | null;
+            /** Zone */
+            zone?: string | null;
         };
         /** ScanOut */
         ScanOut: {
@@ -6880,6 +6916,39 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["OrderAdminOut"][];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refund_order_api_v1_admin_orders__reference__refund_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reference: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefundIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

@@ -55,6 +55,7 @@ function Billetterie() {
   const { data: stats } = useApi<AccessStats>(matchId ? `/access/matches/${matchId}/stats` : null);
   const [form, setForm] = useState<Form | null>(null);
   const [cancel, setCancel] = useState<{ code: string; reason: string } | null>(null);
+  const [refund, setRefund] = useState<{ reference: string; amount: number; reason: string; transaction: string } | null>(null);
   const [notice, setNotice] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const match = matches?.find((m) => m.id === matchId);
 
@@ -250,6 +251,17 @@ function Billetterie() {
                     <span className="w-24 text-right font-semibold">{formatFcfa(o.amount_fcfa)}</span>
                     <span className="text-xs text-stone-500">{formatDateTime(o.paid_at ?? o.created_at)}</span>
                     <Badge tone={st.tone}>{st.label}</Badge>
+                    {o.refund_due_fcfa > 0 && (
+                      <Button
+                        variant="secondary"
+                        onClick={() => setRefund({ reference: o.reference, amount: o.refund_due_fcfa, reason: "", transaction: "" })}
+                      >
+                        À rembourser · Marquer remboursée
+                      </Button>
+                    )}
+                    {o.cancelled_tickets > 0 && o.refund_due_fcfa === 0 && o.state === "paid" && (
+                      <span className="text-xs text-amber-800">{o.cancelled_tickets} billet(s) annulé(s) : remboursement partiel hors plateforme</span>
+                    )}
                     {o.tickets.length > 0 && (
                       <span className="flex w-full flex-wrap gap-1 pl-40">
                         {o.tickets.map((c) => (
@@ -304,6 +316,45 @@ function Billetterie() {
                 Annuler
               </Button>
               <Button type="submit">Enregistrer</Button>
+            </div>
+          </form>
+        )}
+      </Dialog>
+
+      <Dialog open={!!refund} title={`Remboursement ${refund?.reference ?? ""}`} onClose={() => setRefund(null)}>
+        {refund && (
+          <form
+            className="space-y-3"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                await api(`/admin/orders/${refund.reference}/refund`, {
+                  method: "POST",
+                  body: JSON.stringify({ reason: refund.reason, transaction: refund.transaction || null }),
+                });
+                setNotice({ tone: "ok", text: `${refund.reference} : remboursement de ${formatFcfa(refund.amount)} consigné` });
+                setRefund(null);
+                reloadOrders();
+              } catch (err) {
+                setNotice({ tone: "error", text: err instanceof Error ? err.message : String(err) });
+              }
+            }}
+          >
+            <p className="text-sm text-stone-600">
+              Le remboursement de <strong>{formatFcfa(refund.amount)}</strong> se fait par mobile money, hors plateforme. Consignez-le
+              ici une fois effectué : il est inscrit au journal.
+            </p>
+            <Field label="Motif *">
+              <input required minLength={3} className={inputClass} value={refund.reason} onChange={(e) => setRefund({ ...refund, reason: e.target.value })} />
+            </Field>
+            <Field label="Référence de la transaction" hint="Numéro de l'opération mobile money, pour le rapprochement">
+              <input className={inputClass} value={refund.transaction} onChange={(e) => setRefund({ ...refund, transaction: e.target.value })} />
+            </Field>
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setRefund(null)}>
+                Retour
+              </Button>
+              <Button type="submit">Consigner le remboursement</Button>
             </div>
           </form>
         )}
