@@ -34,9 +34,16 @@ node tutoriels/monter.mjs ../../var/tutoriels/prises ../../var/tutoriels/videos
   l'écran) et le texte de la voix off. Le rythme suit la voix : chaque phrase dispose du temps
   nécessaire à sa lecture (environ 2,6 mots par seconde).
 - `tutoriels/lib.mjs` : capture de l'écran en pleine définition, curseur (ordinateur) ou doigt
-  (téléphone) visibles, saisie au clavier visible.
-- `tutoriels/monter.mjs` : habillage aux couleurs de la Ligue, cadre de téléphone ou de
-  navigateur, sous-titres en fondu, carton de titre, version complète, script de voix off.
+  (téléphone) visibles, saisie au clavier visible ; chaque clic, saisie, défilement et
+  changement de page est horodaté pour le montage.
+- `tutoriels/studio.html` : la composition de chaque image — fond animé aux couleurs
+  nationales, téléphone en léger relief ou fenêtre de navigateur, carton d'ouverture animé,
+  carte d'étape, narration affichée mot à mot au rythme de la voix, barre de diffusion en pied
+  de page (étapes du chapitre, avancement).
+- `tutoriels/monter.mjs` : calcule le mouvement de caméra (zoom amorti sur le clic ou la
+  saisie en cours, retour au plan large aux changements de page), capture le studio image par
+  image (30 images/s) et encode avec ffmpeg ; ouverture et fermeture animées pour la version
+  complète, script de la voix off.
 
 Prérequis : `ffmpeg` installé sur la machine ; le chapitre 6 (contrôle) utilise le billet
 acheté au chapitre 2, à enregistrer avant. Les données affichées sont celles de la

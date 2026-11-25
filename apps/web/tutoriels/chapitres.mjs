@@ -21,7 +21,18 @@ export const CHAPITRES = [
       await t.say("Les scores en direct", "Les matchs en cours s'affichent en direct : le score et la minute se mettent à jour sans recharger la page.");
       await t.scroll(700);
       await t.say("Résultats et classements", "Plus bas, les derniers résultats et le classement des deux poules, calculés automatiquement dès qu'une feuille de match est validée.");
-      await t.scroll(1500, 1400);
+      await t.scroll(1300, 1200);
+      const race = p.getByRole("region", { name: "La course aux trophées" });
+      await race.evaluate((el) => el.scrollIntoView({ block: "start", behavior: "smooth" }));
+      await t.pause(900);
+      await t.say("La course aux cinq trophées", "La course aux cinq trophées de la Ligue se suit en direct : vainqueur, meilleur buteur, meilleur gardien, homme du match et meilleur joueur, à partir des feuilles de match validées et des votes du public.");
+      // On parcourt les cinq cartes pendant la narration, sans dépasser la section
+      for (let i = 0; i < 4; i++) {
+        await t.pause(2200);
+        await t.scroll(300, 900);
+      }
+      await t.waitVoice();
+      await t.scroll(900, 1000);
       await t.say("Les 20 équipes", "Le mur des blasons réunit les vingt équipes. Un appui ouvre la page du club.");
       const wall = p.getByRole("region", { name: "Les équipes" });
       await wall.scrollIntoViewIfNeeded();

@@ -56,6 +56,8 @@ export class Take {
     this.out = out;
     this.frames = [];
     this.captions = [];
+    // Actions (clics, saisies, défilements, changements de page) : le montage zoome dessus
+    this.events = [];
     this.voiceUntil = 0;
   }
 
@@ -71,6 +73,9 @@ export class Take {
     this.page = await this.ctx.newPage();
     this.page.setDefaultTimeout(20_000);
     this.page.on("dialog", (d) => d.accept());
+    this.page.on("framenavigated", (f) => {
+      if (f === this.page.mainFrame() && this.t0) this.events.push({ t: this.now(), kind: "nav" });
+    });
     this.cdp = await this.ctx.newCDPSession(this.page);
     this.cdp.on("Page.screencastFrame", async (f) => {
       const file = path.join(this.out, "frames", `${String(this.frames.length).padStart(5, "0")}.jpg`);
@@ -81,6 +86,10 @@ export class Take {
     await this.cdp.send("Page.startScreencast", { format: "jpeg", quality: 90, maxWidth: 3000, maxHeight: 3000 });
     this.t0 = Date.now() / 1000;
     return this.page;
+  }
+
+  now() {
+    return Date.now() / 1000 - this.t0;
   }
 
   /** Sous-titre à l'écran et texte de la voix off ; le pas suivant attend la fin de la phrase. */
@@ -113,6 +122,7 @@ export class Take {
       await this.page.waitForTimeout(650);
     }
     const box = await locator.boundingBox();
+    if (box) this.events.push({ t: this.now(), kind: "tap", x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height });
     if (box) {
       await this.page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 14 });
       await this.page.waitForTimeout(hold);
@@ -123,10 +133,14 @@ export class Take {
   async type(locator, text) {
     await this.tap(locator, { hold: 200 });
     await locator.fill("");
+    const start = this.now();
     await locator.pressSequentially(text, { delay: 55 });
+    const box = await locator.boundingBox().catch(() => null);
+    if (box) this.events.push({ t: start, end: this.now(), kind: "type", x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height });
   }
 
   async scroll(dy, ms = 900) {
+    this.events.push({ t: this.now(), kind: "scroll", dy });
     await this.page.evaluate((y) => window.scrollBy({ top: y, behavior: "smooth" }), dy);
     await this.page.waitForTimeout(ms);
   }
@@ -140,7 +154,14 @@ export class Take {
     fs.writeFileSync(
       path.join(this.out, "take.json"),
       JSON.stringify(
-        { mobile: this.mobile, end, frames: this.frames.map((f) => ({ file: f.file, t: f.t - this.t0 })), captions: this.captions },
+        {
+          mobile: this.mobile,
+          viewport: this.mobile ? { width: 412, height: 915 } : { width: 1440, height: 900 },
+          end,
+          frames: this.frames.map((f) => ({ file: f.file, t: f.t - this.t0 })),
+          captions: this.captions,
+          events: this.events,
+        },
         null,
         1,
       ),
