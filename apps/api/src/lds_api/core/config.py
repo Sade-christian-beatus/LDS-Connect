@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     jwt_access_ttl_minutes: int = 15
     jwt_refresh_ttl_days: int = 14
     refresh_cookie_secure: bool = False
+    # Rôles tenus d'activer la double authentification (codes séparés par des virgules).
+    # Non renseigné : super administrateur et administration en production, aucun ailleurs
+    # (démonstration et tests sans application d'authentification).
+    mfa_required_roles: str | None = None
 
     # Chiffrement des données personnelles (AES-256-GCM) — clé base64 de 32 octets
     field_encryption_key: SecretStr = SecretStr("")
@@ -82,6 +86,14 @@ class Settings(BaseSettings):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
 
+    @property
+    def mfa_roles(self) -> set[str]:
+        if self.mfa_required_roles is None:
+            if self.environment == "production":
+                return {"super_admin", "admin_competition"}
+            return set()
+        return {r.strip() for r in self.mfa_required_roles.split(",") if r.strip()}
+
     def production_problems(self) -> list[str]:
         """Réglages incompatibles avec une mise en service (vérifiés au démarrage en production)."""
         problems: list[str] = []
@@ -90,6 +102,8 @@ class Settings(BaseSettings):
         for name in ("field_encryption_key", "blind_index_key", "licence_signing_key"):
             if not getattr(self, name).get_secret_value():
                 problems.append(f"{name.upper()} est vide (make keys)")
+        if "super_admin" not in self.mfa_roles:
+            problems.append("MFA_REQUIRED_ROLES doit inclure super_admin (double authentification)")
         if not self.refresh_cookie_secure:
             problems.append("REFRESH_COOKIE_SECURE doit valoir true (HTTPS)")
         if self.payment_provider == "simulator":

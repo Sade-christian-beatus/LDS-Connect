@@ -40,7 +40,7 @@ export function menuFor(user: User): Item[] {
 
 /** Écran d'arrivée après connexion : l'outil principal du rôle. */
 export function landingFor(user: User): string {
-  if (user.must_change_password) return "/compte";
+  if (user.must_change_password || user.mfa_setup_required) return "/compte";
   const p = new Set(user.permissions);
   if (p.has("team:manage")) return "/admin/equipes";
   if (p.has("squad:write") && user.team_id) return `/admin/equipes/${user.team_id}`;
@@ -61,7 +61,7 @@ export function AppHeader() {
   const pathname = usePathname();
   const logo = useBrandLogo();
   // Mot de passe provisoire : aucun menu tant qu'il n'est pas changé
-  const menu = user && !user.must_change_password ? menuFor(user) : [];
+  const menu = user && !user.must_change_password && !user.mfa_setup_required ? menuFor(user) : [];
   const sidebar = menu.length >= SIDEBAR_MIN;
   const active = (href: string) => pathname.startsWith(href);
 

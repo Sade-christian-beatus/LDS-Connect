@@ -144,6 +144,22 @@ def cmd_purge(args: argparse.Namespace) -> None:
     )
 
 
+def cmd_reset_mfa(args: argparse.Namespace) -> None:
+    from sqlalchemy import select
+
+    from lds_api.db.session import SessionLocal
+    from lds_api.models import User
+    from lds_api.services import mfa
+
+    with SessionLocal() as db:
+        user = db.scalar(select(User).where(User.email == args.email.strip().lower()))
+        if user is None:
+            raise SystemExit(f"Aucun compte {args.email}")
+        mfa.reset(db, None, user)
+        db.commit()
+    print(f"Double authentification réinitialisée pour {args.email} : à réactiver à la connexion.")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="lds_api.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -177,6 +193,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--password-stdin", action="store_true", help="Lit le mot de passe sur l'entrée standard"
     )
     p.set_defaults(func=cmd_create_user)
+
+    p = sub.add_parser("reset-mfa", help="Réinitialise la double authentification d'un compte")
+    p.add_argument("--email", required=True)
+    p.set_defaults(func=cmd_reset_mfa)
 
     p = sub.add_parser("purge", help="Efface les données arrivées au terme de leur conservation")
     p.add_argument("--dry-run", action="store_true", help="Compte sans rien effacer")

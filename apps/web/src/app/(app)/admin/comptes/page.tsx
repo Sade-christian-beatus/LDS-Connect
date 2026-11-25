@@ -61,6 +61,17 @@ function Accounts() {
     }
   }
 
+  async function resetMfa(u: UserAdmin) {
+    if (!window.confirm(`Réinitialiser la double authentification de ${u.full_name} (téléphone perdu ou changé) ? Il ou elle devra la réactiver.`)) return;
+    try {
+      await api(`/admin/users/${u.id}/reset-mfa`, { method: "POST" });
+      setNotice({ tone: "ok", text: `${u.full_name} : double authentification réinitialisée (journalisé)` });
+      reload();
+    } catch (e) {
+      fail(e);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -98,6 +109,17 @@ function Accounts() {
                       <Badge tone="amber">Mot de passe provisoire</Badge>
                     </span>
                   )}
+                  {u.mfa_enabled ? (
+                    <span className="mt-0.5 block">
+                      <Badge tone="blue">Double authentification</Badge>
+                    </span>
+                  ) : (
+                    u.mfa_required && (
+                      <span className="mt-0.5 block">
+                        <Badge tone="amber">Double auth. à activer</Badge>
+                      </span>
+                    )
+                  )}
                 </td>
                 <td className="px-2 py-1.5">
                   <div className="flex flex-wrap justify-end gap-x-3">
@@ -107,6 +129,11 @@ function Accounts() {
                     <Button variant="link" onClick={() => reset(u)}>
                       Nouveau mot de passe
                     </Button>
+                    {u.mfa_enabled && u.id !== me?.id && (
+                      <Button variant="link" onClick={() => resetMfa(u)}>
+                        Réinitialiser la double auth.
+                      </Button>
+                    )}
                     {u.id !== me?.id && (
                       <Button variant="link" className={u.is_active ? "!text-lds-red" : ""} onClick={() => toggle(u)}>
                         {u.is_active ? "Désactiver" : "Réactiver"}

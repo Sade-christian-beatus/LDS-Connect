@@ -40,6 +40,13 @@ Puis éditer `.env` :
 | `TICKET_ALLOWED_COUNTRY_CODES` | `226` : indicatifs acceptés pour l'achat de billets |
 | `PAYMENT_CALLBACK_BASE_URL` | adresse publique de l'API vue par l'agrégateur (vide = `API_BASE_URL`) |
 
+> **Double authentification** : obligatoire en production pour le super administrateur et
+> l'administration de la Ligue (`MFA_REQUIRED_ROLES` pour changer la liste). À la première
+> connexion, ces comptes n'ont accès qu'à « Mon compte » tant qu'ils ne l'ont pas activée
+> (application Google Authenticator, Microsoft Authenticator, FreeOTP…). Téléphone perdu : le
+> super administrateur la réinitialise depuis « Comptes » ; pour son propre compte, sur le
+> serveur : `docker compose exec api python -m lds_api.cli reset-mfa --email …`.
+
 > **Contrôle au démarrage** : avec `ENVIRONMENT=production`, l'API **refuse de démarrer** et
 > liste les réglages à corriger si l'un de ces points n'est pas respecté : `JWT_SECRET` d'au
 > moins 32 caractères, clés de chiffrement et de signature renseignées,

@@ -13,7 +13,7 @@ from lds_api.core.errors import BusinessError, NotFound
 from lds_api.core.rbac import Perm
 from lds_api.models import Match, MatchSheet, Team, User
 from lds_api.models.enums import RoleCode, SheetStatus
-from lds_api.services import audit, seasons
+from lds_api.services import audit, mfa, seasons
 from lds_api.services import matchsheet as sheets
 from lds_api.services import users as svc
 
@@ -35,6 +35,8 @@ class UserAdminOut(BaseModel):
     team: TeamBrief | None
     is_active: bool
     must_change_password: bool
+    mfa_enabled: bool = False
+    mfa_required: bool = False
     last_login_at: datetime | None
     created_at: datetime
 
@@ -85,6 +87,8 @@ def _out(db, u: User) -> UserAdminOut:
         team=TeamBrief(id=team.id, name=team.name) if team else None,
         is_active=u.is_active,
         must_change_password=u.must_change_password,
+        mfa_enabled=mfa.enabled(u),
+        mfa_required=mfa.required_for(u),
         last_login_at=u.last_login_at,
         created_at=u.created_at,
     )
@@ -120,6 +124,17 @@ def reset_password(user_id: uuid.UUID, db: DbSession, actor: UserManager):
     password = svc.reset_password(db, actor, user)
     db.commit()
     return CredentialsOut(user=_out(db, user), temporary_password=password)
+
+
+@router.post("/admin/users/{user_id}/reset-mfa", response_model=UserAdminOut)
+def reset_mfa(user_id: uuid.UUID, db: DbSession, actor: UserManager):
+    """Téléphone perdu : la double authentification est à réactiver à la prochaine connexion."""
+    user = svc.get_user(db, user_id)
+    if user.id == actor.user.id:
+        raise BusinessError("Réinitialisez la vôtre par la commande reset-mfa du serveur")
+    mfa.reset(db, actor, user)
+    db.commit()
+    return _out(db, user)
 
 
 # --- Mon compte -------------------------------------------------------------------
