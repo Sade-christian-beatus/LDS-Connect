@@ -33,6 +33,8 @@ const spoken = (page: Page) => page.evaluate(() => (window as unknown as { __spo
 
 test("le classement est lu ligne par ligne, avec le nom des colonnes", async ({ page }) => {
   await page.goto("/classements");
+  // Contenu chargé d'abord (sinon seul « Chargement… » est lu, fidèlement)
+  await expect(page.getByRole("table").first()).toBeVisible();
   await page.getByRole("button", { name: "Écouter la page" }).click();
   await expect.poll(async () => (await spoken(page)).length).toBeGreaterThan(10);
   const text = (await spoken(page)).join("\n");
@@ -44,7 +46,7 @@ test("le classement est lu ligne par ligne, avec le nom des colonnes", async ({ 
 });
 
 test("commandes de lecture : pause, reprise, arrêt", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "networkidle" });
   await page.evaluate(() => ((window as unknown as { __hold: boolean }).__hold = true));
   await page.getByRole("button", { name: "Écouter la page" }).click();
   const bar = page.getByRole("toolbar", { name: "Lecture à voix haute" });
@@ -58,4 +60,14 @@ test("commandes de lecture : pause, reprise, arrêt", async ({ page }) => {
   await bar.getByRole("button", { name: "Arrêter la lecture" }).click();
   await expect(bar).toBeHidden();
   await expect(page.locator("[data-reading]")).toHaveCount(0);
+});
+
+test("la lecture s'arrête quand on change de page", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
+  await page.evaluate(() => ((window as unknown as { __hold: boolean }).__hold = true));
+  await page.getByRole("button", { name: "Écouter la page" }).click();
+  await expect(page.getByRole("toolbar", { name: "Lecture à voix haute" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Navigation principale" }).getByRole("link", { name: "Classements" }).click();
+  await expect(page).toHaveURL(/\/classements$/);
+  await expect(page.getByRole("toolbar", { name: "Lecture à voix haute" })).toBeHidden();
 });

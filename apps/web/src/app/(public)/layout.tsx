@@ -64,9 +64,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               >
                 Mes billets
               </Link>
-              <Suspense>
-                <ListenButton />
-              </Suspense>
+              <ListenButton />
               <ThemeToggle />
             </div>
           </div>

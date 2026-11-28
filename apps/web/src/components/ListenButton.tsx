@@ -4,7 +4,7 @@
 // pour celles qui lisent difficilement le français ; les personnes aveugles gardent leur
 // lecteur d'écran, plus complet.
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { frenchVoice, type Passage, passages } from "@/lib/read-aloud";
 
 const RATE_KEY = "lds-ecoute-vitesse";
@@ -24,6 +24,19 @@ function mark(el: HTMLElement | null) {
   el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
 }
 
+/** Appelle `onChange` à chaque changement d'adresse (pas au premier affichage). À part du
+ * bouton : il doit être sous Suspense, et peut être recréé sans interrompre la lecture. */
+function OnNavigate({ onChange }: { onChange: () => void }) {
+  const pathname = usePathname();
+  const shown = useRef(pathname);
+  useEffect(() => {
+    if (shown.current === pathname) return;
+    shown.current = pathname;
+    Promise.resolve().then(onChange);
+  }, [pathname, onChange]);
+  return null;
+}
+
 export function ListenButton() {
   const [supported, setSupported] = useState(false);
   const [state, setState] = useState<State>("idle");
@@ -33,7 +46,6 @@ export function ListenButton() {
   const list = useRef<Passage[]>([]);
   const pos = useRef(0);
   const run = useRef(0); // chaque lecture porte un numéro : une phrase annulée ne relance rien
-  const pathname = usePathname();
 
   useEffect(() => {
     Promise.resolve().then(() => {
@@ -84,10 +96,6 @@ export function ListenButton() {
     setState("idle");
   }, []);
 
-  // Changement de page : la lecture s'arrête
-  useEffect(() => {
-    if (supported) Promise.resolve().then(stop);
-  }, [pathname, supported, stop]);
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
 
   const start = () => {
@@ -118,6 +126,10 @@ export function ListenButton() {
 
   return (
     <>
+      {/* Changement de page : la lecture s'arrête */}
+      <Suspense>
+        <OnNavigate onChange={stop} />
+      </Suspense>
       <button
         type="button"
         onClick={state === "idle" ? start : stop}
