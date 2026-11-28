@@ -77,7 +77,7 @@ export function AppHeader() {
         </div>
         <div className="flex items-center justify-between gap-2 px-3 py-2 text-[13px] sm:px-4 sm:text-sm">
           <Link href={user ? landingFor(user) : "/"} className="flex items-center gap-2 font-black tracking-tight">
-            <BrandLogo logoUrl={logo} size="sm" />
+            <BrandLogo logoUrl={logo} size="sm" alt="" />
             <span className="leading-tight">
               <span className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-lds-gold sm:block">LDS Connect</span>
               <span className="block">Officiels</span>
