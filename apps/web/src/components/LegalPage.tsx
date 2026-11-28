@@ -6,6 +6,7 @@ export const LEGAL_LINKS = [
   { href: "/mentions-legales", label: "Mentions légales" },
   { href: "/confidentialite", label: "Confidentialité" },
   { href: "/conditions-de-vente", label: "Conditions de vente" },
+  { href: "/accessibilite", label: "Accessibilité" },
 ];
 
 export function LegalPage({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
