@@ -1,5 +1,6 @@
 // Bandeau d'un match (accueil, billetterie, billets) : équipes en grand, date, stade.
 import { PitchLines } from "./Illustrations";
+import { scoreSpeech } from "@/lib/a11y";
 import { formatDate, formatTime, PHASE_LABEL } from "@/lib/format";
 import type { Match } from "@/lib/types";
 import { TeamBadge } from "./TeamBadge";
@@ -27,14 +28,15 @@ export function MatchHero({ match, children, compact = false }: { match: Match; 
         <div className="mt-3 flex items-center gap-3">
           <Team team={match.home} />
           <div className="w-28 shrink-0 text-center">
+            {(live || done) && <p className="sr-only">{scoreSpeech(match)}</p>}
             {live || done ? (
-              <p className={`text-4xl font-black tabular-nums ${live ? "text-yellow-300" : ""}`}>
+              <p aria-hidden className={`text-4xl font-black tabular-nums ${live ? "text-yellow-300" : ""}`}>
                 {match.home_score}–{match.away_score}
               </p>
             ) : (
               <p className="text-3xl font-black tabular-nums">{formatTime(match.kickoff_at) || "—"}</p>
             )}
-            <p className="mt-1 text-xs text-green-100">
+            <p aria-hidden={live || done || undefined} className="mt-1 text-xs text-green-100">
               {live ? `● En direct ${match.live_minute ?? 0}'` : done ? "Terminé" : formatDate(match.kickoff_at)}
             </p>
           </div>

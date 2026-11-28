@@ -45,29 +45,41 @@ export function MatchLogList({ matches, teamId }: { matches: MatchLog[]; teamId?
                 res === "V" ? "bg-green-600" : res === "D" ? "bg-lds-red" : "bg-stone-400"
               }`}
               title={res === "V" ? "Victoire" : res === "D" ? "Défaite" : "Nul"}
+              aria-hidden
             >
               {res ?? "–"}
             </span>
+            <span className="sr-only">{res === "V" ? "Victoire" : res === "D" ? "Défaite" : res === "N" ? "Match nul" : "Score non disponible"}</span>
             <span className="min-w-40 flex-1">
               <span className="font-semibold">
                 {home ? "contre" : "à"} {opp ? <Link href={`/equipes/${opp.slug}`} className="hover:underline">{opp.short_name}</Link> : "?"}
               </span>
-              <span className="ml-2 tabular-nums text-muted">
+              <span aria-hidden className="ml-2 tabular-nums text-muted">
                 {mine}–{theirs}
               </span>
+              {mine != null && <span className="sr-only">, {mine} à {theirs}</span>}
               <span className="block text-xs text-subtle">
                 {m.kickoff_at ? new Date(m.kickoff_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }) : ""}
-                {m.round_number ? ` · J${m.round_number}` : ""}
+                {m.round_number ? (
+                  <>
+                    {" · "}
+                    <span aria-hidden>J{m.round_number}</span>
+                    <span className="sr-only">journée {m.round_number}</span>
+                  </>
+                ) : (
+                  ""
+                )}
               </span>
             </span>
             <span className="w-20 text-xs text-muted">
-              {l.started ? "Titulaire" : "Entré"} · {l.minutes}&apos;
+              {l.started ? "Titulaire" : "Entré"} · <span aria-hidden>{l.minutes}&apos;</span>
+              <span className="sr-only">{l.minutes} minutes jouées</span>
             </span>
             <span className="flex min-w-24 justify-end gap-1.5 text-xs">
-              {l.goals > 0 && <span className="rounded-full bg-qualify px-2 py-0.5 font-bold">⚽ {l.goals}</span>}
-              {l.assists > 0 && <span className="rounded-full bg-soft px-2 py-0.5 font-bold">🅰 {l.assists}</span>}
-              {l.yellow_cards > 0 && <span className="inline-block h-4 w-3 rounded-sm bg-yellow-400" title="Carton jaune" />}
-              {l.red_cards > 0 && <span className="inline-block h-4 w-3 rounded-sm bg-lds-red" title="Carton rouge" />}
+              {l.goals > 0 && <span className="rounded-full bg-qualify px-2 py-0.5 font-bold"><span aria-hidden>⚽ {l.goals}</span><span className="sr-only">{l.goals} but{l.goals > 1 ? "s" : ""}</span></span>}
+              {l.assists > 0 && <span className="rounded-full bg-soft px-2 py-0.5 font-bold"><span aria-hidden>🅰 {l.assists}</span><span className="sr-only">{l.assists} passe{l.assists > 1 ? "s" : ""} décisive{l.assists > 1 ? "s" : ""}</span></span>}
+              {l.yellow_cards > 0 && <span className="inline-block h-4 w-3 rounded-sm bg-yellow-400" title="Carton jaune" role="img" aria-label="Carton jaune" />}
+              {l.red_cards > 0 && <span className="inline-block h-4 w-3 rounded-sm bg-lds-red" title="Carton rouge" role="img" aria-label="Carton rouge" />}
               {l.clean_sheet && <span className="rounded-full bg-soft px-2 py-0.5 font-bold">Clean sheet</span>}
             </span>
           </li>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { scoreSpeech } from "@/lib/a11y";
 import { formatTime, PHASE_LABEL } from "@/lib/format";
 import type { Match } from "@/lib/types";
 import { TeamBadge } from "./TeamBadge";
@@ -42,8 +43,10 @@ export function MatchCard({ match }: { match: Match }) {
       <span aria-hidden className="absolute inset-y-0 right-0 w-1.5" style={{ backgroundColor: match.away?.primary_color ?? "transparent" }} />
       <Side team={match.home} align="left" winner={homeWins} />
       <div className="w-[4.25rem] shrink-0 text-center sm:w-24">
+        {/* Score lu en toutes lettres (« 1 à 0, en direct, 66e minute ») ; l'affichage compact est masqué au lecteur d'écran */}
+        {showScore && <span className="sr-only">{scoreSpeech(match)}</span>}
         {showScore ? (
-          <div className={`text-2xl font-black tabular-nums tracking-tight ${live ? "text-lds-red" : ""}`}>
+          <div aria-hidden className={`text-2xl font-black tabular-nums tracking-tight ${live ? "text-lds-red" : ""}`}>
             {match.home_score}
             <span className="mx-1 text-subtle">–</span>
             {match.away_score}
@@ -51,10 +54,10 @@ export function MatchCard({ match }: { match: Match }) {
         ) : (
           <div className="inline-block rounded-lg bg-soft px-2.5 py-1 text-base font-bold tabular-nums">{formatTime(match.kickoff_at) || "—"}</div>
         )}
-        <div className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
+        <div aria-hidden={showScore || undefined} className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
           {live ? (
             <span className="inline-flex items-center gap-1 font-bold text-lds-red">
-              <span className="h-1.5 w-1.5 animate-live rounded-full bg-lds-red" /> {match.live_minute ?? 0}&apos;
+              <span aria-hidden className="h-1.5 w-1.5 animate-live rounded-full bg-lds-red" /> {match.live_minute ?? 0}&apos;
             </span>
           ) : done ? (
             match.home_penalties != null ? (

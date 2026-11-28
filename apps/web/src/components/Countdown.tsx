@@ -24,14 +24,20 @@ export function Countdown({ to }: { to: string }) {
     [p.m, "min"],
     [p.s, "s"],
   ];
+  const plural = (n: number, w: string) => `${n} ${w}${n > 1 ? "s" : ""}`;
+  // Lecteur d'écran : une phrase à la minute près, plutôt que des chiffres qui changent chaque seconde
+  const spoken = [p.d && plural(p.d, "jour"), p.h && plural(p.h, "heure"), plural(p.m, "minute")].filter(Boolean).join(", ");
   return (
-    <div className="flex justify-center gap-2" role="timer" aria-label="Temps avant le coup d'envoi">
-      {cells.map(([v, l]) => (
-        <div key={l} className="w-16 rounded-xl bg-white/10 py-1.5 text-center backdrop-blur">
-          <div className="text-2xl font-black tabular-nums">{String(v).padStart(2, "0")}</div>
-          <div className="text-[10px] uppercase tracking-wider text-green-100">{l}</div>
-        </div>
-      ))}
-    </div>
+    <>
+      <p className="sr-only">Coup d&apos;envoi dans {spoken}.</p>
+      <div aria-hidden className="flex justify-center gap-2">
+        {cells.map(([v, l]) => (
+          <div key={l} className="w-16 rounded-xl bg-white/10 py-1.5 text-center backdrop-blur">
+            <div className="text-2xl font-black tabular-nums">{String(v).padStart(2, "0")}</div>
+            <div className="text-[10px] uppercase tracking-wider text-green-100">{l}</div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

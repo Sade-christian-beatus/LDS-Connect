@@ -3,12 +3,24 @@
 
 const SIZES = { sm: "h-9", md: "h-12", lg: "h-20", xl: "h-32" };
 
-export function BrandLogo({ logoUrl, size = "md", className = "" }: { logoUrl?: string | null; size?: keyof typeof SIZES; className?: string }) {
+/** `alt=""` quand le nom de la Ligue est écrit juste à côté (en-tête, pied de page) : le lecteur
+ * d'écran ne le lit alors qu'une fois. */
+export function BrandLogo({
+  logoUrl,
+  size = "md",
+  className = "",
+  alt = "Ligue de la Souveraineté",
+}: {
+  logoUrl?: string | null;
+  size?: keyof typeof SIZES;
+  className?: string;
+  alt?: string;
+}) {
   if (logoUrl) {
     return (
       <span className={`inline-flex shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow ${SIZES[size]} ${className}`}>
         {/* eslint-disable-next-line @next/next/no-img-element -- logo servi par l'API (fichier versionné, cache long) */}
-        <img src={logoUrl} alt="Ligue de la Souveraineté" className="h-full w-auto object-contain" />
+        <img src={logoUrl} alt={alt} className="h-full w-auto object-contain" />
       </span>
     );
   }

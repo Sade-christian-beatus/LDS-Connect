@@ -145,4 +145,5 @@ docs/              Architecture, déploiement, données personnelles, questions 
 - [Architecture](docs/ARCHITECTURE.md)
 - [Déploiement](docs/DEPLOIEMENT.md) — serveur Linux + Docker, TLS, sauvegardes, mises à jour
 - [Données personnelles](docs/DONNEES_PERSONNELLES.md) — mineurs, chiffrement, journalisation, CIL
+- [Accessibilité](docs/ACCESSIBILITE.md) — lecteurs d'écran, règles pour les nouveaux écrans, contrôle automatique
 - [Questions ouvertes](docs/QUESTIONS_OUVERTES.md) — points à trancher par la Ligue

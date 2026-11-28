@@ -17,7 +17,7 @@
   --color-line: #e5e3dc;
   --color-ink: #1c1917;
   --color-muted: #57534e;
-  --color-subtle: #78716c;
+  --color-subtle: #716a65; /* 4,7:1 au moins sur les fonds clairs (WCAG AA) */
   --color-heading: #14532d;
   --color-qualify: #ecfdf3;
 
@@ -46,6 +46,28 @@
   --color-heading: #c7f0d4;
   --color-qualify: #12301e;
   color-scheme: dark;
+}
+
+/* Accessibilité : contour de focus bien visible au clavier (lecteurs d'écran, navigation sans
+   souris), sur fond clair comme sur fond foncé */
+:focus-visible {
+  outline: 3px solid var(--color-lds-gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #0a3a1e;
+}
+/* Cible d'un lien d'évitement : pas de contour sur le contenu lui-même */
+main:focus {
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Espace officiels : place du menu latéral sur grand écran */

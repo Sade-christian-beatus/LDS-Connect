@@ -32,7 +32,7 @@ async function Tables() {
     <>
       <div className="grid gap-6 xl:grid-cols-2">
         {standings.map((p) => (
-          <StandingsTable key={p.pool_code} pool={p} />
+          <StandingsTable key={p.pool_code} pool={p} headingLevel={2} />
         ))}
       </div>
       <p className="text-xs text-subtle">

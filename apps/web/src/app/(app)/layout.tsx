@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { SkipLink } from "@/components/SkipLink";
 import { AuthProvider } from "@/lib/auth";
 import { AppHeader } from "./app-header";
 
@@ -21,13 +22,14 @@ function HeaderShell() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
+      <SkipLink />
       {/* L'en-tête lit l'URL (menu actif) : rendu côté navigateur, coquille statique en attendant */}
       <Suspense fallback={<HeaderShell />}>
         <AppHeader />
       </Suspense>
       {/* Menu latéral (grand écran, nombreux outils) : le contenu se décale d'autant */}
       <div className="app-main">
-        <main className="mx-auto max-w-6xl px-4 py-5">{children}</main>
+        <main id="contenu" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-5">{children}</main>
       </div>
     </AuthProvider>
   );
