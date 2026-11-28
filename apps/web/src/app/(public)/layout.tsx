@@ -3,6 +3,7 @@ import { LEGAL_LINKS } from "@/components/LegalPage";
 import { LeagueFacts } from "@/components/SeasonFacts";
 import { Suspense } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
+import { ListenButton } from "@/components/ListenButton";
 import { SkipLink } from "@/components/SkipLink";
 import { BottomTabs, TopNav } from "@/components/PublicNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -63,6 +64,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               >
                 Mes billets
               </Link>
+              <Suspense>
+                <ListenButton />
+              </Suspense>
               <ThemeToggle />
             </div>
           </div>

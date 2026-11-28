@@ -18,6 +18,23 @@ l'engagement aux visiteurs et le moyen de signaler une difficulté.
 | Phases finales | `components/BracketTree.tsx` | liste des matchs dans l'ordre de la compétition |
 | Compte à rebours | `components/Countdown.tsx` | phrase à la minute près |
 | Logos | `BrandLogo`, `TeamBadge` | décoratifs (`alt=""`) quand le nom est écrit à côté |
+| Écouter la page | `components/ListenButton.tsx`, `lib/read-aloud.ts` | lecture à voix haute du contenu principal (voix de l'appareil) |
+
+## « Écouter la page »
+
+Bouton dans l'en-tête du site public. Il lit `main#contenu` avec la synthèse vocale du
+navigateur (`speechSynthesis`) : aucune bibliothèque, aucun service extérieur, aucun son envoyé
+par Internet. Pour les personnes malvoyantes et pour celles qui lisent difficilement le
+français ; les personnes aveugles gardent leur lecteur d'écran, plus complet.
+
+- Le texte lu est celui du lecteur d'écran : les éléments `aria-hidden` sont sautés, les textes
+  `sr-only` sont lus (« 1 à 0, en direct, 66e minute »).
+- Un tableau se lit ligne par ligne avec le nom des colonnes (« Rang 1, Équipe…, Points 6 »).
+- Passages de 220 caractères au plus (certaines voix s'arrêtent sur les phrases longues).
+- Pause, passage précédent ou suivant, vitesse (normale, lente, rapide, gardée sur l'appareil),
+  arrêt ; la lecture s'arrête au changement de page.
+- Un élément marqué `data-read-aloud-skip` n'est jamais lu.
+- Test : `e2e/ecouter.spec.ts` (voix remplacée par un enregistreur).
 
 ## Règles pour les nouveaux écrans
 

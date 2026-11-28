@@ -45,7 +45,22 @@ export default function AccessibilitePage() {
       </section>
 
       <section>
-        <h2>3. Ce qui est adapté</h2>
+        <h2>3. Écouter la page</h2>
+        <p>
+          Le bouton <strong>« Écouter la page »</strong>, en haut de chaque page (icône de haut-parleur sur téléphone), lit
+          le contenu à voix haute avec la voix de votre appareil. Il est utile si vous voyez mal ou si vous lisez
+          difficilement le français. Le passage lu est surligné, et une barre permet de mettre en pause, de passer au
+          passage suivant ou précédent, et de lire plus lentement ou plus vite.
+        </p>
+        <p>
+          La voix est celle de votre téléphone ou de votre ordinateur : aucun son n&apos;est envoyé par Internet. Si la
+          lecture est en anglais, installez une voix française dans les réglages de synthèse vocale de l&apos;appareil. Les
+          langues nationales (mooré, dioula, fulfuldé) ne sont pas encore proposées par ces voix.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Ce qui est adapté</h2>
         <ul>
           <li>
             <strong>Scores :</strong> lus en toutes lettres, par exemple « 2 à 1, en direct, 66e minute ». Pendant un match,
@@ -74,7 +89,7 @@ export default function AccessibilitePage() {
       </section>
 
       <section>
-        <h2>4. Au stade</h2>
+        <h2>5. Au stade</h2>
         <p>
           À l&apos;entrée, présentez votre billet sur votre téléphone, ou imprimé : le contrôleur le scanne pour vous.
           [Le personnel d&apos;accueil peut vous accompagner jusqu&apos;à votre place : signalez-vous au contrôle.]
@@ -82,7 +97,7 @@ export default function AccessibilitePage() {
       </section>
 
       <section>
-        <h2>5. Limites connues</h2>
+        <h2>6. Limites connues</h2>
         <ul>
           <li>
             L&apos;espace des officiels (feuilles de match, contrôle des entrées) s&apos;utilise au clavier, mais n&apos;a pas
@@ -99,7 +114,7 @@ export default function AccessibilitePage() {
       </section>
 
       <section>
-        <h2>6. Signaler une difficulté</h2>
+        <h2>7. Signaler une difficulté</h2>
         <p>
           Une page vous pose problème ? Dites-le nous : [adresse électronique] · [téléphone ou WhatsApp]. Précisez la page,
           votre appareil et votre lecteur d&apos;écran si possible. Nous répondons sous [7 jours] et vous donnons

@@ -55,6 +55,13 @@
   outline-offset: 2px;
   box-shadow: 0 0 0 5px #0a3a1e;
 }
+/* « Écouter la page » : passage en cours de lecture, surligné */
+[data-reading] {
+  outline: 3px solid var(--color-lds-gold);
+  outline-offset: 3px;
+  border-radius: 6px;
+  background-color: color-mix(in srgb, var(--color-lds-gold) 14%, transparent);
+}
 /* Cible d'un lien d'évitement : pas de contour sur le contenu lui-même */
 main:focus {
   outline: none;
