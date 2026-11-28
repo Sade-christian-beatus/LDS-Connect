@@ -20,12 +20,14 @@ async function audit(page: Page, path: string) {
 
 async function pages(page: Page) {
   const paths = ["/", "/calendrier", "/resultats", "/classements", "/statistiques", "/equipes", "/billetterie", "/votes", "/billets", "/accessibilite"];
-  // Une fiche d'équipe et une page d'achat, prises dans les liens du site
-  await page.goto("/equipes");
-  const team = await page.locator('main a[href^="/equipes/"]').first().getAttribute("href");
+  // Une fiche d'équipe et une page d'achat, prises dans les liens du site quand elles existent
+  // (sur une base neuve, aucun billet n'est encore en vente) : lecture sans attente
+  const firstHref = (selector: string) => page.locator(selector).evaluateAll((els) => els[0]?.getAttribute("href") ?? null);
+  await page.goto("/equipes", { waitUntil: "networkidle" });
+  const team = await firstHref('main a[href^="/equipes/"]');
   if (team) paths.push(team);
-  await page.goto("/billetterie");
-  const buy = await page.locator('main a[href^="/billetterie/"]').first().getAttribute("href");
+  await page.goto("/billetterie", { waitUntil: "networkidle" });
+  const buy = await firstHref('main a[href^="/billetterie/"]');
   if (buy) paths.push(buy);
   return paths;
 }
