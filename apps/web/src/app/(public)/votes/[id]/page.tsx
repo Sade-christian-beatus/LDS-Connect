@@ -44,7 +44,11 @@ async function Ballot({ params }: { params: PageProps<"/votes/[id]">["params"] }
             <p className="text-xs text-subtle">{b.results.participants} votant(s).</p>
           </>
         ) : (
-          <p className="text-sm text-muted">Les résultats seront publiés le {formatDateTime(b.results_publish_at)}.</p>
+          <p className="text-sm text-muted">
+            {b.results_publish_at
+              ? `Les résultats seront publiés le ${formatDateTime(b.results_publish_at)}.`
+              : "Les résultats seront publiés après la clôture du vote."}
+          </p>
         )}
       </section>
     </>

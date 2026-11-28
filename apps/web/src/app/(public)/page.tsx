@@ -67,6 +67,9 @@ async function HomeContent() {
     <>
       {next ? (
         <section aria-label="Prochain match">
+          <h1 className="sr-only">
+            Ligue de la Souveraineté, {season.name} : accueil
+          </h1>
           <MatchHero match={next}>
             <div className="space-y-4">
               <Countdown to={next.kickoff_at!} />

@@ -18,7 +18,7 @@ export function ResultsBars({ results }: { results: Results }) {
               {o.votes} voix · {(o.share * 100).toFixed(1).replace(".", ",")} %
             </span>
           </div>
-          <div className="ml-7 mt-1 h-2 rounded bg-soft">
+          <div aria-hidden className="ml-7 mt-1 h-2 rounded bg-soft">
             <div className="h-2 rounded bg-lds-green" style={{ width: `${(o.votes / max) * 100}%` }} />
           </div>
         </li>
